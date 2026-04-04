@@ -1,0 +1,38 @@
+/* Leaflet custom styles for MyFleet */
+
+/* Fix marker icon paths */
+.leaflet-default-icon-path {
+  background-image: url('https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png');
+}
+
+/* Custom car marker animation */
+.car-marker {
+  transition: all 1s ease-in-out !important;
+}
+
+/* Remove leaflet attribution if needed */
+.leaflet-container a.leaflet-popup-close-button {
+  color: #1D1D1F;
+}
+
+/* Dark mode adjustments */
+.leaflet-container {
+  font-family: 'Poppins', sans-serif;
+}
+
+.leaflet-control-attribution {
+  font-size: 10px;
+  background: rgba(255, 255, 255, 0.8) !important;
+  padding: 2px 5px;
+  border-radius: 4px;
+}
+
+/* Remove default marker shadow since we have custom icon */
+.car-marker .leaflet-marker-shadow {
+  display: none;
+}
+
+/* Smooth transitions for map panning */
+.leaflet-container .leaflet-map-pane {
+  transition: transform 1s ease-in-out;
+}
