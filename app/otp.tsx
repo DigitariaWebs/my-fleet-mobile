@@ -58,8 +58,7 @@ export default function OTPScreen() {
   );
 
   const handleVerify = useCallback(() => {
-    // TODO: Navigate to KYC screen when implemented
-    // router.push("/kyc");
+    router.push("/kyc");
   }, [router]);
 
   const handleResend = useCallback(() => {
