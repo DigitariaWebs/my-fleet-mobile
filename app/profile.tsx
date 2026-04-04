@@ -6,6 +6,7 @@ import {
   ScrollView,
   StyleSheet,
 } from "react-native";
+import { useRouter } from "expo-router";
 import { SafeAreaView } from "react-native-safe-area-context";
 import {
   User,
@@ -23,6 +24,7 @@ import {
 import type { LucideIcon } from "lucide-react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import { BottomNav } from "@/components/BottomNav";
+import { useTheme } from "@/context/ThemeContext";
 import { loyaltyTiers, loyaltyHistory } from "@/data/mockData";
 
 const currentPoints = 2480;
@@ -41,23 +43,24 @@ const accountItems: AccountItem[] = [
 ];
 
 export default function ProfileScreen() {
-  const [darkMode, setDarkMode] = useState(true);
+  const router = useRouter();
+  const { colors, isDark, toggleTheme } = useTheme();
   const [notifications, setNotifications] = useState(true);
 
   return (
-    <SafeAreaView style={styles.safeArea} edges={["top"]}>
-      <View style={styles.container}>
+    <SafeAreaView style={[styles.safeArea, { backgroundColor: colors.surface }]} edges={["top"]}>
+      <View style={[styles.container, { backgroundColor: colors.background }]}>
         <ScrollView
           showsVerticalScrollIndicator={false}
           contentContainerStyle={styles.scrollContent}
         >
           {/* ─── Header Card ─── */}
-          <View style={styles.headerCard}>
-            <View style={styles.avatar}>
-              <Text style={styles.avatarText}>JD</Text>
+          <View style={[styles.headerCard, { backgroundColor: colors.surface }]}>
+            <View style={[styles.avatar, { borderColor: colors.border }]}>
+              <Text style={[styles.avatarText, { color: colors.text }]}>JD</Text>
             </View>
-            <Text style={styles.userName}>Jean-Pierre Dupont</Text>
-            <Text style={styles.memberSince}>
+            <Text style={[styles.userName, { color: colors.text }]}>Jean-Pierre Dupont</Text>
+            <Text style={[styles.memberSince, { color: colors.textSecondary }]}>
               Membre depuis Janvier 2024
             </Text>
             <View style={styles.verifiedBadge}>
@@ -104,7 +107,7 @@ export default function ProfileScreen() {
               <Text style={styles.sectionTitle}>Historique fidélité</Text>
               <View style={styles.historyList}>
                 {loyaltyHistory.slice(0, 3).map((item) => (
-                  <View key={item.id} style={styles.historyRow}>
+                  <View key={item.id} style={[styles.historyRow, { backgroundColor: colors.surface }]}>
                     <View style={styles.historyLeft}>
                       {item.type === "earned" ? (
                         <TrendingUp
@@ -120,10 +123,10 @@ export default function ProfileScreen() {
                         />
                       )}
                       <View>
-                        <Text style={styles.historyDescription}>
+                        <Text style={[styles.historyDescription, { color: colors.text }]}>
                           {item.description}
                         </Text>
-                        <Text style={styles.historyDate}>{item.date}</Text>
+                        <Text style={[styles.historyDate, { color: colors.textSecondary }]}>{item.date}</Text>
                       </View>
                     </View>
                     <Text
@@ -144,7 +147,7 @@ export default function ProfileScreen() {
             </View>
 
             {/* ─── Mon compte ─── */}
-            <View style={styles.menuGroup}>
+            <View style={[styles.menuGroup, { backgroundColor: colors.surface }]}>
               {accountItems.map((item, index) => {
                 const Icon = item.icon;
                 const isLast = index === accountItems.length - 1;
@@ -153,7 +156,7 @@ export default function ProfileScreen() {
                     key={index}
                     style={[
                       styles.menuRow,
-                      !isLast && styles.menuRowBorder,
+                      !isLast && styles.menuRowBorder, { borderBottomColor: colors.border },
                     ]}
                     activeOpacity={0.7}
                   >
@@ -163,7 +166,7 @@ export default function ProfileScreen() {
                         color="rgba(234, 234, 234, 0.6)"
                         strokeWidth={1.5}
                       />
-                      <Text style={styles.menuLabel}>{item.label}</Text>
+                      <Text style={[styles.menuLabel, { color: colors.text }]}>{item.label}</Text>
                     </View>
                     <ChevronRight
                       size={20}
@@ -176,7 +179,7 @@ export default function ProfileScreen() {
             </View>
 
             {/* ─── Préférences ─── */}
-            <View style={styles.menuGroup}>
+            <View style={[styles.menuGroup, { backgroundColor: colors.surface }]}>
               {/* Notifications */}
               <View style={[styles.menuRow, styles.menuRowBorder]}>
                 <View style={styles.menuLeft}>
@@ -239,24 +242,24 @@ export default function ProfileScreen() {
                     color="rgba(234, 234, 234, 0.6)"
                     strokeWidth={1.5}
                   />
-                  <Text style={styles.menuLabel}>Mode sombre</Text>
+                  <Text style={[styles.menuLabel, { color: colors.text }]}>Mode sombre</Text>
                 </View>
                 <TouchableOpacity
-                  onPress={() => setDarkMode(!darkMode)}
+                  onPress={toggleTheme}
                   activeOpacity={0.7}
                   style={[
                     styles.toggle,
                     {
-                      backgroundColor: darkMode
+                      backgroundColor: isDark
                         ? "#4A1942"
-                        : "rgba(234, 234, 234, 0.15)",
+                        : "rgba(0, 0, 0, 0.1)",
                     },
                   ]}
                 >
                   <View
                     style={[
                       styles.toggleThumb,
-                      { left: darkMode ? 24 : 4 },
+                      { left: isDark ? 24 : 4, backgroundColor: isDark ? "#EAEAEA" : "#1D1D1F" },
                     ]}
                   />
                 </TouchableOpacity>
@@ -264,7 +267,7 @@ export default function ProfileScreen() {
             </View>
 
             {/* ─── Log Out ─── */}
-            <TouchableOpacity style={styles.logoutButton} activeOpacity={0.7}>
+            <TouchableOpacity style={styles.logoutButton} activeOpacity={0.7} onPress={() => router.replace("/onboarding")}>
               <LogOut size={20} color="#E74C3C" strokeWidth={1.5} />
               <Text style={styles.logoutText}>Se déconnecter</Text>
             </TouchableOpacity>

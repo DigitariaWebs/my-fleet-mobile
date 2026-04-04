@@ -1,5 +1,4 @@
 import "../global.css";
-import { useEffect, useState } from "react";
 import { View, ActivityIndicator } from "react-native";
 import { Stack } from "expo-router";
 import { StatusBar } from "expo-status-bar";
@@ -10,6 +9,24 @@ import {
   Poppins_600SemiBold,
   Poppins_700Bold,
 } from "@expo-google-fonts/poppins";
+import { ThemeProvider, useTheme } from "@/context/ThemeContext";
+
+function RootContent() {
+  const { colors } = useTheme();
+
+  return (
+    <>
+      <StatusBar style={colors.statusBarStyle} />
+      <Stack
+        screenOptions={{
+          headerShown: false,
+          contentStyle: { backgroundColor: colors.background },
+          animation: "fade",
+        }}
+      />
+    </>
+  );
+}
 
 export default function RootLayout() {
   const [fontsLoaded] = useFonts({
@@ -28,15 +45,8 @@ export default function RootLayout() {
   }
 
   return (
-    <>
-      <StatusBar style="light" />
-      <Stack
-        screenOptions={{
-          headerShown: false,
-          contentStyle: { backgroundColor: "#050404" },
-          animation: "fade",
-        }}
-      />
-    </>
+    <ThemeProvider>
+      <RootContent />
+    </ThemeProvider>
   );
 }

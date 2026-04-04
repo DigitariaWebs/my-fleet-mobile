@@ -484,6 +484,24 @@ export const notifications: Notification[] = [
   },
 ];
 
+export const cities: string[] = [
+  "Nice",
+  "Cannes",
+  "Monaco",
+  "Antibes",
+  "Marseille",
+  "Paris",
+];
+
+export const dateRanges: string[] = [
+  "12 — 15 Juin",
+  "18 — 21 Juin",
+  "25 — 28 Juin",
+  "1 — 4 Juil",
+  "8 — 11 Juil",
+  "15 — 18 Juil",
+];
+
 export const vehicleImages: string[] = [
   "https://images.unsplash.com/photo-1654159866733-09f0614c3b79?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=400",
   "https://images.unsplash.com/photo-1629086314381-8f4c852a3c03?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=400",

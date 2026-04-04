@@ -16,6 +16,7 @@ import {
 } from "lucide-react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import { BottomNav } from "@/components/BottomNav";
+import { useTheme } from "@/context/ThemeContext";
 import { bookings, vehicleImages } from "@/data/mockData";
 
 type TabKey = "active" | "upcoming" | "history";
@@ -57,20 +58,21 @@ const statusConfig: Record<
 
 export default function BookingsScreen() {
   const router = useRouter();
+  const { colors, isDark } = useTheme();
   const [activeTab, setActiveTab] = useState<TabKey>("active");
 
   return (
-    <SafeAreaView style={styles.safeArea} edges={["top"]}>
-      <View style={styles.container}>
+    <SafeAreaView style={[styles.safeArea, { backgroundColor: colors.background }]} edges={["top"]}>
+      <View style={[styles.container, { backgroundColor: colors.background }]}>
         <ScrollView
           showsVerticalScrollIndicator={false}
           contentContainerStyle={styles.scrollContent}
         >
           {/* Title */}
-          <Text style={styles.pageTitle}>Mes réservations</Text>
+          <Text style={[styles.pageTitle, { color: colors.text }]}>Mes réservations</Text>
 
           {/* Tabs */}
-          <View style={styles.tabContainer}>
+          <View style={[styles.tabContainer, { borderBottomColor: colors.border }]}>
             {tabs.map((tab) => {
               const isActive = activeTab === tab.key;
               return (
@@ -107,7 +109,7 @@ export default function BookingsScreen() {
                 <TouchableOpacity
                   key={booking.id}
                   activeOpacity={0.95}
-                  style={styles.card}
+                  style={[styles.card, { backgroundColor: colors.surface, borderColor: isDark ? "rgba(74, 25, 66, 0.3)" : colors.border }]}
                   onPress={() => router.push(`/tracking/${booking.id}` as any)}
                 >
                   {/* Image Section */}
@@ -145,7 +147,7 @@ export default function BookingsScreen() {
                     {/* Top row */}
                     <View style={styles.cardTopRow}>
                       <View style={styles.cardTopLeft}>
-                        <Text style={styles.vehicleName}>
+                        <Text style={[styles.vehicleName, { color: colors.text }]}>
                           {booking.vehicleName}
                         </Text>
                         <View style={styles.agencyRow}>
@@ -179,10 +181,10 @@ export default function BookingsScreen() {
                     </View>
 
                     {/* Footer */}
-                    <View style={styles.cardFooter}>
+                    <View style={[styles.cardFooter, { borderTopColor: colors.border }]}>
                       <View>
                         <Text style={styles.totalLabel}>Total</Text>
-                        <Text style={styles.totalValue}>{booking.total} €</Text>
+                        <Text style={[styles.totalValue, { color: colors.text }]}>{booking.total} €</Text>
                       </View>
                       <View style={styles.detailsButton}>
                         <Text style={styles.detailsButtonText}>

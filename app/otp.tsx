@@ -187,9 +187,13 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     backgroundColor: "#2E1C2B",
     textAlign: "center",
+    textAlignVertical: "center",
     fontFamily: "Poppins_600SemiBold",
     fontSize: 24,
+    lineHeight: 28,
     color: "#EAEAEA",
+    padding: 0,
+    includeFontPadding: false,
   },
   otpInputFilled: {
     borderWidth: 2,

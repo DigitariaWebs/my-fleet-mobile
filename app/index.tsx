@@ -47,11 +47,6 @@ export default function SplashScreen() {
 
   return (
     <View style={styles.container}>
-      {/* Ambient glow */}
-      <View style={styles.glowContainer}>
-        <View style={styles.glow} />
-      </View>
-
       {/* Logo */}
       <Animated.View style={logoAnimatedStyle}>
         <View style={styles.logoRow}>
