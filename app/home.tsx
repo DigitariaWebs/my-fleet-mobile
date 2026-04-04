@@ -188,7 +188,7 @@ export default function HomeScreen() {
           <View style={styles.section}>
             <View style={styles.sectionHeaderRow}>
               <Text style={styles.sectionTitle}>Véhicules recommandés</Text>
-              <TouchableOpacity activeOpacity={0.7}>
+              <TouchableOpacity activeOpacity={0.7} onPress={() => router.push("/agencies")}>
                 <Text style={styles.seeAll}>Voir tout</Text>
               </TouchableOpacity>
             </View>
@@ -206,6 +206,7 @@ export default function HomeScreen() {
                     key={vehicle.id}
                     activeOpacity={0.9}
                     style={styles.vehicleCard}
+                    onPress={() => router.push(`/vehicle/${vehicle.id}` as any)}
                   >
                     {/* Image */}
                     <Image

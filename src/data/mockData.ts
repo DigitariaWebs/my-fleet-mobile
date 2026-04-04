@@ -29,6 +29,12 @@ export interface Vehicle {
   description: string;
   chauffeurAvailable: boolean;
   chauffeurPrice: number;
+  conditions: {
+    minAge: number;
+    licenseYears: number;
+    deposit: number;
+    kmPerDay: number;
+  };
 }
 
 export const agencies: Agency[] = [
@@ -102,9 +108,10 @@ export const vehicles: Vehicle[] = [
     agencyName: "Prestige Auto Nice",
     category: "Sportive",
     features: ["Climatisation", "GPS intégré", "Bluetooth", "Sièges cuir"],
-    description: "Icône sportive par excellence.",
+    description: "Icône sportive par excellence, la Porsche 911 Carrera S allie performances exceptionnelles et confort de conduite quotidien. Moteur boxer 6 cylindres de 450 ch, 0-100 km/h en 3.7s.",
     chauffeurAvailable: true,
     chauffeurPrice: 120,
+    conditions: { minAge: 25, licenseYears: 3, deposit: 5000, kmPerDay: 300 },
   },
   {
     id: "2",
@@ -121,9 +128,10 @@ export const vehicles: Vehicle[] = [
     agencyName: "Prestige Auto Nice",
     category: "Sportive",
     features: ["Climatisation", "GPS intégré", "Bluetooth", "Échappement sport"],
-    description: "La sportivité pure.",
+    description: "La Mercedes-AMG GT incarne la sportivité pure. Design agressif et performances de supercar pour une expérience de conduite inoubliable.",
     chauffeurAvailable: true,
     chauffeurPrice: 150,
+    conditions: { minAge: 28, licenseYears: 5, deposit: 8000, kmPerDay: 250 },
   },
   {
     id: "3",
@@ -140,9 +148,10 @@ export const vehicles: Vehicle[] = [
     agencyName: "Riviera Luxury Cars",
     category: "Sportive",
     features: ["Climatisation", "GPS intégré", "Sièges cuir M", "Harman Kardon"],
-    description: "Sportivité extrême et praticité.",
+    description: "La BMW M4 Competition offre un équilibre parfait entre sportivité extrême et praticité quotidienne. 510 ch de pur plaisir.",
     chauffeurAvailable: true,
     chauffeurPrice: 120,
+    conditions: { minAge: 25, licenseYears: 3, deposit: 6000, kmPerDay: 300 },
   },
   {
     id: "4",
@@ -159,9 +168,10 @@ export const vehicles: Vehicle[] = [
     agencyName: "Monaco Premium Fleet",
     category: "SUV",
     features: ["Climatisation", "Caméra 360°", "Toit panoramique", "Sièges cuir"],
-    description: "Élégance britannique et technologie de pointe.",
+    description: "Le Range Rover Velar combine élégance britannique et technologie de pointe. Confort absolu et présence imposante.",
     chauffeurAvailable: true,
     chauffeurPrice: 100,
+    conditions: { minAge: 23, licenseYears: 2, deposit: 4000, kmPerDay: 350 },
   },
   {
     id: "5",
@@ -178,9 +188,10 @@ export const vehicles: Vehicle[] = [
     agencyName: "Riviera Luxury Cars",
     category: "Berline",
     features: ["Climatisation", "GPS intégré", "Sièges sport", "Bang & Olufsen"],
-    description: "Le break sportif ultime.",
+    description: "L'Audi RS6 Avant est le break sportif ultime. 600 ch, design agressif et praticité familiale dans un même véhicule.",
     chauffeurAvailable: true,
     chauffeurPrice: 130,
+    conditions: { minAge: 26, licenseYears: 4, deposit: 7000, kmPerDay: 300 },
   },
   {
     id: "6",
@@ -197,9 +208,10 @@ export const vehicles: Vehicle[] = [
     agencyName: "Côte d'Azur Motors",
     category: "Électrique",
     features: ["Autopilot", "Écran tactile 17\"", "Climatisation", "Audio Premium"],
-    description: "La berline la plus rapide du monde.",
+    description: "La Tesla Model S Plaid redéfinit la performance électrique. 0-100 km/h en 2.1s, la berline la plus rapide du monde.",
     chauffeurAvailable: true,
     chauffeurPrice: 110,
+    conditions: { minAge: 25, licenseYears: 3, deposit: 5500, kmPerDay: 400 },
   },
 ];
 
