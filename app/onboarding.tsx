@@ -51,8 +51,7 @@ export default function OnboardingScreen() {
   const contentOpacity = useSharedValue(1);
 
   const navigateToAuth = useCallback(() => {
-    // TODO: Navigate to auth screen when implemented
-    // router.replace("/auth");
+    router.replace("/auth");
   }, [router]);
 
   const handleNext = useCallback(() => {
