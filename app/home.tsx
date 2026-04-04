@@ -44,6 +44,7 @@ export default function HomeScreen() {
               <TouchableOpacity
                 style={styles.bellWrapper}
                 activeOpacity={0.7}
+                onPress={() => router.push("/notifications")}
               >
                 <Bell size={24} color="#EAEAEA" strokeWidth={1.5} />
                 <View style={styles.bellDot} />
@@ -130,7 +131,7 @@ export default function HomeScreen() {
           <View style={styles.section}>
             <View style={styles.sectionHeaderRow}>
               <Text style={styles.sectionTitle}>Agences populaires</Text>
-              <TouchableOpacity activeOpacity={0.7}>
+              <TouchableOpacity activeOpacity={0.7} onPress={() => router.push("/agencies")}>
                 <Text style={styles.seeAll}>Voir tout</Text>
               </TouchableOpacity>
             </View>
@@ -144,6 +145,7 @@ export default function HomeScreen() {
                   key={agency.id}
                   activeOpacity={0.9}
                   style={styles.agencyCard}
+                  onPress={() => router.push(`/agency/${agency.id}` as any)}
                 >
                   {/* Cover Image */}
                   <Image

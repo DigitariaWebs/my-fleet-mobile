@@ -379,6 +379,99 @@ export const loyaltyHistory: LoyaltyHistoryItem[] = [
   },
 ];
 
+export interface Review {
+  id: string;
+  agencyId: string;
+  userName: string;
+  rating: number;
+  date: string;
+  comment: string;
+  agencyResponse: string | null;
+}
+
+export const reviews: Review[] = [
+  {
+    id: "1",
+    agencyId: "1",
+    userName: "Sophie Martin",
+    rating: 5,
+    date: "15 Mars 2026",
+    comment:
+      "Service impeccable ! La Porsche était dans un état parfait et l'équipe très professionnelle. Je recommande vivement.",
+    agencyResponse:
+      "Merci Sophie pour votre confiance ! Au plaisir de vous revoir bientôt.",
+  },
+  {
+    id: "2",
+    agencyId: "1",
+    userName: "Ahmed Benali",
+    rating: 4,
+    date: "10 Mars 2026",
+    comment:
+      "Très belle expérience. Petit bémol sur le délai de livraison mais le véhicule était exceptionnel.",
+    agencyResponse: null,
+  },
+  {
+    id: "3",
+    agencyId: "1",
+    userName: "Jean-Pierre Dupont",
+    rating: 5,
+    date: "5 Mars 2026",
+    comment:
+      "Une agence au top ! Personnel accueillant, véhicules de qualité et tarifs compétitifs.",
+    agencyResponse:
+      "Merci beaucoup Jean-Pierre ! C'est toujours un plaisir.",
+  },
+];
+
+export type NotificationType = "booking" | "delivery" | "loyalty" | "kyc" | "review";
+
+export interface Notification {
+  id: string;
+  type: NotificationType;
+  title: string;
+  time: string;
+  read: boolean;
+}
+
+export const notifications: Notification[] = [
+  {
+    id: "1",
+    type: "booking",
+    title: "Votre réservation #MF-2026-0847 est confirmée",
+    time: "2h",
+    read: false,
+  },
+  {
+    id: "2",
+    type: "delivery",
+    title: "Votre véhicule est en route — arrivée estimée à 10:15",
+    time: "3h",
+    read: false,
+  },
+  {
+    id: "3",
+    type: "loyalty",
+    title: "Vous avez gagné 320 points de fidélité",
+    time: "1j",
+    read: true,
+  },
+  {
+    id: "4",
+    type: "kyc",
+    title: "Votre identité a été vérifiée avec succès",
+    time: "2j",
+    read: true,
+  },
+  {
+    id: "5",
+    type: "review",
+    title: "N'oubliez pas de laisser un avis pour votre dernière location",
+    time: "3j",
+    read: true,
+  },
+];
+
 export const vehicleImages: string[] = [
   "https://images.unsplash.com/photo-1654159866733-09f0614c3b79?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=400",
   "https://images.unsplash.com/photo-1629086314381-8f4c852a3c03?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=400",
