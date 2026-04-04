@@ -108,6 +108,7 @@ export default function BookingsScreen() {
                   key={booking.id}
                   activeOpacity={0.95}
                   style={styles.card}
+                  onPress={() => router.push(`/tracking/${booking.id}` as any)}
                 >
                   {/* Image Section */}
                   <View style={styles.cardImageWrapper}>
