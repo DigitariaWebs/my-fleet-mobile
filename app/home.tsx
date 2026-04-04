@@ -6,8 +6,6 @@ import {
   ScrollView,
   Image,
   StyleSheet,
-  Modal,
-  Pressable,
 } from "react-native";
 import { useRouter } from "expo-router";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -15,29 +13,21 @@ import {
   Bell,
   Search,
   SlidersHorizontal,
-  MapPin,
-  Calendar,
   Star,
-  X,
-  Check,
 } from "lucide-react-native";
 import { BottomNav } from "@/components/BottomNav";
+import { useTheme } from "@/context/ThemeContext";
 import {
   agencies,
   vehicles,
   categories,
   vehicleImages,
-  cities,
-  dateRanges,
 } from "@/data/mockData";
 
 export default function HomeScreen() {
   const router = useRouter();
+  const { colors } = useTheme();
   const [selectedCategory, setSelectedCategory] = useState("Toutes");
-  const [selectedCity, setSelectedCity] = useState("Nice");
-  const [selectedDates, setSelectedDates] = useState("12 — 15 Juin");
-  const [showCityModal, setShowCityModal] = useState(false);
-  const [showDateModal, setShowDateModal] = useState(false);
 
   // Filter vehicles by category
   const filteredVehicles = useMemo(() => {
@@ -47,16 +37,11 @@ export default function HomeScreen() {
     return vehicles.filter((v) => v.category === selectedCategory);
   }, [selectedCategory]);
 
-  // Filter agencies by city
-  const filteredAgencies = useMemo(() => {
-    return agencies.filter(
-      (a) => a.city === selectedCity || selectedCity === "Nice"
-    );
-  }, [selectedCity]);
+
 
   return (
-    <SafeAreaView style={styles.safeArea} edges={["top"]}>
-      <View style={styles.container}>
+    <SafeAreaView style={[styles.safeArea, { backgroundColor: colors.background }]} edges={["top"]}>
+      <View style={[styles.container, { backgroundColor: colors.background }]}>
         <ScrollView
           showsVerticalScrollIndicator={false}
           contentContainerStyle={styles.scrollContent}
@@ -64,7 +49,7 @@ export default function HomeScreen() {
           {/* ─── Header ─── */}
           <View style={styles.headerSection}>
             <View style={styles.headerRow}>
-              <Text style={styles.greeting}>Bonjour, Jean-Pierre</Text>
+              <Text style={[styles.greeting, { color: colors.text }]}>Bonjour, Jean-Pierre</Text>
               <TouchableOpacity
                 style={styles.bellWrapper}
                 activeOpacity={0.7}
@@ -77,36 +62,17 @@ export default function HomeScreen() {
 
             {/* Search Bar */}
             <TouchableOpacity
-              style={styles.searchBar}
+              style={[styles.searchBar, { backgroundColor: colors.surface, borderColor: colors.border }]}
               activeOpacity={0.85}
               onPress={() => router.push("/search")}
             >
-              <Search size={20} color="rgba(234, 234, 234, 0.6)" strokeWidth={1.5} />
-              <Text style={styles.searchPlaceholder}>
+              <Search size={20} color={colors.textSecondary} strokeWidth={1.5} />
+              <Text style={[styles.searchPlaceholder, { color: colors.textSecondary }]}>
                 Rechercher un véhicule, une agence...
               </Text>
-              <SlidersHorizontal size={20} color="rgba(234, 234, 234, 0.6)" strokeWidth={1.5} />
+              <SlidersHorizontal size={20} color={colors.textSecondary} strokeWidth={1.5} />
             </TouchableOpacity>
 
-            {/* Quick Filters */}
-            <View style={styles.filtersRow}>
-              <TouchableOpacity
-                style={[styles.filterChip, styles.filterChipActive]}
-                activeOpacity={0.85}
-                onPress={() => setShowCityModal(true)}
-              >
-                <MapPin size={16} color="#EAEAEA" strokeWidth={1.5} />
-                <Text style={styles.filterChipTextActive}>{selectedCity}, France</Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                style={[styles.filterChip, styles.filterChipActive]}
-                activeOpacity={0.85}
-                onPress={() => setShowDateModal(true)}
-              >
-                <Calendar size={16} color="#EAEAEA" strokeWidth={1.5} />
-                <Text style={styles.filterChipTextActive}>{selectedDates}</Text>
-              </TouchableOpacity>
-            </View>
           </View>
 
           {/* ─── Catégories ─── */}
@@ -161,7 +127,7 @@ export default function HomeScreen() {
                   onPress={() => router.push(`/agency/${agency.id}` as any)}
                 >
                   <Image source={{ uri: vehicleImages[index] }} style={styles.agencyCover} />
-                  <View style={styles.agencyInfo}>
+                  <View style={[styles.agencyInfo, { backgroundColor: colors.surface }]}>
                     <View style={styles.agencyLogo}>
                       <Text style={styles.agencyLogoText}>{agency.logo}</Text>
                     </View>
@@ -215,7 +181,7 @@ export default function HomeScreen() {
                       onPress={() => router.push(`/vehicle/${vehicle.id}` as any)}
                     >
                       <Image source={{ uri: vehicleImages[imgIndex] }} style={styles.vehicleImage} />
-                      <View style={styles.vehicleInfo}>
+                      <View style={[styles.vehicleInfo, { backgroundColor: colors.surface }]}>
                         <Text style={styles.vehicleName} numberOfLines={1}>{vehicle.name}</Text>
                         <View style={styles.vehicleSpecs}>
                           <Text style={styles.specText}>{vehicle.year}</Text>
@@ -250,91 +216,6 @@ export default function HomeScreen() {
         <BottomNav />
       </View>
 
-      {/* ─── City Picker Modal ─── */}
-      <Modal visible={showCityModal} transparent animationType="slide">
-        <Pressable style={styles.modalOverlay} onPress={() => setShowCityModal(false)}>
-          <Pressable style={styles.modalSheet} onPress={() => {}}>
-            <View style={styles.modalDragHandle} />
-            <View style={styles.modalHeader}>
-              <Text style={styles.modalTitle}>Localisation</Text>
-              <TouchableOpacity onPress={() => setShowCityModal(false)} activeOpacity={0.7}>
-                <X size={24} color="#EAEAEA" strokeWidth={1.5} />
-              </TouchableOpacity>
-            </View>
-            <View style={styles.modalList}>
-              {cities.map((city) => {
-                const isSelected = selectedCity === city;
-                return (
-                  <TouchableOpacity
-                    key={city}
-                    style={[styles.modalRow, isSelected && styles.modalRowSelected]}
-                    activeOpacity={0.7}
-                    onPress={() => {
-                      setSelectedCity(city);
-                      setShowCityModal(false);
-                    }}
-                  >
-                    <View style={styles.modalRowLeft}>
-                      <MapPin
-                        size={20}
-                        color={isSelected ? "#4A1942" : "rgba(234, 234, 234, 0.5)"}
-                        strokeWidth={1.5}
-                      />
-                      <Text style={[styles.modalRowText, isSelected && styles.modalRowTextSelected]}>
-                        {city}, France
-                      </Text>
-                    </View>
-                    {isSelected && <Check size={20} color="#4A1942" strokeWidth={2} />}
-                  </TouchableOpacity>
-                );
-              })}
-            </View>
-          </Pressable>
-        </Pressable>
-      </Modal>
-
-      {/* ─── Date Picker Modal ─── */}
-      <Modal visible={showDateModal} transparent animationType="slide">
-        <Pressable style={styles.modalOverlay} onPress={() => setShowDateModal(false)}>
-          <Pressable style={styles.modalSheet} onPress={() => {}}>
-            <View style={styles.modalDragHandle} />
-            <View style={styles.modalHeader}>
-              <Text style={styles.modalTitle}>Dates de location</Text>
-              <TouchableOpacity onPress={() => setShowDateModal(false)} activeOpacity={0.7}>
-                <X size={24} color="#EAEAEA" strokeWidth={1.5} />
-              </TouchableOpacity>
-            </View>
-            <View style={styles.modalList}>
-              {dateRanges.map((range) => {
-                const isSelected = selectedDates === range;
-                return (
-                  <TouchableOpacity
-                    key={range}
-                    style={[styles.modalRow, isSelected && styles.modalRowSelected]}
-                    activeOpacity={0.7}
-                    onPress={() => {
-                      setSelectedDates(range);
-                      setShowDateModal(false);
-                    }}
-                  >
-                    <View style={styles.modalRowLeft}>
-                      <Calendar
-                        size={20}
-                        color={isSelected ? "#4A1942" : "rgba(234, 234, 234, 0.5)"}
-                        strokeWidth={1.5}
-                      />
-                      <Text style={[styles.modalRowText, isSelected && styles.modalRowTextSelected]}>
-                        {range}
-                      </Text>
-                    </View>
-                    {isSelected && <Check size={20} color="#4A1942" strokeWidth={2} />}
-                  </TouchableOpacity>
-                );
-              })}
-            </View>
-          </Pressable>
-        </Pressable>
-      </Modal>
     </SafeAreaView>
   );
 }
