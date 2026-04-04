@@ -13,5 +13,6 @@
       "@assets/*": ["src/assets/*"]
     }
   },
-  "include": ["**/*.ts", "**/*.tsx", "nativewind-env.d.ts"]
+  "include": ["app/**/*.ts", "app/**/*.tsx", "src/**/*.ts", "src/**/*.tsx", "nativewind-env.d.ts"],
+  "exclude": ["node_modules", "template"]
 }
