@@ -6,6 +6,7 @@ import {
   ScrollView,
   StyleSheet,
 } from "react-native";
+import { useRouter } from "expo-router";
 import { SafeAreaView } from "react-native-safe-area-context";
 import {
   User,
@@ -41,6 +42,7 @@ const accountItems: AccountItem[] = [
 ];
 
 export default function ProfileScreen() {
+  const router = useRouter();
   const [darkMode, setDarkMode] = useState(true);
   const [notifications, setNotifications] = useState(true);
 
@@ -264,7 +266,7 @@ export default function ProfileScreen() {
             </View>
 
             {/* ─── Log Out ─── */}
-            <TouchableOpacity style={styles.logoutButton} activeOpacity={0.7}>
+            <TouchableOpacity style={styles.logoutButton} activeOpacity={0.7} onPress={() => router.replace("/onboarding")}>
               <LogOut size={20} color="#E74C3C" strokeWidth={1.5} />
               <Text style={styles.logoutText}>Se déconnecter</Text>
             </TouchableOpacity>
