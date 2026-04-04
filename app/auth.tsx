@@ -74,8 +74,7 @@ export default function AuthScreen() {
   });
 
   const handleSubmit = () => {
-    // TODO: Navigate to OTP screen when implemented
-    // router.push("/otp");
+    router.push("/otp");
   };
 
   const iconColor = "rgba(234, 234, 234, 0.6)";
