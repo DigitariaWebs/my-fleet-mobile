@@ -13,8 +13,6 @@ import Animated, {
   useAnimatedStyle,
   withTiming,
   Easing,
-  FadeIn,
-  FadeOut,
 } from "react-native-reanimated";
 import { LinearGradient } from "expo-linear-gradient";
 import { Button } from "@/components/ui/Button";
@@ -54,39 +52,31 @@ export default function OnboardingScreen() {
     router.replace("/auth");
   }, [router]);
 
+  const goToSlide = useCallback(
+    (index: number) => {
+      if (index === currentSlide) return;
+      contentOpacity.value = withTiming(0, { duration: 200, easing: Easing.out(Easing.ease) });
+      setTimeout(() => {
+        setCurrentSlide(index);
+        contentOpacity.value = withTiming(1, { duration: 300, easing: Easing.in(Easing.ease) });
+      }, 220);
+    },
+    [currentSlide, contentOpacity]
+  );
+
   const handleNext = useCallback(() => {
     if (currentSlide < slides.length - 1) {
-      // Fade out, change slide, fade in
-      contentOpacity.value = withTiming(0, { duration: 200, easing: Easing.out(Easing.ease) }, () => {
-        // This runs on UI thread, so use runOnJS if needed
-      });
-
-      setTimeout(() => {
-        setCurrentSlide((prev) => prev + 1);
-        contentOpacity.value = withTiming(1, { duration: 300, easing: Easing.in(Easing.ease) });
-      }, 200);
+      goToSlide(currentSlide + 1);
     } else {
       navigateToAuth();
     }
-  }, [currentSlide, contentOpacity, navigateToAuth]);
-
-  const handleSkip = useCallback(() => {
-    navigateToAuth();
-  }, [navigateToAuth]);
-
-  const handleDotPress = useCallback((index: number) => {
-    contentOpacity.value = withTiming(0, { duration: 200 });
-    setTimeout(() => {
-      setCurrentSlide(index);
-      contentOpacity.value = withTiming(1, { duration: 300 });
-    }, 200);
-  }, [contentOpacity]);
+  }, [currentSlide, goToSlide, navigateToAuth]);
 
   const contentAnimatedStyle = useAnimatedStyle(() => ({
     opacity: contentOpacity.value,
   }));
 
-  const slide = slides[currentSlide];
+  const slide = slides[currentSlide]!;
 
   return (
     <View style={styles.container}>
@@ -97,7 +87,6 @@ export default function OnboardingScreen() {
           style={styles.backgroundImage}
           resizeMode="cover"
         >
-          {/* Gradient Overlay */}
           <LinearGradient
             colors={[
               "transparent",
@@ -114,7 +103,7 @@ export default function OnboardingScreen() {
 
       {/* Skip Button */}
       <TouchableOpacity
-        onPress={handleSkip}
+        onPress={navigateToAuth}
         style={styles.skipButton}
         activeOpacity={0.7}
       >
@@ -133,7 +122,8 @@ export default function OnboardingScreen() {
           {slides.map((_, index) => (
             <TouchableOpacity
               key={index}
-              onPress={() => handleDotPress(index)}
+              onPress={() => goToSlide(index)}
+              hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
               style={[
                 styles.dot,
                 {

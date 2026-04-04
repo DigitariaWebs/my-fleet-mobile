@@ -55,16 +55,14 @@ export default function KYCScreen() {
   }, [step, router]);
 
   const handleSkip = useCallback(() => {
-    // TODO: Navigate to home when implemented
-    // router.replace("/home");
+    router.replace("/home");
   }, [router]);
 
   const handleContinue = useCallback(() => {
     if (step < 3) {
       setStep((s) => s + 1);
     } else {
-      // TODO: Navigate to home when implemented
-      // router.replace("/home");
+      router.replace("/home");
     }
   }, [step, router]);
 
