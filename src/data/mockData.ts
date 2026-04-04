@@ -203,6 +203,72 @@ export const vehicles: Vehicle[] = [
   },
 ];
 
+export interface Booking {
+  id: string;
+  vehicleId: string;
+  vehicleName: string;
+  agencyName: string;
+  startDate: string;
+  endDate: string;
+  startTime: string;
+  endTime: string;
+  status: "active" | "confirmed" | "completed";
+  total: number;
+  reference: string;
+  pickupMethod: string;
+  deliveryAddress?: string;
+  withChauffeur: boolean;
+}
+
+export const bookings: Booking[] = [
+  {
+    id: "1",
+    vehicleId: "1",
+    vehicleName: "Porsche 911 Carrera S",
+    agencyName: "Prestige Auto Nice",
+    startDate: "2026-06-12",
+    endDate: "2026-06-15",
+    startTime: "10:00",
+    endTime: "18:00",
+    status: "active",
+    total: 1370,
+    reference: "MF-2026-0847",
+    pickupMethod: "delivery",
+    deliveryAddress: "14 Rue de France, Nice",
+    withChauffeur: true,
+  },
+  {
+    id: "2",
+    vehicleId: "4",
+    vehicleName: "Range Rover Velar",
+    agencyName: "Monaco Premium Fleet",
+    startDate: "2026-04-08",
+    endDate: "2026-04-11",
+    startTime: "09:00",
+    endTime: "19:00",
+    status: "confirmed",
+    total: 980,
+    reference: "MF-2026-0832",
+    pickupMethod: "agency",
+    withChauffeur: false,
+  },
+  {
+    id: "3",
+    vehicleId: "2",
+    vehicleName: "Mercedes-AMG GT",
+    agencyName: "Prestige Auto Nice",
+    startDate: "2026-03-15",
+    endDate: "2026-03-17",
+    startTime: "14:00",
+    endTime: "14:00",
+    status: "completed",
+    total: 1200,
+    reference: "MF-2026-0789",
+    pickupMethod: "agency",
+    withChauffeur: false,
+  },
+];
+
 export const categories: string[] = [
   "Toutes",
   "Berline",
@@ -211,6 +277,106 @@ export const categories: string[] = [
   "Cabriolet",
   "Électrique",
   "Avec chauffeur",
+];
+
+export interface LoyaltyTier {
+  id: string;
+  name: string;
+  points: number;
+  color: string;
+  benefits: string[];
+}
+
+export interface LoyaltyHistoryItem {
+  id: string;
+  type: "earned" | "spent";
+  amount: number;
+  description: string;
+  date: string;
+}
+
+export const loyaltyTiers: LoyaltyTier[] = [
+  {
+    id: "bronze",
+    name: "Bronze",
+    points: 0,
+    color: "#2E1C2B",
+    benefits: [
+      "2% de réduction sur toutes les locations",
+      "Support par email",
+      "Points sur chaque location",
+    ],
+  },
+  {
+    id: "silver",
+    name: "Argent",
+    points: 1000,
+    color: "#2E1C2B",
+    benefits: [
+      "5% de réduction sur toutes les locations",
+      "Livraison gratuite",
+      "Accès prioritaire aux nouveautés",
+      "Support dédié",
+    ],
+  },
+  {
+    id: "gold",
+    name: "Or",
+    points: 3000,
+    color: "#4A1942",
+    benefits: [
+      "10% de réduction sur toutes les locations",
+      "Livraison et retour gratuits",
+      "Surclassement gratuit selon disponibilité",
+      "Accès VIP aux nouveautés",
+      "Support prioritaire 24/7",
+    ],
+  },
+  {
+    id: "platinum",
+    name: "Platine",
+    points: 7000,
+    color: "#4A1942",
+    benefits: [
+      "15% de réduction sur toutes les locations",
+      "Tous les services gratuits",
+      "Surclassement garanti",
+      "Accès exclusif aux véhicules de collection",
+      "Concierge dédié 24/7",
+      "Champagne de bienvenue",
+    ],
+  },
+];
+
+export const loyaltyHistory: LoyaltyHistoryItem[] = [
+  {
+    id: "1",
+    type: "earned",
+    amount: 320,
+    description: "Location Porsche 911",
+    date: "15 Juin",
+  },
+  {
+    id: "2",
+    type: "earned",
+    amount: 80,
+    description: "Avis laissé",
+    date: "16 Juin",
+  },
+  {
+    id: "3",
+    type: "spent",
+    amount: -500,
+    description: "Réduction utilisée",
+    date: "20 Juin",
+  },
+  {
+    id: "4",
+    type: "earned",
+    amount: 280,
+    description: "Location Range Rover",
+    date: "8 Avril",
+  },
 ];
 
 export const vehicleImages: string[] = [

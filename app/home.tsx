@@ -51,7 +51,7 @@ export default function HomeScreen() {
             </View>
 
             {/* Search Bar */}
-            <TouchableOpacity style={styles.searchBar} activeOpacity={0.85}>
+            <TouchableOpacity style={styles.searchBar} activeOpacity={0.85} onPress={() => router.push("/search")}>
               <Search
                 size={20}
                 color="rgba(234, 234, 234, 0.6)"
