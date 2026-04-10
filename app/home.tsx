@@ -67,7 +67,11 @@ export default function HomeScreen() {
               onPress={() => router.push("/search")}
             >
               <Search size={20} color={colors.textSecondary} strokeWidth={1.5} />
-              <Text style={[styles.searchPlaceholder, { color: colors.textSecondary }]}>
+              <Text
+                style={[styles.searchPlaceholder, { color: colors.textSecondary }]}
+                numberOfLines={1}
+                ellipsizeMode="tail"
+              >
                 Rechercher un véhicule, une agence...
               </Text>
               <SlidersHorizontal size={20} color={colors.textSecondary} strokeWidth={1.5} />
@@ -233,8 +237,8 @@ const styles = StyleSheet.create({
   bellDot: { position: "absolute", top: 0, right: 0, width: 8, height: 8, borderRadius: 4, backgroundColor: "#E74C3C" },
 
   /* Search */
-  searchBar: { height: 48, borderRadius: 24, backgroundColor: "#2E1C2B", borderWidth: 1, borderColor: "rgba(234, 234, 234, 0.1)", flexDirection: "row", alignItems: "center", paddingHorizontal: 16, gap: 12, marginBottom: 16 },
-  searchPlaceholder: { flex: 1, fontFamily: "Poppins_400Regular", fontSize: 15, color: "rgba(234, 234, 234, 0.6)" },
+  searchBar: { height: 48, borderRadius: 24, backgroundColor: "#2E1C2B", borderWidth: 1, borderColor: "rgba(234, 234, 234, 0.1)", flexDirection: "row", alignItems: "center", paddingHorizontal: 16, gap: 10, marginBottom: 16 },
+  searchPlaceholder: { flex: 1, minWidth: 0, fontFamily: "Poppins_400Regular", fontSize: 14, color: "rgba(234, 234, 234, 0.6)" },
 
   /* Filters */
   filtersRow: { flexDirection: "row", gap: 8 },
