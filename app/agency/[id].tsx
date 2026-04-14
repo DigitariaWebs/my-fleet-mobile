@@ -106,7 +106,7 @@ export default function AgencyDetailScreen() {
           <View style={styles.tabContainer}>
             <TouchableOpacity
               onPress={() => setActiveTab("vehicles")}
-              style={styles.tab}
+              style={[styles.tab, activeTab === "vehicles" && styles.tabActive]}
               activeOpacity={0.7}
             >
               <Text
@@ -116,17 +116,16 @@ export default function AgencyDetailScreen() {
                     color:
                       activeTab === "vehicles"
                         ? "#EAEAEA"
-                        : "rgba(234, 234, 234, 0.4)",
+                        : "rgba(234, 234, 234, 0.5)",
                   },
                 ]}
               >
                 Véhicules
               </Text>
-              {activeTab === "vehicles" && <View style={styles.tabIndicator} />}
             </TouchableOpacity>
             <TouchableOpacity
               onPress={() => setActiveTab("reviews")}
-              style={styles.tab}
+              style={[styles.tab, activeTab === "reviews" && styles.tabActive]}
               activeOpacity={0.7}
             >
               <Text
@@ -136,13 +135,12 @@ export default function AgencyDetailScreen() {
                     color:
                       activeTab === "reviews"
                         ? "#EAEAEA"
-                        : "rgba(234, 234, 234, 0.4)",
+                        : "rgba(234, 234, 234, 0.5)",
                   },
                 ]}
               >
                 Avis
               </Text>
-              {activeTab === "reviews" && <View style={styles.tabIndicator} />}
             </TouchableOpacity>
           </View>
 
@@ -295,18 +293,20 @@ const styles = StyleSheet.create({
   heroButton: {
     width: 40,
     height: 40,
-    borderRadius: 20,
-    backgroundColor: "rgba(46, 28, 43, 0.8)",
+    borderRadius: 999,
+    backgroundColor: "rgba(46, 28, 43, 0.85)",
+    borderWidth: 1,
+    borderColor: "rgba(234, 234, 234, 0.08)",
     alignItems: "center",
     justifyContent: "center",
   },
   heroLogo: {
     position: "absolute",
-    bottom: -28,
-    left: 20,
-    width: 56,
-    height: 56,
-    borderRadius: 28,
+    bottom: -24,
+    left: 16,
+    width: 52,
+    height: 52,
+    borderRadius: 999,
     backgroundColor: "#4A1942",
     borderWidth: 3,
     borderColor: "#050404",
@@ -321,46 +321,50 @@ const styles = StyleSheet.create({
 
   /* ─── Info ─── */
   infoSection: {
-    paddingHorizontal: 20,
-    paddingTop: 40,
-    paddingBottom: 24,
+    paddingHorizontal: 16,
+    paddingTop: 34,
+    paddingBottom: 20,
   },
   agencyName: {
     fontFamily: "Poppins_700Bold",
-    fontSize: 22,
+    fontSize: 20,
     color: "#EAEAEA",
-    marginBottom: 8,
+    marginBottom: 6,
   },
   addressRow: {
     flexDirection: "row",
     alignItems: "center",
-    gap: 8,
-    marginBottom: 12,
+    gap: 6,
+    marginBottom: 10,
   },
   addressText: {
     fontFamily: "Poppins_400Regular",
-    fontSize: 14,
+    fontSize: 13,
     color: "rgba(234, 234, 234, 0.6)",
   },
   metaRow: {
     flexDirection: "row",
     alignItems: "center",
-    gap: 16,
-    marginBottom: 16,
+    gap: 10,
+    marginBottom: 14,
   },
   ratingRow: {
     flexDirection: "row",
     alignItems: "center",
     gap: 4,
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+    borderRadius: 999,
+    backgroundColor: "rgba(241, 196, 15, 0.1)",
   },
   ratingValue: {
     fontFamily: "Poppins_600SemiBold",
-    fontSize: 16,
+    fontSize: 13,
     color: "#EAEAEA",
   },
   ratingCount: {
     fontFamily: "Poppins_400Regular",
-    fontSize: 13,
+    fontSize: 11,
     color: "rgba(234, 234, 234, 0.5)",
   },
   verifiedBadge: {
@@ -379,46 +383,50 @@ const styles = StyleSheet.create({
   },
   description: {
     fontFamily: "Poppins_400Regular",
-    fontSize: 14,
+    fontSize: 13,
     color: "rgba(234, 234, 234, 0.7)",
-    lineHeight: 21,
+    lineHeight: 19,
     marginBottom: 16,
   },
 
-  /* ─── Tabs ─── */
+  /* ─── Tabs pill ─── */
   tabContainer: {
     flexDirection: "row",
-    borderBottomWidth: 1,
-    borderBottomColor: "rgba(234, 234, 234, 0.1)",
-    marginBottom: 24,
+    padding: 4,
+    borderRadius: 999,
+    backgroundColor: "#2E1C2B",
+    borderWidth: 1,
+    borderColor: "rgba(234, 234, 234, 0.08)",
+    marginBottom: 18,
   },
   tab: {
     flex: 1,
-    paddingBottom: 12,
+    height: 36,
+    borderRadius: 999,
     alignItems: "center",
+    justifyContent: "center",
     position: "relative",
   },
+  tabActive: {
+    backgroundColor: "#4A1942",
+  },
   tabText: {
-    fontFamily: "Poppins_500Medium",
-    fontSize: 15,
+    fontFamily: "Poppins_600SemiBold",
+    fontSize: 12,
+    letterSpacing: 0.2,
   },
   tabIndicator: {
-    position: "absolute",
-    bottom: 0,
-    left: 0,
-    right: 0,
-    height: 3,
-    backgroundColor: "#4A1942",
-    borderTopLeftRadius: 999,
-    borderTopRightRadius: 999,
+    display: "none",
+    height: 0,
+    width: 0,
   },
 
   /* ─── Vehicles Tab ─── */
   vehicleCount: {
-    fontFamily: "Poppins_400Regular",
-    fontSize: 14,
-    color: "rgba(234, 234, 234, 0.6)",
-    marginBottom: 16,
+    fontFamily: "Poppins_500Medium",
+    fontSize: 12,
+    color: "rgba(234, 234, 234, 0.55)",
+    marginBottom: 12,
   },
   vehiclesGrid: {
     flexDirection: "row",
@@ -427,22 +435,23 @@ const styles = StyleSheet.create({
   },
   vehicleMiniCard: {
     width: GRID_ITEM_WIDTH,
-    borderRadius: 12,
+    borderRadius: 20,
     overflow: "hidden",
     borderWidth: 1,
-    borderColor: "rgba(234, 234, 234, 0.08)",
+    borderColor: "rgba(234, 234, 234, 0.06)",
   },
   vehicleMiniImage: {
     width: GRID_ITEM_WIDTH,
-    height: 100,
+    height: 96,
   },
   vehicleMiniInfo: {
     backgroundColor: "#2E1C2B",
-    padding: 8,
+    paddingHorizontal: 10,
+    paddingVertical: 10,
   },
   vehicleMiniName: {
     fontFamily: "Poppins_600SemiBold",
-    fontSize: 14,
+    fontSize: 13,
     color: "#EAEAEA",
     marginBottom: 4,
   },
@@ -451,23 +460,25 @@ const styles = StyleSheet.create({
     alignItems: "baseline",
   },
   vehicleMiniPrice: {
-    fontFamily: "Poppins_600SemiBold",
-    fontSize: 15,
+    fontFamily: "Poppins_700Bold",
+    fontSize: 14,
     color: "#EAEAEA",
   },
   vehicleMiniUnit: {
     fontFamily: "Poppins_400Regular",
-    fontSize: 11,
+    fontSize: 10,
     color: "rgba(234, 234, 234, 0.5)",
   },
 
   /* ─── Reviews Tab ─── */
   ratingSummary: {
     backgroundColor: "#2E1C2B",
-    borderRadius: 16,
-    padding: 24,
+    borderRadius: 28,
+    padding: 22,
     alignItems: "center",
-    marginBottom: 24,
+    marginBottom: 18,
+    borderWidth: 1,
+    borderColor: "rgba(234, 234, 234, 0.06)",
   },
   ratingSummaryTop: {
     flexDirection: "row",
@@ -498,12 +509,14 @@ const styles = StyleSheet.create({
 
   /* Review Cards */
   reviewsList: {
-    gap: 16,
+    gap: 12,
   },
   reviewCard: {
     backgroundColor: "#2E1C2B",
-    borderRadius: 12,
+    borderRadius: 24,
     padding: 16,
+    borderWidth: 1,
+    borderColor: "rgba(234, 234, 234, 0.06)",
   },
   reviewHeader: {
     flexDirection: "row",
@@ -519,7 +532,7 @@ const styles = StyleSheet.create({
   reviewAvatar: {
     width: 32,
     height: 32,
-    borderRadius: 16,
+    borderRadius: 999,
     backgroundColor: "#4A1942",
     alignItems: "center",
     justifyContent: "center",
@@ -553,8 +566,8 @@ const styles = StyleSheet.create({
   responseBox: {
     marginTop: 12,
     padding: 12,
-    borderRadius: 8,
-    backgroundColor: "rgba(74, 25, 66, 0.15)",
+    borderRadius: 18,
+    backgroundColor: "rgba(74, 25, 66, 0.25)",
   },
   responseLabel: {
     fontFamily: "Poppins_500Medium",

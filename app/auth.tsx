@@ -94,7 +94,7 @@ export default function AuthScreen() {
           <View style={styles.tabContainer}>
             <TouchableOpacity
               onPress={() => setActiveTab("login")}
-              style={styles.tab}
+              style={[styles.tab, activeTab === "login" && styles.tabActive]}
               activeOpacity={0.7}
             >
               <Text
@@ -110,12 +110,11 @@ export default function AuthScreen() {
               >
                 Connexion
               </Text>
-              {activeTab === "login" && <View style={styles.tabIndicator} />}
             </TouchableOpacity>
 
             <TouchableOpacity
               onPress={() => setActiveTab("signup")}
-              style={styles.tab}
+              style={[styles.tab, activeTab === "signup" && styles.tabActive]}
               activeOpacity={0.7}
             >
               <Text
@@ -131,7 +130,6 @@ export default function AuthScreen() {
               >
                 Inscription
               </Text>
-              {activeTab === "signup" && <View style={styles.tabIndicator} />}
             </TouchableOpacity>
           </View>
 
@@ -303,75 +301,75 @@ const styles = StyleSheet.create({
     paddingBottom: 40,
   },
 
-  // Tabs
+  // Tabs - pill switch
   tabContainer: {
     flexDirection: "row",
-    borderBottomWidth: 1,
-    borderBottomColor: "rgba(234, 234, 234, 0.1)",
-    marginBottom: 32,
+    padding: 4,
+    borderRadius: 999,
+    backgroundColor: "#2E1C2B",
+    borderWidth: 1,
+    borderColor: "rgba(234, 234, 234, 0.08)",
+    marginBottom: 24,
   },
   tab: {
     flex: 1,
-    paddingBottom: 12,
+    height: 40,
+    borderRadius: 999,
     alignItems: "center",
+    justifyContent: "center",
     position: "relative",
   },
-  tabText: {
-    fontFamily: "Poppins_500Medium",
-    fontSize: 15,
-  },
-  tabIndicator: {
-    position: "absolute",
-    bottom: 0,
-    left: 0,
-    right: 0,
-    height: 3,
+  tabActive: {
     backgroundColor: "#4A1942",
-    borderTopLeftRadius: 999,
-    borderTopRightRadius: 999,
+  },
+  tabText: {
+    fontFamily: "Poppins_600SemiBold",
+    fontSize: 13,
+    letterSpacing: 0.2,
   },
 
   // Form
   form: {
-    gap: 12,
+    gap: 10,
   },
   inputRow: {
     flexDirection: "row",
     alignItems: "center",
     height: 48,
-    paddingHorizontal: 16,
-    borderRadius: 12,
+    paddingHorizontal: 18,
+    borderRadius: 999,
     backgroundColor: "#2E1C2B",
     borderWidth: 1,
-    borderColor: "rgba(234, 234, 234, 0.1)",
-    gap: 12,
+    borderColor: "rgba(234, 234, 234, 0.08)",
+    gap: 10,
   },
   input: {
     flex: 1,
     fontFamily: "Poppins_400Regular",
-    fontSize: 15,
+    fontSize: 14,
     color: "#EAEAEA",
     height: 48,
   },
   phonePrefix: {
-    fontFamily: "Poppins_400Regular",
-    fontSize: 15,
-    color: "rgba(234, 234, 234, 0.6)",
+    fontFamily: "Poppins_500Medium",
+    fontSize: 14,
+    color: "rgba(234, 234, 234, 0.7)",
   },
 
   // Forgot password
   forgotRow: {
     alignItems: "flex-end",
+    paddingRight: 4,
   },
   forgotText: {
     fontFamily: "Poppins_500Medium",
-    fontSize: 13,
+    fontSize: 12,
     color: "rgba(234, 234, 234, 0.6)",
   },
 
   // Submit
   submitContainer: {
-    paddingTop: 8,
+    paddingTop: 6,
   },
 
   // Social divider
@@ -395,16 +393,16 @@ const styles = StyleSheet.create({
   // Social buttons
   socialRow: {
     flexDirection: "row",
-    gap: 12,
-    paddingTop: 16,
+    gap: 10,
+    paddingTop: 14,
   },
   socialButton: {
     flex: 1,
-    height: 48,
-    borderRadius: 12,
+    height: 46,
+    borderRadius: 999,
     backgroundColor: "#2E1C2B",
     borderWidth: 1,
-    borderColor: "rgba(234, 234, 234, 0.1)",
+    borderColor: "rgba(234, 234, 234, 0.08)",
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
@@ -412,7 +410,7 @@ const styles = StyleSheet.create({
   },
   socialText: {
     fontFamily: "Poppins_500Medium",
-    fontSize: 15,
+    fontSize: 14,
     color: "#EAEAEA",
   },
 
@@ -421,17 +419,16 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "center",
     alignItems: "center",
-    paddingTop: 16,
+    paddingTop: 14,
   },
   bottomLinkSecondary: {
     fontFamily: "Poppins_400Regular",
-    fontSize: 14,
+    fontSize: 13,
     color: "rgba(234, 234, 234, 0.6)",
   },
   bottomLinkPrimary: {
-    fontFamily: "Poppins_500Medium",
-    fontSize: 14,
+    fontFamily: "Poppins_600SemiBold",
+    fontSize: 13,
     color: "#EAEAEA",
-    textDecorationLine: "underline",
   },
 });

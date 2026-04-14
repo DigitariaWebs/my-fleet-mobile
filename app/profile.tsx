@@ -306,7 +306,7 @@ const styles = StyleSheet.create({
   avatar: {
     width: 80,
     height: 80,
-    borderRadius: 40,
+    borderRadius: 999,
     backgroundColor: "#4A1942",
     borderWidth: 3,
     borderColor: "rgba(234, 234, 234, 0.1)",
@@ -352,8 +352,8 @@ const styles = StyleSheet.create({
 
   /* ─── Loyalty Card ─── */
   loyaltyCard: {
-    padding: 24,
-    borderRadius: 16,
+    padding: 22,
+    borderRadius: 28,
   },
   loyaltyHeader: {
     flexDirection: "row",
@@ -380,7 +380,7 @@ const styles = StyleSheet.create({
   },
   benefitsBox: {
     backgroundColor: "rgba(5, 4, 4, 0.3)",
-    borderRadius: 12,
+    borderRadius: 22,
     padding: 16,
   },
   benefitsTitle: {
@@ -424,8 +424,9 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "space-between",
     backgroundColor: "#2E1C2B",
-    borderRadius: 12,
-    padding: 16,
+    borderRadius: 999,
+    paddingHorizontal: 16,
+    paddingVertical: 12,
   },
   historyLeft: {
     flexDirection: "row",
@@ -450,7 +451,7 @@ const styles = StyleSheet.create({
   /* ─── Menu Groups ─── */
   menuGroup: {
     backgroundColor: "#2E1C2B",
-    borderRadius: 12,
+    borderRadius: 24,
     overflow: "hidden",
   },
   menuRow: {
@@ -488,7 +489,7 @@ const styles = StyleSheet.create({
   toggle: {
     width: 48,
     height: 28,
-    borderRadius: 14,
+    borderRadius: 999,
     position: "relative",
     justifyContent: "center",
   },
@@ -496,7 +497,7 @@ const styles = StyleSheet.create({
     position: "absolute",
     width: 20,
     height: 20,
-    borderRadius: 10,
+    borderRadius: 999,
     backgroundColor: "#EAEAEA",
   },
 

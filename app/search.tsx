@@ -205,12 +205,12 @@ const cityStyles = StyleSheet.create({
   header: { flexDirection: "row", alignItems: "center", justifyContent: "space-between", paddingHorizontal: 20, marginBottom: 16 },
   title: { fontFamily: "Poppins_600SemiBold", fontSize: 18, color: "#EAEAEA" },
 
-  inputWrapper: { marginHorizontal: 20, height: 48, borderRadius: 12, backgroundColor: "#2E1C2B", borderWidth: 1, borderColor: "rgba(234, 234, 234, 0.1)", flexDirection: "row", alignItems: "center", paddingHorizontal: 14, gap: 10, marginBottom: 16 },
+  inputWrapper: { marginHorizontal: 20, height: 46, borderRadius: 999, backgroundColor: "#2E1C2B", borderWidth: 1, borderColor: "rgba(234, 234, 234, 0.08)", flexDirection: "row", alignItems: "center", paddingHorizontal: 18, gap: 10, marginBottom: 16 },
   input: { flex: 1, fontFamily: "Poppins_400Regular", fontSize: 15, color: "#EAEAEA", height: 48 },
 
   listScroll: { maxHeight: 350 },
   list: { paddingHorizontal: 20, gap: 4 },
-  row: { flexDirection: "row", alignItems: "center", justifyContent: "space-between", paddingHorizontal: 12, paddingVertical: 12, borderRadius: 12 },
+  row: { flexDirection: "row", alignItems: "center", justifyContent: "space-between", paddingHorizontal: 14, paddingVertical: 10, borderRadius: 999 },
   rowSelected: { backgroundColor: "rgba(74, 25, 66, 0.15)" },
   rowLeft: { flexDirection: "row", alignItems: "center", gap: 12 },
   iconCircle: { width: 36, height: 36, borderRadius: 18, backgroundColor: "rgba(234, 234, 234, 0.06)", alignItems: "center", justifyContent: "center" },
@@ -535,13 +535,13 @@ const styles = StyleSheet.create({
   scrollContent: { paddingHorizontal: 20, paddingTop: 32, paddingBottom: 40 },
 
   headerRow: { flexDirection: "row", alignItems: "center", gap: 12, marginBottom: 16 },
-  searchInputWrapper: { flex: 1, height: 52, borderRadius: 26, backgroundColor: "#2E1C2B", borderWidth: 1, borderColor: "rgba(234, 234, 234, 0.1)", flexDirection: "row", alignItems: "center", paddingHorizontal: 16, gap: 12 },
+  searchInputWrapper: { flex: 1, height: 48, borderRadius: 999, backgroundColor: "#2E1C2B", borderWidth: 1, borderColor: "rgba(234, 234, 234, 0.08)", flexDirection: "row", alignItems: "center", paddingHorizontal: 18, gap: 10 },
   searchInput: { flex: 1, fontFamily: "Poppins_400Regular", fontSize: 15, color: "#EAEAEA", height: 52 },
 
   /* Filter bar */
-  locationBtn: { flexDirection: "row", alignItems: "center", justifyContent: "center", gap: 8, height: 40, borderRadius: 12, backgroundColor: "#2E1C2B", borderWidth: 1, borderColor: "rgba(234, 234, 234, 0.1)", marginBottom: 10 },
+  locationBtn: { flexDirection: "row", alignItems: "center", justifyContent: "center", gap: 8, height: 40, borderRadius: 999, backgroundColor: "#2E1C2B", borderWidth: 1, borderColor: "rgba(234, 234, 234, 0.08)", marginBottom: 10 },
   filterBar: { flexDirection: "row", gap: 8, marginBottom: 20 },
-  filterBtn: { flex: 1, flexDirection: "row", alignItems: "center", justifyContent: "center", gap: 6, height: 40, borderRadius: 12, backgroundColor: "#2E1C2B", borderWidth: 1, borderColor: "rgba(234, 234, 234, 0.1)" },
+  filterBtn: { flex: 1, flexDirection: "row", alignItems: "center", justifyContent: "center", gap: 6, height: 40, borderRadius: 999, backgroundColor: "#2E1C2B", borderWidth: 1, borderColor: "rgba(234, 234, 234, 0.08)" },
   filterBtnActive: { backgroundColor: "rgba(74, 25, 66, 0.3)", borderColor: "#4A1942" },
   filterBtnText: { fontFamily: "Poppins_500Medium", fontSize: 12, color: "rgba(234, 234, 234, 0.5)" },
   filterBtnTextActive: { color: "#EAEAEA" },
@@ -555,17 +555,17 @@ const styles = StyleSheet.create({
   sectionTitle: { fontFamily: "Poppins_600SemiBold", fontSize: 16, color: "#EAEAEA", marginBottom: 12 },
 
   recentList: { gap: 8 },
-  recentRow: { flexDirection: "row", alignItems: "center", justifyContent: "space-between", height: 44, paddingHorizontal: 16, borderRadius: 12, backgroundColor: "#2E1C2B" },
+  recentRow: { flexDirection: "row", alignItems: "center", justifyContent: "space-between", height: 44, paddingHorizontal: 16, borderRadius: 999, backgroundColor: "#2E1C2B" },
   recentLeft: { flexDirection: "row", alignItems: "center", gap: 12, flex: 1 },
   recentText: { fontFamily: "Poppins_400Regular", fontSize: 14, color: "rgba(234, 234, 234, 0.7)" },
 
   categoriesGrid: { flexDirection: "row", flexWrap: "wrap", gap: 12 },
-  categoryCard: { width: "48%", height: 60, borderRadius: 12, backgroundColor: "#2E1C2B", flexDirection: "row", alignItems: "center", justifyContent: "center", gap: 8 },
+  categoryCard: { width: "48%", height: 56, borderRadius: 999, backgroundColor: "#2E1C2B", flexDirection: "row", alignItems: "center", justifyContent: "center", gap: 8, borderWidth: 1, borderColor: "rgba(234,234,234,0.06)" },
   categoryIcon: { fontSize: 24 },
   categoryName: { fontFamily: "Poppins_500Medium", fontSize: 14, color: "#EAEAEA" },
 
   suggestionsScroll: { gap: 12 },
-  suggestionCard: { width: 160, borderRadius: 12, overflow: "hidden", borderWidth: 1, borderColor: "rgba(234, 234, 234, 0.08)" },
+  suggestionCard: { width: 160, borderRadius: 22, overflow: "hidden", borderWidth: 1, borderColor: "rgba(234, 234, 234, 0.06)" },
   suggestionImage: { width: 160, height: 90 },
   suggestionInfo: { backgroundColor: "#2E1C2B", padding: 10 },
   suggestionName: { fontFamily: "Poppins_600SemiBold", fontSize: 12, color: "#EAEAEA", marginBottom: 4 },
@@ -573,7 +573,7 @@ const styles = StyleSheet.create({
 
   /* Results */
   resultsList: { gap: 12 },
-  resultCard: { flexDirection: "row", backgroundColor: "#2E1C2B", borderRadius: 12, overflow: "hidden", borderWidth: 1, borderColor: "rgba(234, 234, 234, 0.08)" },
+  resultCard: { flexDirection: "row", backgroundColor: "#2E1C2B", borderRadius: 22, overflow: "hidden", borderWidth: 1, borderColor: "rgba(234, 234, 234, 0.06)" },
   resultCardUnavailable: { opacity: 0.55, borderColor: "rgba(231, 76, 60, 0.2)" },
   resultImageWrapper: { position: "relative" },
   resultImage: { width: 110, height: 120 },
@@ -592,7 +592,7 @@ const styles = StyleSheet.create({
   resultRating: { fontFamily: "Poppins_600SemiBold", fontSize: 13, color: "#EAEAEA" },
 
   /* Unavailable badge */
-  unavailableBadge: { backgroundColor: "rgba(231, 76, 60, 0.12)", paddingHorizontal: 8, paddingVertical: 4, borderRadius: 6, alignSelf: "flex-start" },
+  unavailableBadge: { backgroundColor: "rgba(231, 76, 60, 0.12)", paddingHorizontal: 10, paddingVertical: 4, borderRadius: 999, alignSelf: "flex-start" },
   unavailableBadgeText: { fontFamily: "Poppins_500Medium", fontSize: 10, color: "#E74C3C", lineHeight: 14 },
 
   noResults: { alignItems: "center", paddingVertical: 48 },
@@ -607,7 +607,7 @@ const styles = StyleSheet.create({
   modalHeader: { flexDirection: "row", alignItems: "center", justifyContent: "space-between", paddingHorizontal: 20, marginBottom: 16 },
   modalTitle: { fontFamily: "Poppins_600SemiBold", fontSize: 18, color: "#EAEAEA" },
 
-  calSummary: { flexDirection: "row", marginHorizontal: 20, backgroundColor: "#2E1C2B", borderRadius: 12, padding: 16, marginBottom: 20 },
+  calSummary: { flexDirection: "row", marginHorizontal: 20, backgroundColor: "#2E1C2B", borderRadius: 22, padding: 16, marginBottom: 20 },
   calSummaryItem: { flex: 1, alignItems: "center" },
   calSummaryLabel: { fontFamily: "Poppins_400Regular", fontSize: 11, color: "rgba(234, 234, 234, 0.5)", marginBottom: 4 },
   calSummaryValue: { fontFamily: "Poppins_600SemiBold", fontSize: 15, color: "#EAEAEA" },
@@ -630,11 +630,11 @@ const styles = StyleSheet.create({
   calDayRange: { color: "#EAEAEA" },
 
   calFooter: { paddingHorizontal: 20, paddingTop: 20 },
-  confirmBtn: { height: 52, borderRadius: 12, backgroundColor: "#4A1942", alignItems: "center", justifyContent: "center" },
+  confirmBtn: { height: 48, borderRadius: 999, backgroundColor: "#4A1942", alignItems: "center", justifyContent: "center" },
   confirmBtnText: { fontFamily: "Poppins_600SemiBold", fontSize: 15, color: "#EAEAEA" },
 
   timeGrid: { flexDirection: "row", flexWrap: "wrap", gap: 10, paddingHorizontal: 20, paddingBottom: 8 },
-  timeChip: { paddingHorizontal: 18, paddingVertical: 10, borderRadius: 10, backgroundColor: "#2E1C2B", borderWidth: 1, borderColor: "rgba(234, 234, 234, 0.1)" },
+  timeChip: { paddingHorizontal: 16, paddingVertical: 8, borderRadius: 999, backgroundColor: "#2E1C2B", borderWidth: 1, borderColor: "rgba(234, 234, 234, 0.08)" },
   timeChipSelected: { backgroundColor: "#4A1942", borderColor: "#4A1942" },
   timeChipText: { fontFamily: "Poppins_500Medium", fontSize: 14, color: "rgba(234, 234, 234, 0.7)" },
   timeChipTextSelected: { color: "#EAEAEA" },

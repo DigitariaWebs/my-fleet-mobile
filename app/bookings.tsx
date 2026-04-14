@@ -79,7 +79,7 @@ export default function BookingsScreen() {
                 <TouchableOpacity
                   key={tab.key}
                   onPress={() => setActiveTab(tab.key)}
-                  style={styles.tab}
+                  style={[styles.tab, isActive && styles.tabActive]}
                   activeOpacity={0.7}
                 >
                   <Text
@@ -94,7 +94,6 @@ export default function BookingsScreen() {
                   >
                     {tab.label}
                   </Text>
-                  {isActive && <View style={styles.tabIndicator} />}
                 </TouchableOpacity>
               );
             })}
@@ -215,56 +214,53 @@ const styles = StyleSheet.create({
     backgroundColor: "#050404",
   },
   scrollContent: {
-    paddingHorizontal: 20,
-    paddingTop: 32,
+    paddingHorizontal: 16,
+    paddingTop: 20,
     paddingBottom: 16,
   },
 
   /* Title */
   pageTitle: {
     fontFamily: "Poppins_700Bold",
-    fontSize: 22,
+    fontSize: 20,
     color: "#EAEAEA",
-    marginBottom: 24,
+    marginBottom: 16,
   },
 
-  /* Tabs */
+  /* Tabs pill */
   tabContainer: {
     flexDirection: "row",
-    borderBottomWidth: 1,
-    borderBottomColor: "rgba(234, 234, 234, 0.1)",
-    marginBottom: 24,
+    padding: 4,
+    borderRadius: 999,
+    backgroundColor: "#2E1C2B",
+    borderWidth: 1,
+    borderColor: "rgba(234, 234, 234, 0.08)",
+    marginBottom: 16,
   },
   tab: {
     flex: 1,
-    paddingBottom: 12,
+    height: 36,
+    borderRadius: 999,
     alignItems: "center",
+    justifyContent: "center",
     position: "relative",
   },
+  tabActive: { backgroundColor: "#4A1942" },
   tabText: {
-    fontFamily: "Poppins_500Medium",
-    fontSize: 15,
-  },
-  tabIndicator: {
-    position: "absolute",
-    bottom: 0,
-    left: 0,
-    right: 0,
-    height: 3,
-    backgroundColor: "#4A1942",
-    borderTopLeftRadius: 999,
-    borderTopRightRadius: 999,
+    fontFamily: "Poppins_600SemiBold",
+    fontSize: 12,
+    letterSpacing: 0.2,
   },
 
   /* Cards */
   cardsList: {
-    gap: 20,
+    gap: 12,
   },
   card: {
-    borderRadius: 16,
+    borderRadius: 28,
     overflow: "hidden",
     borderWidth: 1,
-    borderColor: "rgba(74, 25, 66, 0.3)",
+    borderColor: "rgba(234, 234, 234, 0.06)",
     backgroundColor: "#2E1C2B",
   },
 
@@ -328,11 +324,12 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     gap: 8,
-    paddingHorizontal: 12,
+    paddingHorizontal: 14,
     paddingVertical: 10,
-    borderRadius: 8,
-    backgroundColor: "rgba(74, 25, 66, 0.15)",
-    marginBottom: 16,
+    borderRadius: 999,
+    backgroundColor: "rgba(74, 25, 66, 0.2)",
+    marginBottom: 14,
+    alignSelf: "flex-start",
   },
   dateText: {
     fontFamily: "Poppins_500Medium",
@@ -361,14 +358,15 @@ const styles = StyleSheet.create({
     color: "#EAEAEA",
   },
   detailsButton: {
-    paddingHorizontal: 20,
+    paddingHorizontal: 18,
     paddingVertical: 10,
-    borderRadius: 8,
+    borderRadius: 999,
     backgroundColor: "#4A1942",
   },
   detailsButtonText: {
     fontFamily: "Poppins_600SemiBold",
-    fontSize: 13,
+    fontSize: 12,
     color: "#EAEAEA",
+    letterSpacing: 0.2,
   },
 });

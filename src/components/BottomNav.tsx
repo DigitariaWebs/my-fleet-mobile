@@ -57,28 +57,32 @@ export function BottomNav() {
 
 const styles = StyleSheet.create({
   container: {
-    height: 64,
+    height: 60,
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-around",
-    borderTopWidth: 1,
+    borderTopLeftRadius: 28,
+    borderTopRightRadius: 28,
+    borderWidth: 1,
+    borderBottomWidth: 0,
   },
   tab: {
     alignItems: "center",
     justifyContent: "center",
-    gap: 4,
+    gap: 2,
     minWidth: 60,
     position: "relative",
   },
   activeDot: {
     position: "absolute",
-    top: -8,
+    top: -6,
     width: 4,
     height: 4,
-    borderRadius: 2,
+    borderRadius: 999,
   },
   label: {
-    fontFamily: "Poppins_500Medium",
+    fontFamily: "Poppins_600SemiBold",
     fontSize: 10,
+    letterSpacing: 0.2,
   },
 });

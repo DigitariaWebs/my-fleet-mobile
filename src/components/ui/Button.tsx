@@ -73,9 +73,9 @@ export function Button({
 
 const styles = StyleSheet.create({
   base: {
-    height: 52,
-    paddingHorizontal: 32,
-    borderRadius: 12,
+    height: 48,
+    paddingHorizontal: 24,
+    borderRadius: 999,
     alignItems: "center",
     justifyContent: "center",
   },
@@ -87,7 +87,8 @@ const styles = StyleSheet.create({
   },
   text: {
     fontFamily: "Poppins_600SemiBold",
-    fontSize: 15,
-    lineHeight: 22,
+    fontSize: 14,
+    lineHeight: 20,
+    letterSpacing: 0.2,
   },
 });

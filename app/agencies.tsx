@@ -31,9 +31,10 @@ export default function AgencyListScreen() {
             <TouchableOpacity
               onPress={() => router.back()}
               activeOpacity={0.7}
+              style={styles.backBtn}
               hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
             >
-              <ArrowLeft size={24} color="#EAEAEA" strokeWidth={1.5} />
+              <ArrowLeft size={20} color="#EAEAEA" strokeWidth={1.5} />
             </TouchableOpacity>
             <Text style={styles.title}>Agences</Text>
           </View>
@@ -128,8 +129,8 @@ const styles = StyleSheet.create({
     backgroundColor: "#050404",
   },
   scrollContent: {
-    paddingHorizontal: 20,
-    paddingTop: 32,
+    paddingHorizontal: 16,
+    paddingTop: 20,
     paddingBottom: 16,
   },
 
@@ -137,23 +138,33 @@ const styles = StyleSheet.create({
   headerRow: {
     flexDirection: "row",
     alignItems: "center",
-    gap: 16,
-    marginBottom: 24,
+    gap: 12,
+    marginBottom: 18,
+  },
+  backBtn: {
+    width: 40,
+    height: 40,
+    borderRadius: 999,
+    backgroundColor: "#2E1C2B",
+    borderWidth: 1,
+    borderColor: "rgba(234, 234, 234, 0.08)",
+    alignItems: "center",
+    justifyContent: "center",
   },
   title: {
     fontFamily: "Poppins_700Bold",
-    fontSize: 20,
+    fontSize: 18,
     color: "#EAEAEA",
   },
 
   /* Filters */
   filtersScroll: {
-    gap: 8,
-    marginBottom: 24,
+    gap: 6,
+    marginBottom: 18,
   },
   filterPill: {
-    paddingHorizontal: 16,
-    height: 36,
+    paddingHorizontal: 14,
+    height: 32,
     borderRadius: 999,
     alignItems: "center",
     justifyContent: "center",
@@ -164,32 +175,32 @@ const styles = StyleSheet.create({
   filterPillInactive: {
     backgroundColor: "#2E1C2B",
     borderWidth: 1,
-    borderColor: "rgba(234, 234, 234, 0.1)",
+    borderColor: "rgba(234, 234, 234, 0.08)",
   },
   filterPillText: {
     fontFamily: "Poppins_500Medium",
-    fontSize: 13,
+    fontSize: 12,
     color: "#EAEAEA",
   },
 
   /* Cards */
   cardsList: {
-    gap: 12,
+    gap: 10,
   },
   card: {
-    borderRadius: 16,
+    borderRadius: 24,
     overflow: "hidden",
     borderWidth: 1,
-    borderColor: "rgba(234, 234, 234, 0.08)",
+    borderColor: "rgba(234, 234, 234, 0.06)",
   },
   cardImage: {
     width: "100%",
-    height: 100,
+    height: 92,
   },
   cardInfo: {
     backgroundColor: "#2E1C2B",
-    paddingHorizontal: 16,
-    paddingTop: 12,
+    paddingHorizontal: 14,
+    paddingTop: 10,
     paddingBottom: 12,
     position: "relative",
   },
@@ -197,11 +208,11 @@ const styles = StyleSheet.create({
   /* Logo */
   logoCircle: {
     position: "absolute",
-    top: -24,
-    left: 16,
-    width: 44,
-    height: 44,
-    borderRadius: 22,
+    top: -22,
+    left: 14,
+    width: 42,
+    height: 42,
+    borderRadius: 999,
     backgroundColor: "#4A1942",
     borderWidth: 3,
     borderColor: "#2E1C2B",
@@ -210,13 +221,13 @@ const styles = StyleSheet.create({
   },
   logoText: {
     fontFamily: "Poppins_600SemiBold",
-    fontSize: 16,
+    fontSize: 15,
     color: "#EAEAEA",
   },
 
   /* Details */
   cardDetails: {
-    marginTop: 24,
+    marginTop: 22,
   },
   cardTopRow: {
     flexDirection: "row",
@@ -229,28 +240,32 @@ const styles = StyleSheet.create({
   },
   agencyName: {
     fontFamily: "Poppins_600SemiBold",
-    fontSize: 16,
+    fontSize: 15,
     color: "#EAEAEA",
-    marginBottom: 4,
+    marginBottom: 2,
   },
   agencySub: {
     fontFamily: "Poppins_400Regular",
-    fontSize: 13,
-    color: "rgba(234, 234, 234, 0.6)",
+    fontSize: 12,
+    color: "rgba(234, 234, 234, 0.55)",
   },
   ratingRow: {
     flexDirection: "row",
     alignItems: "center",
     gap: 4,
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: 999,
+    backgroundColor: "rgba(241, 196, 15, 0.1)",
   },
   ratingText: {
     fontFamily: "Poppins_600SemiBold",
-    fontSize: 14,
+    fontSize: 12,
     color: "#EAEAEA",
   },
   reviewCount: {
     fontFamily: "Poppins_400Regular",
-    fontSize: 12,
+    fontSize: 10,
     color: "rgba(234, 234, 234, 0.5)",
   },
 });

@@ -58,7 +58,7 @@ export default function OTPScreen() {
   );
 
   const handleVerify = useCallback(() => {
-    router.push("/kyc");
+    router.push("/scan");
   }, [router]);
 
   const handleResend = useCallback(() => {
@@ -156,7 +156,15 @@ const styles = StyleSheet.create({
 
   // Back
   backButton: {
-    marginBottom: 32,
+    width: 40,
+    height: 40,
+    borderRadius: 999,
+    backgroundColor: "#2E1C2B",
+    borderWidth: 1,
+    borderColor: "rgba(234, 234, 234, 0.08)",
+    alignItems: "center",
+    justifyContent: "center",
+    marginBottom: 24,
     alignSelf: "flex-start",
   },
 
@@ -165,32 +173,32 @@ const styles = StyleSheet.create({
     fontFamily: "Poppins_700Bold",
     fontSize: 22,
     color: "#EAEAEA",
-    marginBottom: 8,
+    marginBottom: 6,
   },
   subtitle: {
     fontFamily: "Poppins_400Regular",
-    fontSize: 14,
+    fontSize: 13,
     color: "rgba(234, 234, 234, 0.6)",
-    marginBottom: 32,
+    marginBottom: 28,
   },
 
   // OTP
   otpRow: {
     flexDirection: "row",
     justifyContent: "center",
-    gap: 8,
-    marginBottom: 24,
+    gap: 10,
+    marginBottom: 20,
   },
   otpInput: {
-    width: 48,
-    height: 52,
-    borderRadius: 12,
+    width: 46,
+    height: 54,
+    borderRadius: 20,
     backgroundColor: "#2E1C2B",
     textAlign: "center",
     textAlignVertical: "center",
     fontFamily: "Poppins_600SemiBold",
-    fontSize: 24,
-    lineHeight: 28,
+    fontSize: 22,
+    lineHeight: 26,
     color: "#EAEAEA",
     padding: 0,
     includeFontPadding: false,
@@ -207,10 +215,10 @@ const styles = StyleSheet.create({
   // Resend
   resendContainer: {
     alignItems: "center",
-    marginBottom: 32,
+    marginBottom: 28,
   },
   resendText: {
     fontFamily: "Poppins_500Medium",
-    fontSize: 14,
+    fontSize: 13,
   },
 });

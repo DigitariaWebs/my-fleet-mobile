@@ -149,7 +149,7 @@ const styles = StyleSheet.create({
   /* Saved Card */
   cardWrapper: {
     marginBottom: 12,
-    borderRadius: 12,
+    borderRadius: 24,
     borderWidth: 2,
     borderColor: "#4A1942",
     overflow: "hidden",
@@ -181,7 +181,7 @@ const styles = StyleSheet.create({
   /* Add Card */
   addCard: {
     padding: 16,
-    borderRadius: 12,
+    borderRadius: 24,
     borderWidth: 2,
     borderStyle: "dashed",
     borderColor: "rgba(234, 234, 234, 0.15)",
