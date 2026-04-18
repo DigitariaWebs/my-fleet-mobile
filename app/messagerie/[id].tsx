@@ -1,18 +1,22 @@
-import { useState, useRef, useCallback } from "react";
+import { useState, useRef, useCallback, useMemo } from "react";
 import {
   View,
   Text,
   TextInput,
-  TouchableOpacity,
+  Pressable,
   FlatList,
   StyleSheet,
   KeyboardAvoidingView,
   Platform,
 } from "react-native";
 import { useRouter, useLocalSearchParams } from "expo-router";
-import { SafeAreaView } from "react-native-safe-area-context";
-import { ArrowLeft, Send, Paperclip } from "lucide-react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { StatusBar } from "expo-status-bar";
+import { LinearGradient } from "expo-linear-gradient";
+import { ArrowLeft, Send, Paperclip, Phone, Check, CheckCheck } from "lucide-react-native";
+import { useTranslation } from "react-i18next";
 import { bookings, agencies } from "@/data/mockData";
+import { useTheme } from "@/context/ThemeContext";
 
 interface Message {
   id: number;
@@ -21,46 +25,29 @@ interface Message {
   time: string;
 }
 
-const initialMessages: Message[] = [
-  {
-    id: 1,
-    text: "Bonjour, votre véhicule est en préparation.",
-    from: "agency",
-    time: "09:30",
-  },
-  {
-    id: 2,
-    text: "Merci ! À quelle heure pensez-vous arriver ?",
-    from: "user",
-    time: "09:32",
-  },
-  {
-    id: 3,
-    text: "Nous arriverons dans environ 15 minutes.",
-    from: "agency",
-    time: "09:45",
-  },
-  {
-    id: 4,
-    text: "Parfait, je vous attends.",
-    from: "user",
-    time: "09:46",
-  },
-];
-
 export default function MessagerieScreen() {
   const router = useRouter();
+  const { t } = useTranslation();
+  const insets = useSafeAreaInsets();
   const { id } = useLocalSearchParams<{ id: string }>();
+  const { colors, isDark } = useTheme();
+  const styles = useMemo(() => makeStyles(colors, isDark), [colors, isDark]);
+
   const [message, setMessage] = useState("");
-  const [messages, setMessages] = useState<Message[]>(initialMessages);
+  const [messages, setMessages] = useState<Message[]>(() => [
+    { id: 1, text: t("messagerie.seed.msg1"), from: "agency", time: "09:30" },
+    { id: 2, text: t("messagerie.seed.msg2"), from: "user", time: "09:32" },
+    { id: 3, text: t("messagerie.seed.msg3"), from: "agency", time: "09:45" },
+    { id: 4, text: t("messagerie.seed.msg4"), from: "user", time: "09:46" },
+  ]);
   const listRef = useRef<FlatList>(null);
 
   const booking = bookings.find((b) => b.id === id);
   const agency = agencies.find(
-    (a) => booking && a.name === booking.agencyName
+    (a) => booking && a.name === booking.agencyName,
   );
   const agencyLogo = agency?.logo ?? "P";
-  const agencyName = booking?.agencyName ?? "Prestige Auto Nice";
+  const agencyName = booking?.agencyName ?? t("messagerie.fallbackAgency");
 
   const handleSend = useCallback(() => {
     if (!message.trim()) return;
@@ -76,63 +63,130 @@ export default function MessagerieScreen() {
     }, 100);
   }, [message]);
 
-  const renderMessage = useCallback(({ item }: { item: Message }) => {
-    const isUser = item.from === "user";
-    return (
-      <View
-        style={[
-          styles.messageRow,
-          isUser ? styles.messageRowUser : styles.messageRowAgency,
-        ]}
-      >
+  const renderMessage = useCallback(
+    ({ item, index }: { item: Message; index: number }) => {
+      const isUser = item.from === "user";
+      const prev = messages[index - 1];
+      const next = messages[index + 1];
+      const isFirstInGroup = !prev || prev.from !== item.from;
+      const isLastInGroup = !next || next.from !== item.from;
+
+      return (
         <View
           style={[
-            styles.bubble,
-            isUser ? styles.bubbleUser : styles.bubbleAgency,
+            styles.messageRow,
+            isUser ? styles.messageRowUser : styles.messageRowAgency,
+            { marginTop: isFirstInGroup ? 12 : 3 },
           ]}
         >
-          <Text style={styles.bubbleText}>{item.text}</Text>
-          <Text
+          {/* Agency avatar — show only on last-in-group for a cleaner look */}
+          {!isUser && (
+            <View style={{ width: 32, marginRight: 8 }}>
+              {isLastInGroup && (
+                <View style={styles.rowAvatar}>
+                  <Text style={styles.rowAvatarText}>{agencyLogo}</Text>
+                </View>
+              )}
+            </View>
+          )}
+
+          <View
             style={[
-              styles.bubbleTime,
-              isUser ? styles.bubbleTimeRight : styles.bubbleTimeLeft,
+              styles.bubble,
+              isUser ? styles.bubbleUser : styles.bubbleAgency,
+              isUser
+                ? isLastInGroup && { borderBottomRightRadius: 6 }
+                : isLastInGroup && { borderBottomLeftRadius: 6 },
             ]}
           >
-            {item.time}
-          </Text>
+            <Text
+              style={[
+                styles.bubbleText,
+                { color: isUser ? "#FFFFFF" : colors.text },
+              ]}
+            >
+              {item.text}
+            </Text>
+            {isLastInGroup && (
+              <View style={styles.bubbleFooter}>
+                <Text
+                  style={[
+                    styles.bubbleTime,
+                    { color: isUser ? "rgba(255,255,255,0.65)" : colors.textMuted },
+                  ]}
+                >
+                  {item.time}
+                </Text>
+                {isUser && (
+                  <CheckCheck
+                    size={13}
+                    color="rgba(255,255,255,0.75)"
+                    strokeWidth={2}
+                  />
+                )}
+              </View>
+            )}
+          </View>
         </View>
-      </View>
-    );
-  }, []);
+      );
+    },
+    [messages, styles, agencyLogo, colors],
+  );
+
+  const canSend = message.trim().length > 0;
 
   return (
-    <SafeAreaView style={styles.container} edges={["top"]}>
+    <View style={styles.container}>
+      {/* Status bar lives over the burgundy header — keep icons light */}
+      <StatusBar style="light" />
+
+      {/* ─── Full-bleed header (extends under the notch) ─── */}
+      <LinearGradient
+        colors={[colors.primary, "#8B3D7E"]}
+        start={{ x: 0, y: 0 }}
+        end={{ x: 1, y: 1 }}
+        style={[
+          styles.header,
+          { paddingTop: insets.top + 8 },
+        ]}
+      >
+        <Pressable
+          onPress={() => router.back()}
+          style={styles.backBtn}
+          hitSlop={10}
+        >
+          <ArrowLeft size={20} color="#FFFFFF" strokeWidth={1.8} />
+        </Pressable>
+
+        <View style={styles.headerInfo}>
+          <View style={styles.headerAvatar}>
+            <Text style={styles.headerAvatarText}>{agencyLogo}</Text>
+          </View>
+          <View style={{ flex: 1 }}>
+            <Text style={styles.headerName} numberOfLines={1}>
+              {agencyName}
+            </Text>
+            <View style={styles.onlineRow}>
+              <View style={styles.onlineDot} />
+              <Text style={styles.headerStatus}>{t("messagerie.online")}</Text>
+            </View>
+          </View>
+        </View>
+
+        <Pressable
+          onPress={() => router.push(`/call/${id}` as any)}
+          style={styles.callBtn}
+          hitSlop={10}
+        >
+          <Phone size={18} color="#FFFFFF" strokeWidth={1.8} />
+        </Pressable>
+      </LinearGradient>
+
       <KeyboardAvoidingView
         style={styles.flex}
         behavior={Platform.OS === "ios" ? "padding" : "height"}
         keyboardVerticalOffset={0}
       >
-        {/* ─── Header ─── */}
-        <View style={styles.header}>
-          <TouchableOpacity
-            onPress={() => router.back()}
-            style={styles.backBtn}
-            activeOpacity={0.7}
-          >
-            <ArrowLeft size={20} color="#EAEAEA" strokeWidth={1.5} />
-          </TouchableOpacity>
-          <View style={styles.headerInfo}>
-            <View style={styles.headerAvatar}>
-              <Text style={styles.headerAvatarText}>{agencyLogo}</Text>
-            </View>
-            <View>
-              <Text style={styles.headerName}>{agencyName}</Text>
-              <Text style={styles.headerStatus}>En ligne</Text>
-            </View>
-          </View>
-        </View>
-
-        {/* ─── Messages ─── */}
         <FlatList
           ref={listRef}
           data={messages}
@@ -145,178 +199,240 @@ export default function MessagerieScreen() {
           }
         />
 
-        {/* ─── Input Bar ─── */}
-        <View style={styles.inputBar}>
+        <View
+          style={[
+            styles.inputBar,
+            { paddingBottom: Math.max(insets.bottom, 12) },
+          ]}
+        >
           <View style={styles.inputRow}>
-            <TouchableOpacity style={styles.attachBtn} activeOpacity={0.7}>
+            <Pressable style={styles.attachBtn} hitSlop={8}>
               <Paperclip
-                size={20}
-                color="rgba(234, 234, 234, 0.5)"
-                strokeWidth={1.5}
+                size={19}
+                color={colors.textSecondary}
+                strokeWidth={1.8}
               />
-            </TouchableOpacity>
+            </Pressable>
             <TextInput
               value={message}
               onChangeText={setMessage}
-              placeholder="Écrire un message..."
-              placeholderTextColor="rgba(234, 234, 234, 0.4)"
+              placeholder={t("messagerie.inputPlaceholder")}
+              placeholderTextColor={colors.textMuted}
               style={styles.input}
               returnKeyType="send"
               onSubmitEditing={handleSend}
+              multiline
             />
-            <TouchableOpacity
-              onPress={handleSend}
-              disabled={!message.trim()}
-              style={[
-                styles.sendBtn,
-                !message.trim() && styles.sendBtnDisabled,
-              ]}
-              activeOpacity={0.7}
-            >
-              <Send size={20} color="#4A1942" strokeWidth={1.5} />
-            </TouchableOpacity>
           </View>
+          <Pressable
+            onPress={handleSend}
+            disabled={!canSend}
+            style={[
+              styles.sendBtn,
+              {
+                backgroundColor: colors.primary,
+                opacity: canSend ? 1 : 0.4,
+              },
+            ]}
+          >
+            <Send
+              size={18}
+              color="#FFFFFF"
+              strokeWidth={2}
+              fill={canSend ? "#FFFFFF" : "transparent"}
+            />
+          </Pressable>
         </View>
       </KeyboardAvoidingView>
-    </SafeAreaView>
+    </View>
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: "#050404",
-  },
-  flex: {
-    flex: 1,
-  },
+function makeStyles(
+  colors: ReturnType<typeof useTheme>["colors"],
+  isDark: boolean,
+) {
+  const bubbleAgencyBg = isDark
+    ? "rgba(46, 28, 43, 0.9)"
+    : "#F2F2F7";
+  const inputBg = isDark ? colors.surface : "#F2F2F7";
 
-  /* ─── Header ─── */
-  header: {
-    backgroundColor: "#2E1C2B",
-    paddingHorizontal: 20,
-    paddingVertical: 24,
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 12,
-  },
-  backBtn: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    backgroundColor: "rgba(234, 234, 234, 0.1)",
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  headerInfo: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 12,
-    flex: 1,
-  },
-  headerAvatar: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    backgroundColor: "#4A1942",
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  headerAvatarText: {
-    fontFamily: "Poppins_600SemiBold",
-    fontSize: 16,
-    color: "#EAEAEA",
-  },
-  headerName: {
-    fontFamily: "Poppins_600SemiBold",
-    fontSize: 15,
-    color: "#EAEAEA",
-  },
-  headerStatus: {
-    fontFamily: "Poppins_400Regular",
-    fontSize: 12,
-    color: "rgba(234, 234, 234, 0.6)",
-  },
+  return StyleSheet.create({
+    container: { flex: 1, backgroundColor: colors.background },
+    flex: { flex: 1 },
 
-  /* ─── Messages ─── */
-  messagesList: {
-    paddingHorizontal: 20,
-    paddingVertical: 16,
-    gap: 16,
-  },
-  messageRow: {
-    flexDirection: "row",
-  },
-  messageRowUser: {
-    justifyContent: "flex-end",
-  },
-  messageRowAgency: {
-    justifyContent: "flex-start",
-  },
-  bubble: {
-    maxWidth: "75%",
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    borderRadius: 16,
-  },
-  bubbleUser: {
-    backgroundColor: "#4A1942",
-    borderBottomRightRadius: 4,
-  },
-  bubbleAgency: {
-    backgroundColor: "#2E1C2B",
-    borderBottomLeftRadius: 4,
-  },
-  bubbleText: {
-    fontFamily: "Poppins_400Regular",
-    fontSize: 14,
-    color: "#EAEAEA",
-    lineHeight: 20,
-  },
-  bubbleTime: {
-    fontFamily: "Poppins_400Regular",
-    fontSize: 11,
-    color: "rgba(234, 234, 234, 0.5)",
-    marginTop: 4,
-  },
-  bubbleTimeRight: {
-    textAlign: "right",
-  },
-  bubbleTimeLeft: {
-    textAlign: "left",
-  },
+    /* Header */
+    header: {
+      paddingHorizontal: 16,
+      paddingBottom: 16,
+      flexDirection: "row",
+      alignItems: "center",
+      gap: 10,
+      shadowColor: "#000",
+      shadowOffset: { width: 0, height: 4 },
+      shadowOpacity: 0.15,
+      shadowRadius: 10,
+      elevation: 6,
+    },
+    backBtn: {
+      width: 38,
+      height: 38,
+      borderRadius: 999,
+      backgroundColor: "rgba(255, 255, 255, 0.18)",
+      alignItems: "center",
+      justifyContent: "center",
+    },
+    headerInfo: {
+      flex: 1,
+      flexDirection: "row",
+      alignItems: "center",
+      gap: 10,
+    },
+    headerAvatar: {
+      width: 40,
+      height: 40,
+      borderRadius: 999,
+      backgroundColor: "rgba(255, 255, 255, 0.22)",
+      borderWidth: 1.5,
+      borderColor: "rgba(255, 255, 255, 0.35)",
+      alignItems: "center",
+      justifyContent: "center",
+    },
+    headerAvatarText: {
+      fontFamily: "Poppins_700Bold",
+      fontSize: 16,
+      color: "#FFFFFF",
+    },
+    headerName: {
+      fontFamily: "Poppins_700Bold",
+      fontSize: 15,
+      color: "#FFFFFF",
+      letterSpacing: -0.2,
+    },
+    onlineRow: {
+      flexDirection: "row",
+      alignItems: "center",
+      gap: 5,
+      marginTop: 1,
+    },
+    onlineDot: {
+      width: 6,
+      height: 6,
+      borderRadius: 3,
+      backgroundColor: "#2ECC71",
+    },
+    headerStatus: {
+      fontFamily: "Poppins_500Medium",
+      fontSize: 11.5,
+      color: "rgba(255, 255, 255, 0.85)",
+    },
+    callBtn: {
+      width: 38,
+      height: 38,
+      borderRadius: 999,
+      backgroundColor: "rgba(255, 255, 255, 0.18)",
+      alignItems: "center",
+      justifyContent: "center",
+    },
 
-  /* ─── Input Bar ─── */
-  inputBar: {
-    paddingHorizontal: 20,
-    paddingVertical: 16,
-    borderTopWidth: 1,
-    borderTopColor: "rgba(234, 234, 234, 0.1)",
-    backgroundColor: "#050404",
-  },
-  inputRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 8,
-    backgroundColor: "#2E1C2B",
-    borderRadius: 12,
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-  },
-  attachBtn: {
-    padding: 4,
-  },
-  input: {
-    flex: 1,
-    fontFamily: "Poppins_400Regular",
-    fontSize: 14,
-    color: "#EAEAEA",
-    height: 24,
-  },
-  sendBtn: {
-    padding: 4,
-  },
-  sendBtnDisabled: {
-    opacity: 0.3,
-  },
-});
+    /* Messages */
+    messagesList: {
+      paddingHorizontal: 14,
+      paddingTop: 14,
+      paddingBottom: 14,
+    },
+    messageRow: { flexDirection: "row", alignItems: "flex-end" },
+    messageRowUser: { justifyContent: "flex-end" },
+    messageRowAgency: { justifyContent: "flex-start" },
+    rowAvatar: {
+      width: 32,
+      height: 32,
+      borderRadius: 999,
+      backgroundColor: colors.primary,
+      alignItems: "center",
+      justifyContent: "center",
+    },
+    rowAvatarText: {
+      fontFamily: "Poppins_700Bold",
+      fontSize: 13,
+      color: "#FFFFFF",
+    },
+
+    bubble: {
+      maxWidth: "78%",
+      paddingHorizontal: 14,
+      paddingVertical: 10,
+      borderRadius: 22,
+    },
+    bubbleUser: {
+      backgroundColor: colors.primary,
+    },
+    bubbleAgency: {
+      backgroundColor: bubbleAgencyBg,
+      borderWidth: isDark ? 1 : 0,
+      borderColor: isDark ? colors.border : "transparent",
+    },
+    bubbleText: {
+      fontFamily: "Poppins_400Regular",
+      fontSize: 14.5,
+      lineHeight: 20,
+    },
+    bubbleFooter: {
+      flexDirection: "row",
+      alignItems: "center",
+      gap: 4,
+      justifyContent: "flex-end",
+      marginTop: 4,
+    },
+    bubbleTime: {
+      fontFamily: "Poppins_400Regular",
+      fontSize: 10.5,
+    },
+
+    /* Input */
+    inputBar: {
+      flexDirection: "row",
+      alignItems: "flex-end",
+      gap: 8,
+      paddingHorizontal: 12,
+      paddingTop: 10,
+      backgroundColor: colors.background,
+      borderTopWidth: 1,
+      borderTopColor: colors.border,
+    },
+    inputRow: {
+      flex: 1,
+      flexDirection: "row",
+      alignItems: "center",
+      gap: 8,
+      backgroundColor: inputBg,
+      borderRadius: 22,
+      paddingHorizontal: 14,
+      paddingVertical: Platform.OS === "ios" ? 10 : 6,
+      minHeight: 44,
+      borderWidth: 1,
+      borderColor: colors.border,
+    },
+    attachBtn: { paddingVertical: 2 },
+    input: {
+      flex: 1,
+      fontFamily: "Poppins_400Regular",
+      fontSize: 14.5,
+      color: colors.text,
+      maxHeight: 100,
+      paddingVertical: 0,
+    },
+    sendBtn: {
+      width: 44,
+      height: 44,
+      borderRadius: 999,
+      alignItems: "center",
+      justifyContent: "center",
+      shadowColor: colors.primary,
+      shadowOffset: { width: 0, height: 4 },
+      shadowOpacity: 0.4,
+      shadowRadius: 10,
+      elevation: 4,
+    },
+  });
+}

@@ -10,6 +10,8 @@ interface ThemeColors {
   textSecondary: string;
   textMuted: string;
   border: string;
+  error: string;
+  errorSoft: string;
   statusBarStyle: "light" | "dark";
 }
 
@@ -28,6 +30,8 @@ const darkColors: ThemeColors = {
   textSecondary: "rgba(234, 234, 234, 0.6)",
   textMuted: "rgba(234, 234, 234, 0.4)",
   border: "rgba(234, 234, 234, 0.1)",
+  error: "#F87171",
+  errorSoft: "rgba(248, 113, 113, 0.15)",
   statusBarStyle: "light",
 };
 
@@ -39,6 +43,8 @@ const lightColors: ThemeColors = {
   textSecondary: "rgba(29, 29, 31, 0.6)",
   textMuted: "rgba(29, 29, 31, 0.4)",
   border: "rgba(0, 0, 0, 0.1)",
+  error: "#DC2626",
+  errorSoft: "rgba(220, 38, 38, 0.1)",
   statusBarStyle: "dark",
 };
 

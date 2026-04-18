@@ -1,0 +1,589 @@
+{
+  "common": {
+    "continue": "Continuer",
+    "confirm": "Confirmer",
+    "cancel": "Annuler",
+    "close": "Fermer",
+    "back": "Retour",
+    "next": "Suivant",
+    "save": "Enregistrer",
+    "edit": "Modifier",
+    "delete": "Supprimer",
+    "search": "Rechercher",
+    "loading": "Chargement…",
+    "error": "Erreur",
+    "success": "Succès",
+    "yes": "Oui",
+    "no": "Non",
+    "ok": "OK",
+    "day": "jour",
+    "days": "jours",
+    "hour": "heure",
+    "hours": "heures",
+    "euro": "€",
+    "comingSoon": "Bientôt disponible",
+    "perDay": "/ jour",
+    "pricePerDay": "{{price}} € / jour",
+    "priceEuro": "{{price}} €",
+    "dayCount_one": "{{count}} jour",
+    "dayCount_other": "{{count}} jours",
+    "skip": "Passer",
+    "all": "Toutes",
+    "france": "France"
+  },
+  "onboarding": {
+    "skip": "Passer",
+    "getStarted": "Commencer",
+    "next": "Suivant",
+    "stepIndicator": "{{current}}/{{total}}",
+    "screen1": {
+      "title": "Louez en toute simplicité",
+      "subtitle": "Parcourez les meilleures agences et réservez en quelques secondes.",
+      "chip1": "Agences vérifiées",
+      "chip2": "Réservation instantanée",
+      "chip3": "Meilleurs prix"
+    },
+    "screen2": {
+      "title": "La confiance de milliers",
+      "subtitle": "Tous nos partenaires sont vérifiés et notés par la communauté.",
+      "chip1": "Avis authentiques",
+      "chip2": "Paiement sécurisé",
+      "chip3": "Assurance complète"
+    },
+    "screen3": {
+      "title": "Votre flotte, votre choix",
+      "subtitle": "Berlines, SUV, sportives, cabriolets — avec ou sans chauffeur.",
+      "chip1": "Flotte premium",
+      "chip2": "Avec chauffeur",
+      "chip3": "Livraison incluse"
+    }
+  },
+  "auth": {
+    "tabLogin": "Connexion",
+    "tabSignup": "Inscription",
+    "namePlaceholder": "Nom complet",
+    "emailPlaceholder": "Adresse e-mail",
+    "phonePlaceholder": "6 12 34 56 78",
+    "emailOrPhonePlaceholder": "E-mail ou téléphone",
+    "passwordPlaceholder": "Mot de passe",
+    "forgotPassword": "Mot de passe oublié ?",
+    "submitSignup": "Créer mon compte",
+    "submitLogin": "Se connecter",
+    "dividerText": "ou continuer avec",
+    "socialGoogle": "Google",
+    "socialApple": "Apple",
+    "hasAccount": "Déjà un compte ? ",
+    "noAccount": "Pas encore de compte ? ",
+    "switchToLogin": "Se connecter",
+    "switchToSignup": "S'inscrire"
+  },
+  "otp": {
+    "title": "Vérifiez votre numéro",
+    "subtitle": "Un code a été envoyé au +33 6 ** ** **42",
+    "resend": "Renvoyer le code",
+    "resendWithCountdown": "Renvoyer le code ({{seconds}}s)",
+    "verify": "Vérifier"
+  },
+  "kyc": {
+    "stepLabel": "Étape {{current}}/{{total}}",
+    "step1": {
+      "title": "Vérification d'identité",
+      "description": "Pour votre sécurité et celle de nos agences partenaires, nous devons vérifier votre identité",
+      "benefit1": "Location sécurisée et garantie",
+      "benefit2": "Badge vérifié sur votre profil",
+      "benefit3": "Accès à l'ensemble des véhicules",
+      "startButton": "Commencer la vérification",
+      "laterButton": "Plus tard"
+    },
+    "step2": {
+      "title": "Pièce d'identité",
+      "description": "Prenez en photo le recto et le verso de votre carte d'identité nationale",
+      "idCardLabel": "Carte d'identité",
+      "licenseLabel": "Permis de conduire",
+      "front": "Recto",
+      "back": "Verso",
+      "tip": "💡 Assurez-vous que la photo est nette, bien éclairée et que tous les textes sont lisibles"
+    },
+    "step3": {
+      "title": "Vérification en cours",
+      "description": "Nous vérifions vos documents. Vous recevrez une notification dès que votre profil sera validé. Cela prend généralement moins de 24 heures.",
+      "statusBadge": "En attente de vérification",
+      "homeButton": "Retour à l'accueil"
+    }
+  },
+  "scan": {
+    "title": "QR Agence",
+    "live": "En direct",
+    "holdSteady": "Gardez stable…",
+    "headline": "Scannez le QR code de votre agence",
+    "subline": "Placez le code dans le cadre. Vous serez connecté automatiquement.",
+    "analyzing": "Analyse en cours…",
+    "simulateButton": "Simuler le scan",
+    "enterCode": "Saisir le code manuellement",
+    "connecting": "Connexion à {{name}}…",
+    "chip1": "Agences uniquement",
+    "chip2": "Appairage instantané",
+    "chip3": "Sécurisé"
+  },
+  "home": {
+    "greeting": "Bonjour, Jean-Pierre",
+    "searchPlaceholder": "Rechercher un véhicule, une agence...",
+    "categoriesTitle": "Catégories",
+    "popularAgenciesTitle": "Agences populaires",
+    "recommendedTitle": "Véhicules recommandés",
+    "seeAll": "Voir tout",
+    "emptyCategory": "Aucun véhicule dans cette catégorie",
+    "categoryAll": "Toutes",
+    "categoryWithChauffeur": "Avec chauffeur"
+  },
+  "calendar": {
+    "months": [
+      "Janvier",
+      "Février",
+      "Mars",
+      "Avril",
+      "Mai",
+      "Juin",
+      "Juillet",
+      "Août",
+      "Septembre",
+      "Octobre",
+      "Novembre",
+      "Décembre"
+    ],
+    "shortMonths": [
+      "Jan",
+      "Fév",
+      "Mars",
+      "Avr",
+      "Mai",
+      "Juin",
+      "Juil",
+      "Août",
+      "Sep",
+      "Oct",
+      "Nov",
+      "Déc"
+    ],
+    "daysOfWeek": [
+      "Lu",
+      "Ma",
+      "Me",
+      "Je",
+      "Ve",
+      "Sa",
+      "Di"
+    ]
+  },
+  "search": {
+    "inputPlaceholder": "Nom du véhicule...",
+    "categoryInputPlaceholder": "Catégorie: {{category}}",
+    "chooseDates": "Choisir les dates",
+    "locationLabel": "{{city}}, France",
+    "resultsCount_one": "{{count}} résultat",
+    "resultsCount_other": "{{count}} résultats",
+    "typeVehicle": "Véhicule",
+    "typeAgency": "Agence",
+    "noResultsTitle": "Aucun résultat",
+    "noResultsText": "Essayez un autre terme de recherche",
+    "recentTitle": "Recherches récentes",
+    "popularCategoriesTitle": "Catégories populaires",
+    "suggestionsTitle": "Suggestions",
+    "cityModalTitle": "Localisation",
+    "citySearchPlaceholder": "Rechercher une ville...",
+    "noCityFound": "Aucune ville trouvée",
+    "cityRegion": "{{region}}, France",
+    "unavailableJune": "Indisponible en Juin — déjà réservé",
+    "unavailableMaxDays": "Durée max. 4 jours pour ce véhicule",
+    "calendarModalTitle": "Choisir les dates",
+    "calendarStart": "Début",
+    "calendarEnd": "Fin",
+    "calendarDuration": "Durée",
+    "calendarDurationDays": "{{count}}j",
+    "calendarEmpty": "—",
+    "timePickupTitle": "Heure de prise en charge",
+    "timeReturnTitle": "Heure de retour",
+    "confirmButton": "Confirmer",
+    "popular": {
+      "sportives": "Sportives",
+      "suv": "SUV",
+      "berlines": "Berlines",
+      "cabriolets": "Cabriolets",
+      "electriques": "Électriques",
+      "withChauffeur": "Avec chauffeur"
+    }
+  },
+  "agencies": {
+    "title": "Agences",
+    "cityAll": "Toutes",
+    "vehiclesCount": "{{city}} — {{count}} véhicules",
+    "reviewsCount": "({{count}} avis)"
+  },
+  "agency": {
+    "verified": "Agence vérifiée",
+    "tabVehicles": "Véhicules",
+    "tabReviews": "Avis",
+    "vehiclesAvailable": "{{count}} véhicules disponibles",
+    "vehicleAvailable": "{{count}} véhicule disponible",
+    "reviewsBasedOn": "Basé sur {{count}} avis",
+    "reviewsCount": "({{count}} avis)",
+    "agencyResponse": "Réponse de l'agence",
+    "connected": "Connecté",
+    "browseFleet": "Parcourir la flotte",
+    "recentReviews": "Avis récents",
+    "callAgency": "Appeler",
+    "messageAgency": "Message"
+  },
+  "vehicle": {
+    "imageCounter": "{{current}}/{{total}}",
+    "specsTitle": "Spécifications",
+    "specs": {
+      "transmission": "Transmission",
+      "fuel": "Carburant",
+      "power": "Puissance",
+      "seats": "Places",
+      "seatsValue": "{{count}} places",
+      "doors": "Portes",
+      "doorsValue": "{{count}} portes",
+      "trunk": "Coffre"
+    },
+    "featuresTitle": "Équipements",
+    "descriptionTitle": "Description",
+    "chauffeur": {
+      "title": "Avec chauffeur privé",
+      "price": "+{{price}} € / jour",
+      "sub": "Chauffeur professionnel bilingue français-anglais"
+    },
+    "conditionsTitle": "Conditions de location",
+    "conditions": {
+      "minAge": "Age minimum : {{age}} ans",
+      "license": "Permis de conduire valide depuis {{years}} ans",
+      "deposit": "Caution : {{amount}} €",
+      "km": "Kilométrage : {{km}} km/jour inclus"
+    },
+    "bookButton": "Réserver"
+  },
+  "booking": {
+    "title": "Réservation",
+    "stepLabel": "{{current}}/{{total}}",
+    "datesTitle": "Dates de location",
+    "dateLabel": "{{start}} — {{end}} ({{count}} jours)",
+    "dateLabelSingle": "{{start}} — {{end}} ({{count}} jour)",
+    "modify": "Modifier",
+    "timePickupLabel": "Heure de prise en charge",
+    "timeReturnLabel": "Heure de retour",
+    "pickupTitle": "Mode de récupération",
+    "pickupAgency": "En agence",
+    "pickupDelivery": "Livraison",
+    "deliveryRate": "{{rate}} {{currency}}/km",
+    "delivery": {
+      "addressLabel": "Adresse de livraison",
+      "addressPlaceholder": "Rue, numéro, code postal, ville",
+      "hintBase": "Point de départ : {{label}}",
+      "hintRadius": " · Rayon max {{km}} km",
+      "computing": "Calcul du trajet…",
+      "distance": "Distance",
+      "distanceKm": "{{km}} km",
+      "feeLabel": "Tarif livraison",
+      "feeValue": "{{fee}} {{currency}}",
+      "minFeeApplied": "Frais minimum appliqué ({{min}} {{currency}})"
+    },
+    "chauffeur": {
+      "title": "Ajouter un chauffeur privé",
+      "price": "+{{price}} € / jour"
+    },
+    "summaryTitle": "Récapitulatif",
+    "summary": {
+      "rental_one": "Location ({{count}} jour)",
+      "rental_other": "Location ({{count}} jours)",
+      "deliveryLine": "Livraison",
+      "deliveryLineWithKm": "Livraison ({{km}} km)",
+      "chauffeurLine_one": "Chauffeur ({{count}} jour)",
+      "chauffeurLine_other": "Chauffeur ({{count}} jours)",
+      "total": "Total",
+      "valueEuro": "{{value}} €"
+    },
+    "continueToPayment": "Continuer vers le paiement",
+    "calendarModalTitle": "Choisir les dates",
+    "calendarStart": "Début",
+    "calendarEnd": "Fin",
+    "calendarDuration": "Durée",
+    "calendarDurationDays": "{{count}}j",
+    "calendarEmpty": "—",
+    "confirm": "Confirmer"
+  },
+  "payment": {
+    "title": "Paiement",
+    "stepLabel": "{{current}}/{{total}}",
+    "methodTitle": "Moyen de paiement",
+    "cardNumber": "**** **** **** 4242",
+    "cardExpiry": "Exp: 09/27",
+    "cardBrand": "VISA",
+    "addCard": "+ Ajouter une carte",
+    "securePayment": "Paiement sécurisé",
+    "guaranteed": "Protection garantie",
+    "confirmPay": "Confirmer et payer — {{amount}} €"
+  },
+  "confirmation": {
+    "stepLabel": "{{current}}/{{total}}",
+    "title": "Réservation confirmée",
+    "subtitle": "Votre véhicule est réservé. Vous recevrez un e-mail de confirmation.",
+    "reference": "Réf. #{{ref}}",
+    "vehicleFallback": "Véhicule",
+    "agencyFallback": "Agence",
+    "deliveryLine": "Livraison : {{address}}",
+    "withChauffeur": "Avec chauffeur",
+    "totalLine": "Total : {{total}} €",
+    "trackBooking": "Suivre ma réservation",
+    "backHome": "Retour à l'accueil",
+    "months": {
+      "jan": "Jan",
+      "feb": "Fév",
+      "mar": "Mars",
+      "apr": "Avr",
+      "may": "Mai",
+      "jun": "Juin",
+      "jul": "Juil",
+      "aug": "Août",
+      "sep": "Sep",
+      "oct": "Oct",
+      "nov": "Nov",
+      "dec": "Déc"
+    }
+  },
+  "bookings": {
+    "title": "Mes réservations",
+    "tabs": {
+      "active": "En cours",
+      "upcoming": "À venir",
+      "history": "Historique"
+    },
+    "status": {
+      "active": "En cours",
+      "confirmed": "Confirmée",
+      "completed": "Terminée"
+    },
+    "totalLabel": "Total",
+    "seeDetails": "Voir détails"
+  },
+  "bookingSummary": {
+    "title": "Résumé de retour",
+    "notFound": "Réservation introuvable",
+    "back": "Retour",
+    "reference": "Réf. #{{ref}}",
+    "mileageTitle": "Kilométrage",
+    "mileage": {
+      "start": "Kilométrage départ",
+      "return": "Kilométrage retour",
+      "driven": "Km parcourus",
+      "included": "Km inclus",
+      "overage": "Dépassement",
+      "overageCost": "Coût supplémentaire",
+      "kmUnit": "{{value}} km",
+      "overageUnit": "+{{value}} km",
+      "overageZero": "0 km",
+      "overageCostZero": "0,00 €",
+      "overageCostUnit": "{{value}} €",
+      "rateNote": "Tarif par km supplémentaire : {{rate}} €"
+    },
+    "stateTitle": "État du véhicule",
+    "state": {
+      "okLabel": "En parfait état",
+      "okDescription": "Aucun dommage constaté lors de la restitution.",
+      "minorLabel": "Dommage mineur",
+      "minorDescription": "Une légère imperfection a été constatée — non facturée.",
+      "majorLabel": "Dommage important",
+      "majorDescription": "Des réparations sont nécessaires. Votre agence vous contactera."
+    },
+    "gallery": {
+      "title": "Photos après location",
+      "hint": "Faites glisser pour parcourir",
+      "counter": "{{current}}/{{total}}"
+    },
+    "invoice": {
+      "title": "Voir la facture",
+      "subtitle": "Total : {{total}} €",
+      "subtitleWithOverage": "Total : {{total}} € (+ {{overage}} € dépassement)"
+    }
+  },
+  "notifications": {
+    "title": "Notifications",
+    "agoPrefix": "Il y a {{time}}"
+  },
+  "tracking": {
+    "mapStart": "Départ",
+    "mapEnd": "Arrivée",
+    "fullscreen": "Plein écran",
+    "timeline": {
+      "confirmed": "Réservation confirmée",
+      "confirmedTime": "12 Juin, 09:00",
+      "preparing": "Véhicule en préparation",
+      "preparingTime": "12 Juin, 09:30",
+      "enRoute": "En route vers vous",
+      "enRouteTime": "Arrivée estimée : 10:15",
+      "delivered": "Livré"
+    },
+    "etaValue": "15 min",
+    "etaLabel": "Temps d'arrivée estimé",
+    "driverStatus": "Livraison en cours",
+    "fallbackAgency": "Prestige Auto Nice"
+  },
+  "call": {
+    "status": "Appel en cours",
+    "phoneNumber": "+33 4 93 88 00 00",
+    "speaker": "Haut-parleur",
+    "mic": "Micro",
+    "muted": "Muet",
+    "fallbackAgency": "Prestige Auto Nice"
+  },
+  "messagerie": {
+    "online": "En ligne",
+    "inputPlaceholder": "Écrire un message...",
+    "fallbackAgency": "Prestige Auto Nice",
+    "seed": {
+      "msg1": "Bonjour, votre véhicule est en préparation.",
+      "msg2": "Merci ! À quelle heure pensez-vous arriver ?",
+      "msg3": "Nous arriverons dans environ 15 minutes.",
+      "msg4": "Parfait, je vous attends."
+    }
+  },
+  "bottomNav": {
+    "home": "Accueil",
+    "bookings": "Réservations",
+    "profile": "Profil",
+    "settings": "Réglages"
+  },
+  "settings": {
+    "title": "Réglages",
+    "sectionPreferences": "Préférences",
+    "sectionAccount": "Compte",
+    "sectionSupport": "Support",
+    "sectionLegal": "Légal",
+    "notifications": "Notifications",
+    "language": "Langue",
+    "darkMode": "Mode sombre",
+    "paymentMethods": "Moyens de paiement",
+    "documents": "Mes documents",
+    "help": "Centre d'aide",
+    "contact": "Contacter le support",
+    "feedback": "Envoyer un commentaire",
+    "terms": "Conditions d'utilisation",
+    "privacy": "Politique de confidentialité",
+    "about": "À propos",
+    "version": "Version {{version}}"
+  },
+  "paymentMethods": {
+    "title": "Moyens de paiement",
+    "subtitle": "Cartes utilisées pour vos réservations",
+    "primary": "Principal",
+    "addCard": "Ajouter une carte",
+    "remove": "Supprimer",
+    "expiry": "Expire {{month}}/{{year}}",
+    "brandVisa": "Visa",
+    "brandMastercard": "Mastercard",
+    "brandAmex": "American Express"
+  },
+  "documents": {
+    "title": "Mes documents",
+    "subtitle": "Identité et permis",
+    "idFront": "Carte d'identité — recto",
+    "idBack": "Carte d'identité — verso",
+    "license": "Permis de conduire",
+    "proofAddress": "Justificatif de domicile",
+    "statusVerified": "Vérifié",
+    "statusPending": "En attente",
+    "statusMissing": "Manquant",
+    "replace": "Remplacer",
+    "upload": "Téléverser"
+  },
+  "help": {
+    "title": "Centre d'aide",
+    "subtitle": "Parcourez la foire aux questions",
+    "searchPlaceholder": "Rechercher un sujet…",
+    "topicBooking": "Réserver un véhicule",
+    "topicPayment": "Paiement et tarifs",
+    "topicDelivery": "Livraison et prise en charge",
+    "topicReturn": "Restitution du véhicule",
+    "topicAccount": "Compte et documents",
+    "topicSafety": "Sécurité et assurance",
+    "readMore": "Lire l'article"
+  },
+  "contact": {
+    "title": "Contacter le support",
+    "subtitle": "Disponible 7 jours sur 7",
+    "chatTitle": "Chat en direct",
+    "chatHint": "Réponse en quelques minutes",
+    "emailTitle": "Nous écrire",
+    "emailAddress": "support@myfleet.app",
+    "phoneTitle": "Appeler le support",
+    "phoneNumber": "+33 4 93 00 00 00",
+    "phoneHint": "Lun–Dim, 8h–22h"
+  },
+  "feedback": {
+    "title": "Envoyer un commentaire",
+    "subtitle": "Aidez-nous à améliorer My Fleet",
+    "ratingLabel": "Comment évaluez-vous votre expérience ?",
+    "commentLabel": "Dites-nous plus",
+    "commentPlaceholder": "Ce que vous avez aimé, ou ce qu'il faut améliorer…",
+    "submit": "Envoyer",
+    "thanks": "Merci ! Votre retour a été envoyé."
+  },
+  "terms": {
+    "title": "Conditions d'utilisation",
+    "subtitle": "Mis à jour en avril 2026",
+    "intro": "En utilisant My Fleet, vous acceptez ces conditions. Merci de les lire attentivement.",
+    "sec1Title": "1. Utilisation du service",
+    "sec1Body": "My Fleet vous met en relation avec des agences de location vérifiées. Chaque réservation est régie par les conditions de l'agence concernée.",
+    "sec2Title": "2. Compte et identité",
+    "sec2Body": "Vous devez fournir des informations exactes et des documents d'identité valides. Nous pouvons suspendre votre compte en cas de fraude.",
+    "sec3Title": "3. Paiements",
+    "sec3Body": "Les prix sont fixés par chaque agence. Vous autorisez My Fleet à débiter votre moyen de paiement pour les réservations, extras, cautions et dégâts éventuels.",
+    "sec4Title": "4. Annulation",
+    "sec4Body": "Chaque agence publie sa propre politique d'annulation. Les délais de remboursement dépendent de votre banque.",
+    "sec5Title": "5. Responsabilité",
+    "sec5Body": "My Fleet est une place de marché ; la location physique est opérée par l'agence. Votre contrat de location régit l'utilisation du véhicule."
+  },
+  "privacy": {
+    "title": "Politique de confidentialité",
+    "subtitle": "Comment nous gérons vos données",
+    "intro": "Nous prenons votre vie privée au sérieux. Cette politique explique quelles données nous collectons et pourquoi.",
+    "sec1Title": "Données collectées",
+    "sec1Body": "Pièces d'identité, coordonnées, localisation lors de l'utilisation, historique de réservations et de paiements.",
+    "sec2Title": "Comment nous les utilisons",
+    "sec2Body": "Pour vérifier votre identité, vous mettre en relation avec les agences, traiter les paiements et vous informer.",
+    "sec3Title": "Partage",
+    "sec3Body": "Nous ne partageons que les données strictement nécessaires avec l'agence de votre réservation. Nous ne vendons jamais vos données.",
+    "sec4Title": "Vos droits",
+    "sec4Body": "Vous pouvez accéder, exporter, corriger ou supprimer vos données à tout moment depuis les Réglages ou en contactant le support."
+  },
+  "about": {
+    "title": "À propos",
+    "subtitle": "My Fleet",
+    "tagline": "La location de véhicules premium, en toute simplicité.",
+    "version": "Version {{version}}",
+    "build": "Build {{build}}",
+    "website": "Site web",
+    "twitter": "Twitter",
+    "linkedin": "LinkedIn",
+    "copyright": "© 2026 My Fleet. Tous droits réservés."
+  },
+  "profile": {
+    "memberSince": "Membre depuis {{date}}",
+    "verified": "Vérifié",
+    "programTitle": "Programme MyFleet",
+    "pointsLabel": "{{value}} points",
+    "nextTier": "Prochain palier : {{name}} — {{value}} points",
+    "benefitsTitle": "Vos avantages — {{tier}}",
+    "loyaltyHistory": "Historique fidélité",
+    "accountInfo": "Mes informations personnelles",
+    "accountCards": "Mes cartes bancaires",
+    "accountDocuments": "Mes documents",
+    "notifications": "Notifications",
+    "language": "Langue",
+    "languageFr": "Français",
+    "languageEn": "English",
+    "languageSheetTitle": "Choisir la langue",
+    "darkMode": "Mode sombre",
+    "logout": "Se déconnecter"
+  }
+}

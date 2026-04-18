@@ -5,298 +5,284 @@ import {
   TouchableOpacity,
   ScrollView,
   StyleSheet,
+  Modal,
+  Pressable,
+  Alert,
 } from "react-native";
 import { useRouter } from "expo-router";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { StatusBar } from "expo-status-bar";
+import { useTranslation } from "react-i18next";
 import {
   User,
   ChevronRight,
   CreditCard,
   FileText,
-  Bell,
-  Globe,
-  Moon,
   LogOut,
   Gift,
   TrendingUp,
   TrendingDown,
+  Check,
 } from "lucide-react-native";
 import type { LucideIcon } from "lucide-react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import { BottomNav } from "@/components/BottomNav";
 import { useTheme } from "@/context/ThemeContext";
 import { loyaltyTiers, loyaltyHistory } from "@/data/mockData";
+import { setAppLocale, SUPPORTED_LOCALES, type AppLocale } from "@/i18n";
 
 const currentPoints = 2480;
-const currentTier = loyaltyTiers[1]; // Argent
-const nextTier = loyaltyTiers[2]; // Or
+const currentTier = loyaltyTiers[1]!; // Argent
+const nextTier = loyaltyTiers[2]!; // Or
 
 interface AccountItem {
   icon: LucideIcon;
-  label: string;
+  labelKey: string;
+  route?: string;
 }
 
 const accountItems: AccountItem[] = [
-  { icon: User, label: "Mes informations personnelles" },
-  { icon: CreditCard, label: "Mes cartes bancaires" },
-  { icon: FileText, label: "Mes documents" },
+  { icon: User, labelKey: "profile.accountInfo" },
+  { icon: CreditCard, labelKey: "profile.accountCards", route: "/payment-methods" },
+  { icon: FileText, labelKey: "profile.accountDocuments", route: "/documents" },
 ];
 
 export default function ProfileScreen() {
   const router = useRouter();
-  const { colors, isDark, toggleTheme } = useTheme();
-  const [notifications, setNotifications] = useState(true);
+  const { t } = useTranslation();
+  const { colors, isDark } = useTheme();
+  const [languageSheetOpen, setLanguageSheetOpen] = useState(false);
+
+  const handleLogout = () => {
+    Alert.alert(
+      t("profile.logout"),
+      "",
+      [
+        { text: t("common.cancel"), style: "cancel" },
+        {
+          text: t("profile.logout"),
+          style: "destructive",
+          onPress: () => router.replace("/onboarding"),
+        },
+      ],
+    );
+  };
 
   return (
-    <SafeAreaView style={[styles.safeArea, { backgroundColor: colors.surface }]} edges={["top"]}>
-      <View style={[styles.container, { backgroundColor: colors.background }]}>
-        <ScrollView
-          showsVerticalScrollIndicator={false}
-          contentContainerStyle={styles.scrollContent}
-        >
-          {/* ─── Header Card ─── */}
+    <View style={[styles.container, { backgroundColor: colors.background }]}>
+      <StatusBar style={colors.statusBarStyle} />
+      <ScrollView
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={{ paddingBottom: 120 }}
+      >
+        {/* Header Card */}
+        <SafeAreaView edges={["top"]} style={{ backgroundColor: colors.surface }}>
           <View style={[styles.headerCard, { backgroundColor: colors.surface }]}>
-            <View style={[styles.avatar, { borderColor: colors.border }]}>
-              <Text style={[styles.avatarText, { color: colors.text }]}>JD</Text>
+            <View
+              style={[
+                styles.avatar,
+                {
+                  backgroundColor: colors.primary,
+                  borderColor: colors.border,
+                },
+              ]}
+            >
+              <Text style={styles.avatarText}>JD</Text>
             </View>
-            <Text style={[styles.userName, { color: colors.text }]}>Jean-Pierre Dupont</Text>
+            <Text style={[styles.userName, { color: colors.text }]}>
+              Jean-Pierre Dupont
+            </Text>
             <Text style={[styles.memberSince, { color: colors.textSecondary }]}>
-              Membre depuis Janvier 2024
+              {t("profile.memberSince", { date: "Janvier 2024" })}
             </Text>
             <View style={styles.verifiedBadge}>
-              <Text style={styles.verifiedText}>Vérifié</Text>
+              <Text style={styles.verifiedText}>{t("profile.verified")}</Text>
+            </View>
+          </View>
+        </SafeAreaView>
+
+        <View style={styles.body}>
+          {/* Loyalty */}
+          <LinearGradient
+            colors={[colors.primary, "#8B3D7E"]}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 1, y: 1 }}
+            style={styles.loyaltyCard}
+          >
+            <View style={styles.loyaltyHeader}>
+              <Gift size={20} color="#FFFFFF" strokeWidth={1.5} />
+              <Text style={styles.loyaltyTitle}>{t("profile.programTitle")}</Text>
+            </View>
+            <Text style={styles.loyaltyPoints}>
+              {t("profile.pointsLabel", { value: currentPoints.toLocaleString() })}
+            </Text>
+            <Text style={styles.loyaltyNext}>
+              {t("profile.nextTier", {
+                name: nextTier.name,
+                value: nextTier.points.toLocaleString(),
+              })}
+            </Text>
+
+            <View style={styles.benefitsBox}>
+              <Text style={styles.benefitsTitle}>
+                {t("profile.benefitsTitle", { tier: currentTier.name })}
+              </Text>
+              {currentTier.benefits.map((benefit, i) => (
+                <View key={i} style={styles.benefitRow}>
+                  <View style={styles.benefitDot} />
+                  <Text style={styles.benefitText}>{benefit}</Text>
+                </View>
+              ))}
+            </View>
+          </LinearGradient>
+
+          {/* Loyalty History */}
+          <View style={styles.sectionBlock}>
+            <Text style={[styles.sectionTitle, { color: colors.text }]}>
+              {t("profile.loyaltyHistory")}
+            </Text>
+            <View style={styles.historyList}>
+              {loyaltyHistory.slice(0, 3).map((item) => (
+                <View
+                  key={item.id}
+                  style={[
+                    styles.historyRow,
+                    { backgroundColor: colors.surface, borderColor: colors.border },
+                  ]}
+                >
+                  <View style={styles.historyLeft}>
+                    {item.type === "earned" ? (
+                      <TrendingUp size={20} color="#2ECC71" strokeWidth={1.5} />
+                    ) : (
+                      <TrendingDown size={20} color={colors.error} strokeWidth={1.5} />
+                    )}
+                    <View>
+                      <Text style={[styles.historyDescription, { color: colors.text }]}>
+                        {item.description}
+                      </Text>
+                      <Text style={[styles.historyDate, { color: colors.textSecondary }]}>
+                        {item.date}
+                      </Text>
+                    </View>
+                  </View>
+                  <Text
+                    style={[
+                      styles.historyAmount,
+                      { color: item.type === "earned" ? "#2ECC71" : colors.error },
+                    ]}
+                  >
+                    {item.amount > 0 ? "+" : ""}
+                    {item.amount}
+                  </Text>
+                </View>
+              ))}
             </View>
           </View>
 
-          <View style={styles.body}>
-            {/* ─── Loyalty Card ─── */}
-            <LinearGradient
-              colors={["#2E1C2B", "#4A1942"]}
-              start={{ x: 0, y: 0 }}
-              end={{ x: 1, y: 1 }}
-              style={styles.loyaltyCard}
-            >
-              <View style={styles.loyaltyHeader}>
-                <Gift size={20} color="#EAEAEA" strokeWidth={1.5} />
-                <Text style={styles.loyaltyTitle}>Programme MyFleet</Text>
-              </View>
-              <Text style={styles.loyaltyPoints}>
-                {currentPoints.toLocaleString()} points
-              </Text>
-              <Text style={styles.loyaltyNext}>
-                Prochain palier : {nextTier.name} —{" "}
-                {nextTier.points.toLocaleString()} points
-              </Text>
-
-              {/* Benefits Box */}
-              <View style={styles.benefitsBox}>
-                <Text style={styles.benefitsTitle}>
-                  Vos avantages — {currentTier.name}
-                </Text>
-                {currentTier.benefits.map((benefit, index) => (
-                  <View key={index} style={styles.benefitRow}>
-                    <View style={styles.benefitDot} />
-                    <Text style={styles.benefitText}>{benefit}</Text>
-                  </View>
-                ))}
-              </View>
-            </LinearGradient>
-
-            {/* ─── Loyalty History ─── */}
-            <View style={styles.sectionBlock}>
-              <Text style={styles.sectionTitle}>Historique fidélité</Text>
-              <View style={styles.historyList}>
-                {loyaltyHistory.slice(0, 3).map((item) => (
-                  <View key={item.id} style={[styles.historyRow, { backgroundColor: colors.surface }]}>
-                    <View style={styles.historyLeft}>
-                      {item.type === "earned" ? (
-                        <TrendingUp
-                          size={20}
-                          color="#2ECC71"
-                          strokeWidth={1.5}
-                        />
-                      ) : (
-                        <TrendingDown
-                          size={20}
-                          color="#E74C3C"
-                          strokeWidth={1.5}
-                        />
-                      )}
-                      <View>
-                        <Text style={[styles.historyDescription, { color: colors.text }]}>
-                          {item.description}
-                        </Text>
-                        <Text style={[styles.historyDate, { color: colors.textSecondary }]}>{item.date}</Text>
-                      </View>
-                    </View>
-                    <Text
-                      style={[
-                        styles.historyAmount,
-                        {
-                          color:
-                            item.type === "earned" ? "#2ECC71" : "#E74C3C",
-                        },
-                      ]}
-                    >
-                      {item.amount > 0 ? "+" : ""}
-                      {item.amount}
+          {/* Account */}
+          <View
+            style={[
+              styles.menuGroup,
+              { backgroundColor: colors.surface, borderColor: colors.border },
+            ]}
+          >
+            {accountItems.map((item, index) => {
+              const Icon = item.icon;
+              const isLast = index === accountItems.length - 1;
+              return (
+                <TouchableOpacity
+                  key={index}
+                  onPress={() => item.route && router.push(item.route as never)}
+                  style={[
+                    styles.menuRow,
+                    !isLast && { borderBottomWidth: 1, borderBottomColor: colors.border },
+                  ]}
+                  activeOpacity={0.7}
+                >
+                  <View style={styles.menuLeft}>
+                    <Icon size={20} color={colors.textSecondary} strokeWidth={1.5} />
+                    <Text style={[styles.menuLabel, { color: colors.text }]}>
+                      {t(item.labelKey)}
                     </Text>
                   </View>
-                ))}
-              </View>
-            </View>
-
-            {/* ─── Mon compte ─── */}
-            <View style={[styles.menuGroup, { backgroundColor: colors.surface }]}>
-              {accountItems.map((item, index) => {
-                const Icon = item.icon;
-                const isLast = index === accountItems.length - 1;
-                return (
-                  <TouchableOpacity
-                    key={index}
-                    style={[
-                      styles.menuRow,
-                      !isLast && styles.menuRowBorder, { borderBottomColor: colors.border },
-                    ]}
-                    activeOpacity={0.7}
-                  >
-                    <View style={styles.menuLeft}>
-                      <Icon
-                        size={20}
-                        color="rgba(234, 234, 234, 0.6)"
-                        strokeWidth={1.5}
-                      />
-                      <Text style={[styles.menuLabel, { color: colors.text }]}>{item.label}</Text>
-                    </View>
-                    <ChevronRight
-                      size={20}
-                      color="rgba(234, 234, 234, 0.6)"
-                      strokeWidth={1.5}
-                    />
-                  </TouchableOpacity>
-                );
-              })}
-            </View>
-
-            {/* ─── Préférences ─── */}
-            <View style={[styles.menuGroup, { backgroundColor: colors.surface }]}>
-              {/* Notifications */}
-              <View style={[styles.menuRow, styles.menuRowBorder]}>
-                <View style={styles.menuLeft}>
-                  <Bell
-                    size={20}
-                    color="rgba(234, 234, 234, 0.6)"
-                    strokeWidth={1.5}
-                  />
-                  <Text style={styles.menuLabel}>Notifications</Text>
-                </View>
-                <TouchableOpacity
-                  onPress={() => setNotifications(!notifications)}
-                  activeOpacity={0.7}
-                  style={[
-                    styles.toggle,
-                    {
-                      backgroundColor: notifications
-                        ? "#4A1942"
-                        : "rgba(234, 234, 234, 0.15)",
-                    },
-                  ]}
-                >
-                  <View
-                    style={[
-                      styles.toggleThumb,
-                      { left: notifications ? 24 : 4 },
-                    ]}
-                  />
+                  <ChevronRight size={20} color={colors.textSecondary} strokeWidth={1.5} />
                 </TouchableOpacity>
-              </View>
-
-              {/* Language */}
-              <TouchableOpacity
-                style={[styles.menuRow, styles.menuRowBorder]}
-                activeOpacity={0.7}
-              >
-                <View style={styles.menuLeft}>
-                  <Globe
-                    size={20}
-                    color="rgba(234, 234, 234, 0.6)"
-                    strokeWidth={1.5}
-                  />
-                  <Text style={styles.menuLabel}>Langue</Text>
-                </View>
-                <View style={styles.menuRight}>
-                  <Text style={styles.menuValue}>Français</Text>
-                  <ChevronRight
-                    size={20}
-                    color="rgba(234, 234, 234, 0.6)"
-                    strokeWidth={1.5}
-                  />
-                </View>
-              </TouchableOpacity>
-
-              {/* Dark Mode */}
-              <View style={styles.menuRow}>
-                <View style={styles.menuLeft}>
-                  <Moon
-                    size={20}
-                    color="rgba(234, 234, 234, 0.6)"
-                    strokeWidth={1.5}
-                  />
-                  <Text style={[styles.menuLabel, { color: colors.text }]}>Mode sombre</Text>
-                </View>
-                <TouchableOpacity
-                  onPress={toggleTheme}
-                  activeOpacity={0.7}
-                  style={[
-                    styles.toggle,
-                    {
-                      backgroundColor: isDark
-                        ? "#4A1942"
-                        : "rgba(0, 0, 0, 0.1)",
-                    },
-                  ]}
-                >
-                  <View
-                    style={[
-                      styles.toggleThumb,
-                      { left: isDark ? 24 : 4, backgroundColor: isDark ? "#EAEAEA" : "#1D1D1F" },
-                    ]}
-                  />
-                </TouchableOpacity>
-              </View>
-            </View>
-
-            {/* ─── Log Out ─── */}
-            <TouchableOpacity style={styles.logoutButton} activeOpacity={0.7} onPress={() => router.replace("/onboarding")}>
-              <LogOut size={20} color="#E74C3C" strokeWidth={1.5} />
-              <Text style={styles.logoutText}>Se déconnecter</Text>
-            </TouchableOpacity>
+              );
+            })}
           </View>
-        </ScrollView>
 
-        <BottomNav />
-      </View>
-    </SafeAreaView>
+          {/* Logout */}
+          <TouchableOpacity
+            style={styles.logoutButton}
+            activeOpacity={0.7}
+            onPress={handleLogout}
+          >
+            <LogOut size={20} color={colors.error} strokeWidth={1.5} />
+            <Text style={[styles.logoutText, { color: colors.error }]}>
+              {t("profile.logout")}
+            </Text>
+          </TouchableOpacity>
+        </View>
+      </ScrollView>
+
+      {/* Language sheet (kept here since profile used to open it) */}
+      <Modal
+        visible={languageSheetOpen}
+        transparent
+        animationType="slide"
+        onRequestClose={() => setLanguageSheetOpen(false)}
+      >
+        <Pressable
+          style={styles.langOverlay}
+          onPress={() => setLanguageSheetOpen(false)}
+        >
+          <Pressable
+            style={[styles.langSheet, { backgroundColor: colors.surface }]}
+            onPress={() => {}}
+          >
+            <View style={styles.langDragHandle} />
+            <Text style={[styles.langTitle, { color: colors.text }]}>
+              {t("profile.languageSheetTitle")}
+            </Text>
+            {SUPPORTED_LOCALES.map((locale) => {
+              const label = t(
+                locale === "en" ? "profile.languageEn" : "profile.languageFr",
+              );
+              return (
+                <TouchableOpacity
+                  key={locale}
+                  activeOpacity={0.7}
+                  onPress={async () => {
+                    setLanguageSheetOpen(false);
+                    await setAppLocale(locale as AppLocale);
+                  }}
+                  style={[
+                    styles.langRow,
+                    { borderBottomColor: colors.border },
+                  ]}
+                >
+                  <Text style={[styles.langLabel, { color: colors.text }]}>
+                    {label}
+                  </Text>
+                  <Check size={18} color={colors.primary} strokeWidth={2} />
+                </TouchableOpacity>
+              );
+            })}
+          </Pressable>
+        </Pressable>
+      </Modal>
+
+      <BottomNav />
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
-  safeArea: {
-    flex: 1,
-    backgroundColor: "#2E1C2B",
-  },
-  container: {
-    flex: 1,
-    backgroundColor: "#050404",
-  },
-  scrollContent: {
-    paddingBottom: 16,
-  },
+  container: { flex: 1 },
 
-  /* ─── Header Card ─── */
+  /* Header */
   headerCard: {
-    backgroundColor: "#2E1C2B",
-    paddingTop: 48,
+    paddingTop: 20,
     paddingBottom: 32,
     paddingHorizontal: 20,
     alignItems: "center",
@@ -307,9 +293,7 @@ const styles = StyleSheet.create({
     width: 80,
     height: 80,
     borderRadius: 999,
-    backgroundColor: "#4A1942",
     borderWidth: 3,
-    borderColor: "rgba(234, 234, 234, 0.1)",
     alignItems: "center",
     justifyContent: "center",
     marginBottom: 12,
@@ -317,18 +301,16 @@ const styles = StyleSheet.create({
   avatarText: {
     fontFamily: "Poppins_700Bold",
     fontSize: 28,
-    color: "#EAEAEA",
+    color: "#FFFFFF",
   },
   userName: {
     fontFamily: "Poppins_600SemiBold",
     fontSize: 18,
-    color: "#EAEAEA",
     marginBottom: 4,
   },
   memberSince: {
     fontFamily: "Poppins_400Regular",
     fontSize: 13,
-    color: "rgba(234, 234, 234, 0.6)",
     marginBottom: 12,
   },
   verifiedBadge: {
@@ -343,18 +325,11 @@ const styles = StyleSheet.create({
     color: "#2ECC71",
   },
 
-  /* ─── Body ─── */
-  body: {
-    paddingHorizontal: 20,
-    paddingTop: 24,
-    gap: 24,
-  },
+  /* Body */
+  body: { paddingHorizontal: 20, paddingTop: 24, gap: 24 },
 
-  /* ─── Loyalty Card ─── */
-  loyaltyCard: {
-    padding: 22,
-    borderRadius: 28,
-  },
+  /* Loyalty */
+  loyaltyCard: { padding: 22, borderRadius: 28 },
   loyaltyHeader: {
     flexDirection: "row",
     alignItems: "center",
@@ -364,29 +339,29 @@ const styles = StyleSheet.create({
   loyaltyTitle: {
     fontFamily: "Poppins_600SemiBold",
     fontSize: 16,
-    color: "#EAEAEA",
+    color: "#FFFFFF",
   },
   loyaltyPoints: {
     fontFamily: "Poppins_700Bold",
     fontSize: 32,
-    color: "#EAEAEA",
+    color: "#FFFFFF",
     marginBottom: 8,
   },
   loyaltyNext: {
     fontFamily: "Poppins_400Regular",
     fontSize: 13,
-    color: "rgba(234, 234, 234, 0.8)",
+    color: "rgba(255, 255, 255, 0.8)",
     marginBottom: 16,
   },
   benefitsBox: {
-    backgroundColor: "rgba(5, 4, 4, 0.3)",
+    backgroundColor: "rgba(0, 0, 0, 0.25)",
     borderRadius: 22,
     padding: 16,
   },
   benefitsTitle: {
     fontFamily: "Poppins_600SemiBold",
     fontSize: 14,
-    color: "#EAEAEA",
+    color: "#FFFFFF",
     marginBottom: 12,
   },
   benefitRow: {
@@ -399,59 +374,41 @@ const styles = StyleSheet.create({
     width: 6,
     height: 6,
     borderRadius: 3,
-    backgroundColor: "#EAEAEA",
+    backgroundColor: "#FFFFFF",
   },
   benefitText: {
     fontFamily: "Poppins_400Regular",
     fontSize: 13,
-    color: "rgba(234, 234, 234, 0.9)",
+    color: "rgba(255, 255, 255, 0.9)",
   },
 
-  /* ─── Loyalty History ─── */
+  /* History */
   sectionBlock: {},
   sectionTitle: {
     fontFamily: "Poppins_600SemiBold",
     fontSize: 17,
-    color: "#EAEAEA",
     marginBottom: 12,
     paddingHorizontal: 4,
   },
-  historyList: {
-    gap: 8,
-  },
+  historyList: { gap: 8 },
   historyRow: {
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
-    backgroundColor: "#2E1C2B",
     borderRadius: 999,
     paddingHorizontal: 16,
     paddingVertical: 12,
+    borderWidth: 1,
   },
-  historyLeft: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 12,
-  },
-  historyDescription: {
-    fontFamily: "Poppins_500Medium",
-    fontSize: 14,
-    color: "#EAEAEA",
-  },
-  historyDate: {
-    fontFamily: "Poppins_400Regular",
-    fontSize: 12,
-    color: "rgba(234, 234, 234, 0.6)",
-  },
-  historyAmount: {
-    fontFamily: "Poppins_600SemiBold",
-    fontSize: 16,
-  },
+  historyLeft: { flexDirection: "row", alignItems: "center", gap: 12 },
+  historyDescription: { fontFamily: "Poppins_500Medium", fontSize: 14 },
+  historyDate: { fontFamily: "Poppins_400Regular", fontSize: 12 },
+  historyAmount: { fontFamily: "Poppins_600SemiBold", fontSize: 16 },
 
-  /* ─── Menu Groups ─── */
+  /* Menu */
   menuGroup: {
-    backgroundColor: "#2E1C2B",
     borderRadius: 24,
+    borderWidth: 1,
     overflow: "hidden",
   },
   menuRow: {
@@ -460,48 +417,10 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     padding: 16,
   },
-  menuRowBorder: {
-    borderBottomWidth: 1,
-    borderBottomColor: "rgba(234, 234, 234, 0.1)",
-  },
-  menuLeft: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 12,
-  },
-  menuLabel: {
-    fontFamily: "Poppins_400Regular",
-    fontSize: 15,
-    color: "#EAEAEA",
-  },
-  menuRight: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 8,
-  },
-  menuValue: {
-    fontFamily: "Poppins_400Regular",
-    fontSize: 14,
-    color: "rgba(234, 234, 234, 0.6)",
-  },
+  menuLeft: { flexDirection: "row", alignItems: "center", gap: 12 },
+  menuLabel: { fontFamily: "Poppins_400Regular", fontSize: 15 },
 
-  /* Toggle */
-  toggle: {
-    width: 48,
-    height: 28,
-    borderRadius: 999,
-    position: "relative",
-    justifyContent: "center",
-  },
-  toggleThumb: {
-    position: "absolute",
-    width: 20,
-    height: 20,
-    borderRadius: 999,
-    backgroundColor: "#EAEAEA",
-  },
-
-  /* ─── Logout ─── */
+  /* Logout */
   logoutButton: {
     flexDirection: "row",
     alignItems: "center",
@@ -509,9 +428,41 @@ const styles = StyleSheet.create({
     gap: 8,
     paddingVertical: 16,
   },
-  logoutText: {
-    fontFamily: "Poppins_500Medium",
-    fontSize: 15,
-    color: "#E74C3C",
+  logoutText: { fontFamily: "Poppins_500Medium", fontSize: 15 },
+
+  /* Language sheet */
+  langOverlay: {
+    flex: 1,
+    backgroundColor: "rgba(0, 0, 0, 0.6)",
+    justifyContent: "flex-end",
   },
+  langSheet: {
+    borderTopLeftRadius: 24,
+    borderTopRightRadius: 24,
+    paddingBottom: 32,
+    paddingTop: 12,
+  },
+  langDragHandle: {
+    width: 40,
+    height: 4,
+    borderRadius: 2,
+    backgroundColor: "rgba(234, 234, 234, 0.3)",
+    alignSelf: "center",
+    marginBottom: 16,
+  },
+  langTitle: {
+    fontFamily: "Poppins_600SemiBold",
+    fontSize: 16,
+    paddingHorizontal: 20,
+    paddingBottom: 12,
+  },
+  langRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    paddingHorizontal: 20,
+    paddingVertical: 16,
+    borderBottomWidth: 1,
+  },
+  langLabel: { fontFamily: "Poppins_500Medium", fontSize: 15 },
 });

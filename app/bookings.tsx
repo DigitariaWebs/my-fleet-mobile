@@ -9,12 +9,10 @@ import {
 } from "react-native";
 import { useRouter } from "expo-router";
 import { SafeAreaView } from "react-native-safe-area-context";
-import {
-  Calendar,
-  MapPin,
-  ChevronRight,
-} from "lucide-react-native";
+import { Calendar, MapPin, ChevronRight } from "lucide-react-native";
 import { LinearGradient } from "expo-linear-gradient";
+import { StatusBar } from "expo-status-bar";
+import { useTranslation } from "react-i18next";
 import { BottomNav } from "@/components/BottomNav";
 import { useTheme } from "@/context/ThemeContext";
 import { bookings, vehicleImages } from "@/data/mockData";
@@ -23,218 +21,241 @@ type TabKey = "active" | "upcoming" | "history";
 
 interface Tab {
   key: TabKey;
-  label: string;
+  labelKey: string;
 }
 
 const tabs: Tab[] = [
-  { key: "active", label: "En cours" },
-  { key: "upcoming", label: "À venir" },
-  { key: "history", label: "Historique" },
+  { key: "active", labelKey: "bookings.tabs.active" },
+  { key: "upcoming", labelKey: "bookings.tabs.upcoming" },
+  { key: "history", labelKey: "bookings.tabs.history" },
 ];
-
-const statusConfig: Record<
-  string,
-  { bg: string; color: string; borderColor: string; label: string }
-> = {
-  active: {
-    bg: "rgba(74, 25, 66, 0.3)",
-    color: "#4A1942",
-    borderColor: "rgba(74, 25, 66, 0.5)",
-    label: "En cours",
-  },
-  confirmed: {
-    bg: "rgba(46, 204, 113, 0.2)",
-    color: "#2ECC71",
-    borderColor: "rgba(46, 204, 113, 0.4)",
-    label: "Confirmée",
-  },
-  completed: {
-    bg: "rgba(234, 234, 234, 0.15)",
-    color: "rgba(234, 234, 234, 0.6)",
-    borderColor: "rgba(234, 234, 234, 0.2)",
-    label: "Terminée",
-  },
-};
 
 export default function BookingsScreen() {
   const router = useRouter();
   const { colors, isDark } = useTheme();
+  const { t } = useTranslation();
   const [activeTab, setActiveTab] = useState<TabKey>("active");
 
-  return (
-    <SafeAreaView style={[styles.safeArea, { backgroundColor: colors.background }]} edges={["top"]}>
-      <View style={[styles.container, { backgroundColor: colors.background }]}>
-        <ScrollView
-          showsVerticalScrollIndicator={false}
-          contentContainerStyle={styles.scrollContent}
-        >
-          {/* Title */}
-          <Text style={[styles.pageTitle, { color: colors.text }]}>Mes réservations</Text>
+  const statusConfig: Record<
+    string,
+    { bg: string; color: string; borderColor: string; labelKey: string }
+  > = {
+    active: {
+      bg: isDark ? "rgba(74, 25, 66, 0.3)" : "rgba(74, 25, 66, 0.12)",
+      color: colors.primary,
+      borderColor: "rgba(74, 25, 66, 0.5)",
+      labelKey: "bookings.status.active",
+    },
+    confirmed: {
+      bg: "rgba(46, 204, 113, 0.2)",
+      color: "#2ECC71",
+      borderColor: "rgba(46, 204, 113, 0.4)",
+      labelKey: "bookings.status.confirmed",
+    },
+    completed: {
+      bg: isDark ? "rgba(234, 234, 234, 0.15)" : "rgba(0, 0, 0, 0.06)",
+      color: colors.textSecondary,
+      borderColor: colors.border,
+      labelKey: "bookings.status.completed",
+    },
+  };
 
-          {/* Tabs */}
-          <View style={[styles.tabContainer, { borderBottomColor: colors.border }]}>
-            {tabs.map((tab) => {
-              const isActive = activeTab === tab.key;
-              return (
-                <TouchableOpacity
-                  key={tab.key}
-                  onPress={() => setActiveTab(tab.key)}
-                  style={[styles.tab, isActive && styles.tabActive]}
-                  activeOpacity={0.7}
+  return (
+    <View style={[styles.container, { backgroundColor: colors.background }]}>
+      <StatusBar style={colors.statusBarStyle} />
+      <SafeAreaView edges={["top"]} style={{ backgroundColor: colors.background }}>
+        <Text style={[styles.pageTitle, { color: colors.text }]}>
+          {t("bookings.title")}
+        </Text>
+      </SafeAreaView>
+
+      <ScrollView
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={{ paddingHorizontal: 16, paddingBottom: 120 }}
+      >
+        {/* Tabs */}
+        <View
+          style={[
+            styles.tabContainer,
+            { backgroundColor: colors.surface, borderColor: colors.border },
+          ]}
+        >
+          {tabs.map((tab) => {
+            const isActive = activeTab === tab.key;
+            return (
+              <TouchableOpacity
+                key={tab.key}
+                onPress={() => setActiveTab(tab.key)}
+                style={[
+                  styles.tab,
+                  isActive && { backgroundColor: colors.primary },
+                ]}
+                activeOpacity={0.7}
+              >
+                <Text
+                  style={[
+                    styles.tabText,
+                    { color: isActive ? "#FFFFFF" : colors.textSecondary },
+                  ]}
                 >
-                  <Text
+                  {t(tab.labelKey)}
+                </Text>
+              </TouchableOpacity>
+            );
+          })}
+        </View>
+
+        {/* Booking Cards */}
+        <View style={styles.cardsList}>
+          {bookings.map((booking, index) => {
+            const status =
+              statusConfig[booking.status] ?? statusConfig.completed;
+
+            return (
+              <TouchableOpacity
+                key={booking.id}
+                activeOpacity={0.95}
+                style={[
+                  styles.card,
+                  { backgroundColor: colors.surface, borderColor: colors.border },
+                ]}
+                onPress={() =>
+                  router.push(
+                    booking.status === "completed"
+                      ? (`/booking-summary/${booking.id}` as any)
+                      : (`/tracking/${booking.id}` as any),
+                  )
+                }
+              >
+                <View style={styles.cardImageWrapper}>
+                  <Image
+                    source={{
+                      uri: vehicleImages[index % vehicleImages.length],
+                    }}
+                    style={styles.cardImage}
+                  />
+                  <LinearGradient
+                    colors={["transparent", "rgba(5, 4, 4, 0.7)"]}
+                    locations={[0, 1]}
+                    style={StyleSheet.absoluteFillObject}
+                  />
+                  <View
                     style={[
-                      styles.tabText,
+                      styles.statusBadge,
                       {
-                        color: isActive
-                          ? "#EAEAEA"
-                          : "rgba(234, 234, 234, 0.5)",
+                        backgroundColor: status.bg,
+                        borderColor: status.borderColor,
                       },
                     ]}
                   >
-                    {tab.label}
-                  </Text>
-                </TouchableOpacity>
-              );
-            })}
-          </View>
+                    <Text style={[styles.statusText, { color: status.color }]}>
+                      {t(status.labelKey)}
+                    </Text>
+                  </View>
+                </View>
 
-          {/* Booking Cards */}
-          <View style={styles.cardsList}>
-            {bookings.map((booking, index) => {
-              const status = statusConfig[booking.status] ?? statusConfig.completed;
+                <View style={styles.cardContent}>
+                  <View style={styles.cardTopRow}>
+                    <View style={styles.cardTopLeft}>
+                      <Text style={[styles.vehicleName, { color: colors.text }]}>
+                        {booking.vehicleName}
+                      </Text>
+                      <View style={styles.agencyRow}>
+                        <MapPin
+                          size={12}
+                          color={colors.textSecondary}
+                          strokeWidth={1.5}
+                        />
+                        <Text
+                          style={[styles.agencyName, { color: colors.textSecondary }]}
+                        >
+                          {booking.agencyName}
+                        </Text>
+                      </View>
+                    </View>
+                    <ChevronRight
+                      size={20}
+                      color={colors.textSecondary}
+                      strokeWidth={1.5}
+                    />
+                  </View>
 
-              return (
-                <TouchableOpacity
-                  key={booking.id}
-                  activeOpacity={0.95}
-                  style={[styles.card, { backgroundColor: colors.surface, borderColor: isDark ? "rgba(74, 25, 66, 0.3)" : colors.border }]}
-                  onPress={() => router.push(`/tracking/${booking.id}` as any)}
-                >
-                  {/* Image Section */}
-                  <View style={styles.cardImageWrapper}>
-                    <Image
-                      source={{
-                        uri: vehicleImages[index % vehicleImages.length],
-                      }}
-                      style={styles.cardImage}
+                  <View
+                    style={[
+                      styles.dateRow,
+                      {
+                        backgroundColor: isDark
+                          ? "rgba(74, 25, 66, 0.25)"
+                          : "rgba(74, 25, 66, 0.08)",
+                      },
+                    ]}
+                  >
+                    <Calendar
+                      size={16}
+                      color={colors.primary}
+                      strokeWidth={1.8}
                     />
-                    {/* Gradient overlay */}
-                    <LinearGradient
-                      colors={["transparent", "rgba(5, 4, 4, 0.7)"]}
-                      locations={[0, 1]}
-                      style={StyleSheet.absoluteFillObject}
-                    />
-                    {/* Status badge */}
+                    <Text style={[styles.dateText, { color: colors.text }]}>
+                      {booking.startDate} — {booking.endDate}
+                    </Text>
+                  </View>
+
+                  <View
+                    style={[
+                      styles.cardFooter,
+                      { borderTopColor: colors.border },
+                    ]}
+                  >
+                    <View>
+                      <Text
+                        style={[styles.totalLabel, { color: colors.textSecondary }]}
+                      >
+                        {t("bookings.totalLabel")}
+                      </Text>
+                      <Text style={[styles.totalValue, { color: colors.text }]}>
+                        {t("common.priceEuro", { price: booking.total })}
+                      </Text>
+                    </View>
                     <View
                       style={[
-                        styles.statusBadge,
-                        {
-                          backgroundColor: status.bg,
-                          borderColor: status.borderColor,
-                        },
+                        styles.detailsButton,
+                        { backgroundColor: colors.primary },
                       ]}
                     >
-                      <Text style={[styles.statusText, { color: status.color }]}>
-                        {status.label}
+                      <Text style={styles.detailsButtonText}>
+                        {t("bookings.seeDetails")}
                       </Text>
                     </View>
                   </View>
+                </View>
+              </TouchableOpacity>
+            );
+          })}
+        </View>
+      </ScrollView>
 
-                  {/* Content Section */}
-                  <View style={styles.cardContent}>
-                    {/* Top row */}
-                    <View style={styles.cardTopRow}>
-                      <View style={styles.cardTopLeft}>
-                        <Text style={[styles.vehicleName, { color: colors.text }]}>
-                          {booking.vehicleName}
-                        </Text>
-                        <View style={styles.agencyRow}>
-                          <MapPin
-                            size={12}
-                            color="rgba(234, 234, 234, 0.6)"
-                            strokeWidth={1.5}
-                          />
-                          <Text style={styles.agencyName}>
-                            {booking.agencyName}
-                          </Text>
-                        </View>
-                      </View>
-                      <ChevronRight
-                        size={20}
-                        color="rgba(234, 234, 234, 0.6)"
-                        strokeWidth={1.5}
-                      />
-                    </View>
-
-                    {/* Date row */}
-                    <View style={styles.dateRow}>
-                      <Calendar
-                        size={16}
-                        color="#4A1942"
-                        strokeWidth={1.5}
-                      />
-                      <Text style={styles.dateText}>
-                        {booking.startDate} — {booking.endDate}
-                      </Text>
-                    </View>
-
-                    {/* Footer */}
-                    <View style={[styles.cardFooter, { borderTopColor: colors.border }]}>
-                      <View>
-                        <Text style={styles.totalLabel}>Total</Text>
-                        <Text style={[styles.totalValue, { color: colors.text }]}>{booking.total} €</Text>
-                      </View>
-                      <View style={styles.detailsButton}>
-                        <Text style={styles.detailsButtonText}>
-                          Voir détails
-                        </Text>
-                      </View>
-                    </View>
-                  </View>
-                </TouchableOpacity>
-              );
-            })}
-          </View>
-        </ScrollView>
-
-        <BottomNav />
-      </View>
-    </SafeAreaView>
+      <BottomNav />
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
-  safeArea: {
-    flex: 1,
-    backgroundColor: "#050404",
-  },
-  container: {
-    flex: 1,
-    backgroundColor: "#050404",
-  },
-  scrollContent: {
-    paddingHorizontal: 16,
-    paddingTop: 20,
-    paddingBottom: 16,
-  },
+  container: { flex: 1 },
 
-  /* Title */
   pageTitle: {
     fontFamily: "Poppins_700Bold",
-    fontSize: 20,
-    color: "#EAEAEA",
-    marginBottom: 16,
+    fontSize: 26,
+    letterSpacing: -0.4,
+    paddingHorizontal: 16,
+    paddingTop: 8,
+    paddingBottom: 14,
   },
 
-  /* Tabs pill */
   tabContainer: {
     flexDirection: "row",
     padding: 4,
     borderRadius: 999,
-    backgroundColor: "#2E1C2B",
     borderWidth: 1,
-    borderColor: "rgba(234, 234, 234, 0.08)",
     marginBottom: 16,
   },
   tab: {
@@ -243,38 +264,26 @@ const styles = StyleSheet.create({
     borderRadius: 999,
     alignItems: "center",
     justifyContent: "center",
-    position: "relative",
   },
-  tabActive: { backgroundColor: "#4A1942" },
   tabText: {
     fontFamily: "Poppins_600SemiBold",
     fontSize: 12,
     letterSpacing: 0.2,
   },
 
-  /* Cards */
-  cardsList: {
-    gap: 12,
-  },
+  cardsList: { gap: 12 },
   card: {
     borderRadius: 28,
     overflow: "hidden",
     borderWidth: 1,
-    borderColor: "rgba(234, 234, 234, 0.06)",
-    backgroundColor: "#2E1C2B",
   },
-
-  /* Card Image */
   cardImageWrapper: {
     width: "100%",
     height: 180,
     position: "relative",
     overflow: "hidden",
   },
-  cardImage: {
-    width: "100%",
-    height: 180,
-  },
+  cardImage: { width: "100%", height: 180 },
   statusBadge: {
     position: "absolute",
     top: 12,
@@ -284,42 +293,22 @@ const styles = StyleSheet.create({
     borderRadius: 999,
     borderWidth: 1,
   },
-  statusText: {
-    fontFamily: "Poppins_600SemiBold",
-    fontSize: 12,
-  },
-
-  /* Card Content */
-  cardContent: {
-    padding: 20,
-  },
+  statusText: { fontFamily: "Poppins_600SemiBold", fontSize: 12 },
+  cardContent: { padding: 20 },
   cardTopRow: {
     flexDirection: "row",
     alignItems: "flex-start",
     justifyContent: "space-between",
     marginBottom: 12,
   },
-  cardTopLeft: {
-    flex: 1,
-  },
+  cardTopLeft: { flex: 1 },
   vehicleName: {
     fontFamily: "Poppins_700Bold",
     fontSize: 17,
-    color: "#EAEAEA",
     marginBottom: 4,
   },
-  agencyRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 6,
-  },
-  agencyName: {
-    fontFamily: "Poppins_400Regular",
-    fontSize: 13,
-    color: "rgba(234, 234, 234, 0.6)",
-  },
-
-  /* Date */
+  agencyRow: { flexDirection: "row", alignItems: "center", gap: 6 },
+  agencyName: { fontFamily: "Poppins_400Regular", fontSize: 13 },
   dateRow: {
     flexDirection: "row",
     alignItems: "center",
@@ -327,46 +316,28 @@ const styles = StyleSheet.create({
     paddingHorizontal: 14,
     paddingVertical: 10,
     borderRadius: 999,
-    backgroundColor: "rgba(74, 25, 66, 0.2)",
     marginBottom: 14,
     alignSelf: "flex-start",
   },
-  dateText: {
-    fontFamily: "Poppins_500Medium",
-    fontSize: 13,
-    color: "#EAEAEA",
-  },
-
-  /* Footer */
+  dateText: { fontFamily: "Poppins_500Medium", fontSize: 13 },
   cardFooter: {
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
     paddingTop: 12,
     borderTopWidth: 1,
-    borderTopColor: "rgba(234, 234, 234, 0.1)",
   },
-  totalLabel: {
-    fontFamily: "Poppins_400Regular",
-    fontSize: 12,
-    color: "rgba(234, 234, 234, 0.6)",
-    marginBottom: 2,
-  },
-  totalValue: {
-    fontFamily: "Poppins_700Bold",
-    fontSize: 20,
-    color: "#EAEAEA",
-  },
+  totalLabel: { fontFamily: "Poppins_400Regular", fontSize: 12, marginBottom: 2 },
+  totalValue: { fontFamily: "Poppins_700Bold", fontSize: 20 },
   detailsButton: {
     paddingHorizontal: 18,
     paddingVertical: 10,
     borderRadius: 999,
-    backgroundColor: "#4A1942",
   },
   detailsButtonText: {
     fontFamily: "Poppins_600SemiBold",
     fontSize: 12,
-    color: "#EAEAEA",
+    color: "#FFFFFF",
     letterSpacing: 0.2,
   },
 });

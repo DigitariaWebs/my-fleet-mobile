@@ -14,8 +14,10 @@ import {
   Gift,
   Shield,
   Star,
+  Receipt,
 } from "lucide-react-native";
 import type { LucideIcon } from "lucide-react-native";
+import { useTranslation } from "react-i18next";
 import { notifications, type NotificationType } from "@/data/mockData";
 
 const iconMap: Record<NotificationType, LucideIcon> = {
@@ -24,6 +26,7 @@ const iconMap: Record<NotificationType, LucideIcon> = {
   loyalty: Gift,
   kyc: Shield,
   review: Star,
+  return_summary_ready: Receipt,
 };
 
 const colorMap: Record<NotificationType, string> = {
@@ -32,10 +35,12 @@ const colorMap: Record<NotificationType, string> = {
   loyalty: "rgba(241, 196, 15, 0.15)",
   kyc: "rgba(243, 156, 18, 0.15)",
   review: "rgba(234, 234, 234, 0.1)",
+  return_summary_ready: "rgba(74, 25, 66, 0.25)",
 };
 
 export default function NotificationsScreen() {
   const router = useRouter();
+  const { t } = useTranslation();
 
   return (
     <SafeAreaView style={styles.container}>
@@ -52,7 +57,7 @@ export default function NotificationsScreen() {
           >
             <ArrowLeft size={24} color="#EAEAEA" strokeWidth={1.5} />
           </TouchableOpacity>
-          <Text style={styles.title}>Notifications</Text>
+          <Text style={styles.title}>{t("notifications.title")}</Text>
         </View>
 
         {/* Notification List */}
@@ -71,6 +76,9 @@ export default function NotificationsScreen() {
                   },
                 ]}
                 activeOpacity={0.85}
+                onPress={() => {
+                  if (notif.route) router.push(notif.route as never);
+                }}
               >
                 {/* Icon */}
                 <View
@@ -82,7 +90,7 @@ export default function NotificationsScreen() {
                 {/* Text */}
                 <View style={styles.notifTextWrapper}>
                   <Text style={styles.notifTitle}>{notif.title}</Text>
-                  <Text style={styles.notifTime}>Il y a {notif.time}</Text>
+                  <Text style={styles.notifTime}>{t("notifications.agoPrefix", { time: notif.time })}</Text>
                 </View>
 
                 {/* Unread dot */}

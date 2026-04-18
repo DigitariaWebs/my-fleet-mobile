@@ -1,391 +1,429 @@
-import { useState, useCallback, useEffect } from "react";
-import {
-  View,
-  Text,
-  StyleSheet,
-  Dimensions,
-  TouchableOpacity,
-  ImageBackground,
-} from "react-native";
+import { useCallback, useRef, useState } from "react";
+import { Dimensions, Pressable, View, Text } from "react-native";
 import { useRouter } from "expo-router";
+import { useTranslation } from "react-i18next";
+import { Image } from "expo-image";
+import { BlurView } from "expo-blur";
+import { LinearGradient } from "expo-linear-gradient";
+import { StatusBar } from "expo-status-bar";
 import Animated, {
-  useSharedValue,
+  FadeIn,
+  FadeInDown,
   useAnimatedStyle,
+  useSharedValue,
   withTiming,
-  withDelay,
-  withSpring,
-  withSequence,
-  Easing,
   interpolate,
+  useAnimatedScrollHandler,
   runOnJS,
 } from "react-native-reanimated";
-import { LinearGradient } from "expo-linear-gradient";
-import { Button } from "@/components/ui/Button";
+import * as Haptics from "expo-haptics";
+import { ArrowRight, ChevronRight } from "lucide-react-native";
+import { useTheme } from "@/context/ThemeContext";
 
 const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get("window");
 
-const TRANSITION_OUT = 350;
-const TRANSITION_IN_DELAY = 100;
+// Client accent (matches tailwind.config.js `accent.DEFAULT`)
+const ACCENT = "#4A1942";
+const ACCENT_SOFT = "#8B3D7E";
 
-interface Slide {
-  image: string;
-  headline: string;
-  subtitle: string;
-}
-
-const slides: Slide[] = [
+const SLIDES = [
   {
-    image: "https://images.unsplash.com/photo-1770847816156-a4041d979580?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1080",
-    headline: "Louez en toute\nsimplicité",
-    subtitle: "Parcourez les meilleures agences et réservez en quelques secondes",
+    key: "screen1" as const,
+    image: require("../assets/Audi Q5/Audi Q5 - 1.jpg"),
   },
   {
-    image: "https://images.unsplash.com/photo-1769546253924-9e23d794be53?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1080",
-    headline: "Des agences\nde confiance",
-    subtitle: "Toutes nos agences sont vérifiées et notées par la communauté",
+    key: "screen2" as const,
+    image: require("../assets/BMW X3/BMW X3 - 2.jpg"),
   },
   {
-    image: "https://images.unsplash.com/photo-1761264889404-a194af20ae90?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1080",
-    headline: "Votre flotte,\nvotre choix",
-    subtitle: "Berlines, SUV, sportives, cabriolets — avec ou sans chauffeur",
+    key: "screen3" as const,
+    image: require("../assets/Classe A/Classe A - 1.jpg"),
   },
 ];
 
 export default function OnboardingScreen() {
   const router = useRouter();
-  const [currentSlide, setCurrentSlide] = useState(0);
-  const [isTransitioning, setIsTransitioning] = useState(false);
+  const { t } = useTranslation();
+  const { colors } = useTheme();
+  const scrollRef = useRef<Animated.ScrollView>(null);
+  const [activeIndex, setActiveIndex] = useState(0);
+  const scrollX = useSharedValue(0);
+  const textOpacity = useSharedValue(1);
 
-  // Image animations
-  const imageOpacity = useSharedValue(0);
-  const imageScale = useSharedValue(1.15);
+  const updateIndex = useCallback(
+    (idx: number) => {
+      if (idx !== activeIndex) {
+        textOpacity.value = withTiming(0, { duration: 150 }, () => {
+          runOnJS(setActiveIndex)(idx);
+          textOpacity.value = withTiming(1, { duration: 280 });
+        });
+      }
+    },
+    [activeIndex, textOpacity],
+  );
 
-  // Text animations
-  const headlineTranslateY = useSharedValue(40);
-  const headlineOpacity = useSharedValue(0);
-  const subtitleTranslateY = useSharedValue(30);
-  const subtitleOpacity = useSharedValue(0);
+  const scrollHandler = useAnimatedScrollHandler({
+    onScroll: (event) => {
+      scrollX.value = event.contentOffset.x;
+    },
+    onMomentumEnd: (event) => {
+      const idx = Math.round(event.contentOffset.x / SCREEN_WIDTH);
+      runOnJS(updateIndex)(idx);
+    },
+  });
 
-  // Dots
-  const dotsOpacity = useSharedValue(0);
+  const handleNext = useCallback(() => {
+    void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    if (activeIndex < SLIDES.length - 1) {
+      const nextIndex = activeIndex + 1;
+      scrollRef.current?.scrollTo({
+        x: nextIndex * SCREEN_WIDTH,
+        animated: true,
+      });
+      textOpacity.value = withTiming(0, { duration: 150 }, () => {
+        runOnJS(setActiveIndex)(nextIndex);
+        textOpacity.value = withTiming(1, { duration: 280 });
+      });
+    } else {
+      router.replace("/auth");
+    }
+  }, [activeIndex, router, textOpacity]);
 
-  // Button
-  const buttonTranslateY = useSharedValue(20);
-  const buttonOpacity = useSharedValue(0);
-
-  // Skip button
-  const skipOpacity = useSharedValue(0);
-
-  // Ken Burns — slow zoom on image
-  const kenBurnsScale = useSharedValue(1.0);
-
-  const animateIn = useCallback(() => {
-    "worklet";
-    // Image: fade in + scale down from 1.15 to 1.0
-    imageOpacity.value = withTiming(1, { duration: 800, easing: Easing.out(Easing.cubic) });
-    imageScale.value = withTiming(1.0, { duration: 900, easing: Easing.out(Easing.cubic) });
-
-    // Ken Burns: slow zoom 1.0 → 1.08 over the slide duration
-    kenBurnsScale.value = 1.0;
-    kenBurnsScale.value = withTiming(1.08, { duration: 8000, easing: Easing.linear });
-
-    // Headline: slide up + fade in with spring
-    headlineTranslateY.value = 40;
-    headlineOpacity.value = 0;
-    headlineTranslateY.value = withDelay(300, withSpring(0, { damping: 20, stiffness: 90 }));
-    headlineOpacity.value = withDelay(300, withTiming(1, { duration: 500 }));
-
-    // Subtitle: slide up + fade in (staggered)
-    subtitleTranslateY.value = 30;
-    subtitleOpacity.value = 0;
-    subtitleTranslateY.value = withDelay(500, withSpring(0, { damping: 20, stiffness: 90 }));
-    subtitleOpacity.value = withDelay(500, withTiming(1, { duration: 500 }));
-
-    // Dots: fade in
-    dotsOpacity.value = withDelay(650, withTiming(1, { duration: 400 }));
-
-    // Button: slide up + fade in
-    buttonTranslateY.value = 20;
-    buttonOpacity.value = 0;
-    buttonTranslateY.value = withDelay(750, withSpring(0, { damping: 20, stiffness: 100 }));
-    buttonOpacity.value = withDelay(750, withTiming(1, { duration: 400 }));
-
-    // Skip
-    skipOpacity.value = withDelay(900, withTiming(1, { duration: 400 }));
-  }, []);
-
-  const animateOut = useCallback(() => {
-    "worklet";
-    // Image: slight zoom in + fade out
-    imageScale.value = withTiming(1.1, { duration: TRANSITION_OUT, easing: Easing.in(Easing.cubic) });
-    imageOpacity.value = withTiming(0, { duration: TRANSITION_OUT, easing: Easing.in(Easing.cubic) });
-
-    // Headline: slide up + fade out
-    headlineTranslateY.value = withTiming(-20, { duration: TRANSITION_OUT, easing: Easing.in(Easing.cubic) });
-    headlineOpacity.value = withTiming(0, { duration: 250 });
-
-    // Subtitle: slide up + fade out (slight delay)
-    subtitleTranslateY.value = withTiming(-15, { duration: TRANSITION_OUT, easing: Easing.in(Easing.cubic) });
-    subtitleOpacity.value = withTiming(0, { duration: 250 });
-
-    // Dots + button: fade out
-    dotsOpacity.value = withTiming(0, { duration: 200 });
-    buttonOpacity.value = withTiming(0, { duration: 200 });
-    buttonTranslateY.value = withTiming(10, { duration: 250 });
-  }, []);
-
-  // Initial entrance animation
-  useEffect(() => {
-    animateIn();
-  }, []);
-
-  const navigateToAuth = useCallback(() => {
+  const handleSkip = useCallback(() => {
+    void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     router.replace("/auth");
   }, [router]);
 
-  const goToSlide = useCallback(
-    (index: number) => {
-      if (index === currentSlide || isTransitioning) return;
-      setIsTransitioning(true);
+  const isLastSlide = activeIndex === SLIDES.length - 1;
+  const currentSlide = SLIDES[activeIndex]!;
 
-      // Animate everything out
-      animateOut();
-
-      setTimeout(() => {
-        setCurrentSlide(index);
-        // Animate everything in
-        animateIn();
-        setTimeout(() => setIsTransitioning(false), 600);
-      }, TRANSITION_OUT + TRANSITION_IN_DELAY);
-    },
-    [currentSlide, isTransitioning, animateOut, animateIn]
-  );
-
-  const handleNext = useCallback(() => {
-    if (currentSlide < slides.length - 1) {
-      goToSlide(currentSlide + 1);
-    } else {
-      navigateToAuth();
-    }
-  }, [currentSlide, goToSlide, navigateToAuth]);
-
-  // ─── Animated styles ───
-
-  const imageAnimatedStyle = useAnimatedStyle(() => ({
-    opacity: imageOpacity.value,
-    transform: [{ scale: imageScale.value * kenBurnsScale.value }],
+  const textAnimatedStyle = useAnimatedStyle(() => ({
+    opacity: textOpacity.value,
   }));
-
-  const headlineAnimatedStyle = useAnimatedStyle(() => ({
-    opacity: headlineOpacity.value,
-    transform: [{ translateY: headlineTranslateY.value }],
-  }));
-
-  const subtitleAnimatedStyle = useAnimatedStyle(() => ({
-    opacity: subtitleOpacity.value,
-    transform: [{ translateY: subtitleTranslateY.value }],
-  }));
-
-  const dotsAnimatedStyle = useAnimatedStyle(() => ({
-    opacity: dotsOpacity.value,
-  }));
-
-  const buttonAnimatedStyle = useAnimatedStyle(() => ({
-    opacity: buttonOpacity.value,
-    transform: [{ translateY: buttonTranslateY.value }],
-  }));
-
-  const skipAnimatedStyle = useAnimatedStyle(() => ({
-    opacity: skipOpacity.value,
-  }));
-
-  const slide = slides[currentSlide]!;
 
   return (
-    <View style={styles.container}>
-      {/* ─── Background Image with Ken Burns ─── */}
-      <Animated.View style={[StyleSheet.absoluteFillObject, imageAnimatedStyle]}>
-        <ImageBackground
-          source={{ uri: slide.image }}
-          style={styles.backgroundImage}
-          resizeMode="cover"
-        >
-          {/* Multi-layer gradient for depth */}
-          <LinearGradient
-            colors={[
-              "rgba(5, 4, 4, 0.1)",
-              "transparent",
-              "rgba(5, 4, 4, 0.4)",
-              "rgba(5, 4, 4, 0.85)",
-              "rgba(5, 4, 4, 0.98)",
-            ]}
-            locations={[0, 0.15, 0.45, 0.7, 1]}
-            start={{ x: 0.5, y: 0 }}
-            end={{ x: 0.5, y: 1 }}
-            style={StyleSheet.absoluteFillObject}
-          />
-          {/* Subtle vignette from sides */}
-          <LinearGradient
-            colors={[
-              "rgba(5, 4, 4, 0.3)",
-              "transparent",
-              "rgba(5, 4, 4, 0.3)",
-            ]}
-            start={{ x: 0, y: 0.5 }}
-            end={{ x: 1, y: 0.5 }}
-            style={StyleSheet.absoluteFillObject}
-          />
-        </ImageBackground>
-      </Animated.View>
+    <View style={{ flex: 1, backgroundColor: colors.background }}>
+      <StatusBar style="light" />
 
-      {/* ─── Skip Button ─── */}
-      <Animated.View style={[styles.skipButton, skipAnimatedStyle]}>
-        <TouchableOpacity
-          onPress={navigateToAuth}
-          activeOpacity={0.7}
-          style={styles.skipTouchable}
-        >
-          <Text style={styles.skipText}>Passer</Text>
-        </TouchableOpacity>
-      </Animated.View>
+      {/* ── Full-bleed image carousel ─────────────────────────── */}
+      <Animated.ScrollView
+        ref={scrollRef}
+        horizontal
+        pagingEnabled
+        showsHorizontalScrollIndicator={false}
+        onScroll={scrollHandler}
+        scrollEventThrottle={16}
+        bounces={false}
+        className="flex-1"
+      >
+        {SLIDES.map((slide) => (
+          <View
+            key={slide.key}
+            style={{ width: SCREEN_WIDTH, height: SCREEN_HEIGHT }}
+          >
+            <Image
+              source={slide.image}
+              style={{ width: SCREEN_WIDTH, height: SCREEN_HEIGHT }}
+              contentFit="cover"
+              transition={400}
+            />
+          </View>
+        ))}
+      </Animated.ScrollView>
 
-      {/* ─── Bottom Content ─── */}
-      <View style={styles.content}>
-        {/* Decorative accent line */}
-        <Animated.View style={[styles.accentLine, headlineAnimatedStyle]} />
+      {/* ── Bottom gradient for legibility ──────────────────── */}
+      <LinearGradient
+        colors={[
+          "transparent",
+          "rgba(5, 4, 4, 0.35)",
+          "rgba(5, 4, 4, 0.85)",
+          "rgba(5, 4, 4, 1)",
+        ]}
+        locations={[0, 0.35, 0.7, 1]}
+        style={{
+          position: "absolute",
+          bottom: 0,
+          left: 0,
+          right: 0,
+          height: SCREEN_HEIGHT * 0.62,
+        }}
+        pointerEvents="none"
+      />
 
-        {/* Headline */}
-        <Animated.View style={headlineAnimatedStyle}>
-          <Text style={styles.headline}>{slide.headline}</Text>
-        </Animated.View>
-
-        {/* Subtitle */}
-        <Animated.View style={subtitleAnimatedStyle}>
-          <Text style={styles.subtitle}>{slide.subtitle}</Text>
-        </Animated.View>
-
-        {/* Pagination Dots */}
-        <Animated.View style={[styles.dotsContainer, dotsAnimatedStyle]}>
-          {slides.map((_, index) => {
-            const isActive = index === currentSlide;
-            return (
-              <TouchableOpacity
-                key={index}
-                onPress={() => goToSlide(index)}
-                hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}
-                activeOpacity={0.7}
-              >
-                <View
-                  style={[
-                    styles.dot,
-                    isActive ? styles.dotActive : styles.dotInactive,
-                  ]}
-                />
-              </TouchableOpacity>
-            );
-          })}
-        </Animated.View>
-
-        {/* CTA Button */}
-        <Animated.View style={buttonAnimatedStyle}>
-          <Button fullWidth onPress={handleNext}>
-            {currentSlide === slides.length - 1 ? "Commencer" : "Suivant"}
-          </Button>
+      {/* ── Top bar: centered logo pill ─────────────────────── */}
+      <View
+        className="absolute left-0 right-0 items-center z-10"
+        style={{ top: 60 }}
+        pointerEvents="box-none"
+      >
+        <Animated.View entering={FadeIn.duration(500)}>
+          <BlurView
+            intensity={30}
+            tint="dark"
+            className="items-center justify-center rounded-full overflow-hidden border"
+            style={{
+              width: 48,
+              height: 48,
+              borderColor: "rgba(255, 255, 255, 0.15)",
+            }}
+          >
+            <Image
+              source={require("../assets/logo.png")}
+              style={{ width: 30, height: 30 }}
+              contentFit="contain"
+            />
+          </BlurView>
         </Animated.View>
       </View>
+
+      {/* ── Skip pill ──────────────────────────────────────── */}
+      {!isLastSlide && (
+        <Animated.View
+          entering={FadeIn.duration(500)}
+          className="absolute z-10"
+          style={{ top: 66, right: 20 }}
+        >
+          <Pressable onPress={handleSkip} hitSlop={10}>
+            <BlurView
+              intensity={30}
+              tint="dark"
+              className="flex-row items-center rounded-full overflow-hidden border"
+              style={{
+                gap: 4,
+                paddingLeft: 14,
+                paddingRight: 10,
+                paddingVertical: 8,
+                borderColor: "rgba(255, 255, 255, 0.15)",
+              }}
+            >
+              <Text className="font-poppins-medium text-[13px] text-white/90">
+                {t("onboarding.skip")}
+              </Text>
+              <ChevronRight
+                size={14}
+                color="rgba(255, 255, 255, 0.9)"
+                strokeWidth={2}
+              />
+            </BlurView>
+          </Pressable>
+        </Animated.View>
+      )}
+
+      {/* ── Bottom glass card ──────────────────────────────── */}
+      <Animated.View
+        entering={FadeInDown.duration(600).delay(150)}
+        className="absolute"
+        style={{ bottom: 40, left: 16, right: 16 }}
+      >
+        <View
+          className="overflow-hidden border"
+          style={{
+            borderRadius: 32,
+            borderColor: "rgba(255, 255, 255, 0.08)",
+          }}
+        >
+          <BlurView
+            intensity={50}
+            tint="dark"
+            style={{
+              padding: 22,
+              backgroundColor: "rgba(5, 4, 4, 0.55)",
+            }}
+          >
+            {/* Step chip + pagination dots */}
+            <View className="flex-row items-center justify-between mb-4">
+              <View
+                className="rounded-full border"
+                style={{
+                  paddingHorizontal: 12,
+                  paddingVertical: 5,
+                  backgroundColor: "rgba(74, 25, 66, 0.25)",
+                  borderColor: "rgba(74, 25, 66, 0.55)",
+                }}
+              >
+                <Text
+                  className="font-poppins-semibold text-[11px]"
+                  style={{ color: ACCENT_SOFT, letterSpacing: 1 }}
+                >
+                  {t("onboarding.stepIndicator", {
+                    current: String(activeIndex + 1).padStart(2, "0"),
+                    total: String(SLIDES.length).padStart(2, "0"),
+                  })}
+                </Text>
+              </View>
+
+              <View className="flex-row" style={{ gap: 6 }}>
+                {SLIDES.map((_, i) => (
+                  <PaginationDot key={i} index={i} scrollX={scrollX} />
+                ))}
+              </View>
+            </View>
+
+            {/* Title + subtitle + chips with fade transition */}
+            <Animated.View style={textAnimatedStyle}>
+              <Text
+                className="font-poppins-bold text-white"
+                style={{
+                  fontSize: 28,
+                  lineHeight: 34,
+                  marginBottom: 10,
+                  letterSpacing: -0.5,
+                }}
+              >
+                {t(`onboarding.${currentSlide.key}.title`)}
+              </Text>
+
+              <Text
+                className="font-poppins text-[14px]"
+                style={{
+                  lineHeight: 21,
+                  color: "rgba(255, 255, 255, 0.7)",
+                  marginBottom: 16,
+                }}
+              >
+                {t(`onboarding.${currentSlide.key}.subtitle`)}
+              </Text>
+
+              <View
+                className="flex-row flex-wrap"
+                style={{ gap: 6, marginBottom: 22 }}
+              >
+                {["chip1", "chip2", "chip3"].map((chipKey) => (
+                  <View
+                    key={chipKey}
+                    className="rounded-full border"
+                    style={{
+                      paddingHorizontal: 11,
+                      paddingVertical: 6,
+                      backgroundColor: "rgba(255, 255, 255, 0.08)",
+                      borderColor: "rgba(255, 255, 255, 0.12)",
+                    }}
+                  >
+                    <Text
+                      className="font-poppins-medium text-[11px]"
+                      style={{
+                        color: "rgba(255, 255, 255, 0.85)",
+                        letterSpacing: 0.2,
+                      }}
+                    >
+                      {t(`onboarding.${currentSlide.key}.${chipKey}`)}
+                    </Text>
+                  </View>
+                ))}
+              </View>
+            </Animated.View>
+
+            {/* CTA pill: accent circle + centered label + triple chevron */}
+            <Pressable
+              onPress={handleNext}
+              style={({ pressed }) => ({
+                opacity: pressed ? 0.85 : 1,
+                transform: [{ scale: pressed ? 0.98 : 1 }],
+              })}
+            >
+              <View
+                className="flex-row items-center rounded-full border"
+                style={{
+                  backgroundColor: "rgba(255, 255, 255, 0.08)",
+                  padding: 6,
+                  paddingRight: 18,
+                  borderColor: "rgba(74, 25, 66, 0.45)",
+                }}
+              >
+                <View
+                  className="items-center justify-center"
+                  style={{
+                    width: 42,
+                    height: 42,
+                    borderRadius: 21,
+                    backgroundColor: ACCENT,
+                    shadowColor: ACCENT,
+                    shadowOffset: { width: 0, height: 4 },
+                    shadowOpacity: 0.6,
+                    shadowRadius: 12,
+                    elevation: 8,
+                  }}
+                >
+                  <ArrowRight size={18} color="#FFFFFF" strokeWidth={2.2} />
+                </View>
+
+                <Text
+                  className="flex-1 text-center font-poppins-semibold text-white"
+                  style={{
+                    fontSize: 15,
+                    letterSpacing: 0.3,
+                    marginLeft: -42,
+                  }}
+                >
+                  {isLastSlide
+                    ? t("onboarding.getStarted")
+                    : t("onboarding.next")}
+                </Text>
+
+                <View className="flex-row" style={{ gap: 2 }}>
+                  <ChevronRight
+                    size={14}
+                    color="rgba(139, 61, 126, 0.5)"
+                    strokeWidth={2.4}
+                  />
+                  <ChevronRight
+                    size={14}
+                    color="rgba(139, 61, 126, 0.75)"
+                    strokeWidth={2.4}
+                    style={{ marginLeft: -8 }}
+                  />
+                  <ChevronRight
+                    size={14}
+                    color={ACCENT_SOFT}
+                    strokeWidth={2.4}
+                    style={{ marginLeft: -8 }}
+                  />
+                </View>
+              </View>
+            </Pressable>
+          </BlurView>
+        </View>
+      </Animated.View>
     </View>
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: "#050404",
-  },
-  backgroundImage: {
-    flex: 1,
-    width: SCREEN_WIDTH,
-    height: SCREEN_HEIGHT,
-  },
+// ── Pagination Dot ──────────────────────────────────────────────────────────
 
-  /* Skip */
-  skipButton: {
-    position: "absolute",
-    top: 56,
-    right: 20,
-    zIndex: 10,
-  },
-  skipTouchable: {
-    paddingHorizontal: 16,
-    paddingVertical: 8,
-    borderRadius: 999,
-    backgroundColor: "rgba(46, 28, 43, 0.5)",
-    borderWidth: 1,
-    borderColor: "rgba(234, 234, 234, 0.1)",
-  },
-  skipText: {
-    fontFamily: "Poppins_500Medium",
-    fontSize: 13,
-    color: "rgba(234, 234, 234, 0.7)",
-  },
+function PaginationDot({
+  index,
+  scrollX,
+}: {
+  index: number;
+  scrollX: { value: number };
+}) {
+  const style = useAnimatedStyle(() => {
+    const inputRange = [
+      (index - 1) * SCREEN_WIDTH,
+      index * SCREEN_WIDTH,
+      (index + 1) * SCREEN_WIDTH,
+    ];
+    const width = interpolate(scrollX.value, inputRange, [6, 22, 6], "clamp");
+    const opacity = interpolate(
+      scrollX.value,
+      inputRange,
+      [0.3, 1, 0.3],
+      "clamp",
+    );
 
-  /* Content */
-  content: {
-    position: "absolute",
-    bottom: 0,
-    left: 0,
-    right: 0,
-    paddingHorizontal: 24,
-    paddingBottom: 52,
-  },
+    return { width, opacity };
+  });
 
-  /* Accent line */
-  accentLine: {
-    width: 32,
-    height: 3,
-    borderRadius: 2,
-    backgroundColor: "#4A1942",
-    marginBottom: 16,
-  },
-
-  /* Headline */
-  headline: {
-    fontFamily: "Poppins_700Bold",
-    fontSize: 30,
-    color: "#EAEAEA",
-    lineHeight: 40,
-    letterSpacing: -0.5,
-    marginBottom: 16,
-  },
-
-  /* Subtitle */
-  subtitle: {
-    fontFamily: "Poppins_400Regular",
-    fontSize: 15,
-    color: "rgba(234, 234, 234, 0.65)",
-    lineHeight: 24,
-    marginBottom: 36,
-  },
-
-  /* Dots */
-  dotsContainer: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 10,
-    marginBottom: 28,
-  },
-  dot: {
-    borderRadius: 999,
-  },
-  dotActive: {
-    width: 24,
-    height: 6,
-    borderRadius: 3,
-    backgroundColor: "#4A1942",
-  },
-  dotInactive: {
-    width: 6,
-    height: 6,
-    backgroundColor: "rgba(234, 234, 234, 0.25)",
-  },
-});
+  return (
+    <Animated.View
+      style={[
+        {
+          height: 6,
+          borderRadius: 3,
+          backgroundColor: ACCENT_SOFT,
+        },
+        style,
+      ]}
+    />
+  );
+}

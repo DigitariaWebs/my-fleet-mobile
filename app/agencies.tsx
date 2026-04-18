@@ -10,6 +10,7 @@ import {
 import { useRouter } from "expo-router";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { ArrowLeft, Star } from "lucide-react-native";
+import { useTranslation } from "react-i18next";
 import { BottomNav } from "@/components/BottomNav";
 import { agencies, vehicleImages } from "@/data/mockData";
 
@@ -17,6 +18,7 @@ const cityFilters = ["Toutes", "Nice", "Cannes", "Monaco", "Antibes"];
 
 export default function AgencyListScreen() {
   const router = useRouter();
+  const { t } = useTranslation();
   const [selectedCity, setSelectedCity] = useState("Toutes");
 
   return (
@@ -36,7 +38,7 @@ export default function AgencyListScreen() {
             >
               <ArrowLeft size={20} color="#EAEAEA" strokeWidth={1.5} />
             </TouchableOpacity>
-            <Text style={styles.title}>Agences</Text>
+            <Text style={styles.title}>{t("agencies.title")}</Text>
           </View>
 
           {/* City Filter Chips */}
@@ -57,7 +59,7 @@ export default function AgencyListScreen() {
                     isActive ? styles.filterPillActive : styles.filterPillInactive,
                   ]}
                 >
-                  <Text style={styles.filterPillText}>{city}</Text>
+                  <Text style={styles.filterPillText}>{city === "Toutes" ? t("agencies.cityAll") : city}</Text>
                 </TouchableOpacity>
               );
             })}
@@ -90,7 +92,7 @@ export default function AgencyListScreen() {
                       <View style={styles.cardTopLeft}>
                         <Text style={styles.agencyName}>{agency.name}</Text>
                         <Text style={styles.agencySub}>
-                          {agency.city} — {agency.vehicles} véhicules
+                          {t("agencies.vehiclesCount", { city: agency.city, count: agency.vehicles })}
                         </Text>
                       </View>
                       <View style={styles.ratingRow}>
@@ -102,7 +104,7 @@ export default function AgencyListScreen() {
                         />
                         <Text style={styles.ratingText}>{agency.rating}</Text>
                         <Text style={styles.reviewCount}>
-                          ({agency.reviews} avis)
+                          {t("agencies.reviewsCount", { count: agency.reviews })}
                         </Text>
                       </View>
                     </View>

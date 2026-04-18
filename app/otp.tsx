@@ -11,12 +11,14 @@ import {
 import { useRouter } from "expo-router";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { ArrowLeft } from "lucide-react-native";
+import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/Button";
 
 const OTP_LENGTH = 6;
 
 export default function OTPScreen() {
   const router = useRouter();
+  const { t } = useTranslation();
   const [otp, setOtp] = useState<string[]>(Array(OTP_LENGTH).fill(""));
   const [countdown, setCountdown] = useState(60);
   const inputRefs = useRef<(TextInput | null)[]>([]);
@@ -81,9 +83,9 @@ export default function OTPScreen() {
         </TouchableOpacity>
 
         {/* Header */}
-        <Text style={styles.title}>Vérifiez votre numéro</Text>
+        <Text style={styles.title}>{t("otp.title")}</Text>
         <Text style={styles.subtitle}>
-          Un code a été envoyé au +33 6 ** ** **42
+          {t("otp.subtitle")}
         </Text>
 
         {/* OTP Inputs */}
@@ -129,14 +131,14 @@ export default function OTPScreen() {
                 },
               ]}
             >
-              Renvoyer le code{countdown > 0 ? ` (${countdown}s)` : ""}
+              {countdown > 0 ? t("otp.resendWithCountdown", { seconds: countdown }) : t("otp.resend")}
             </Text>
           </TouchableOpacity>
         </View>
 
         {/* Verify Button */}
         <Button fullWidth onPress={handleVerify} disabled={!isComplete}>
-          Vérifier
+          {t("otp.verify")}
         </Button>
       </View>
     </SafeAreaView>

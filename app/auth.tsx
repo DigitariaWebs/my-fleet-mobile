@@ -20,7 +20,9 @@ import {
   EyeOff,
 } from "lucide-react-native";
 import Svg, { Path } from "react-native-svg";
+import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/Button";
+import { useTheme } from "@/context/ThemeContext";
 
 type Tab = "login" | "signup";
 
@@ -64,6 +66,8 @@ function AppleIcon() {
 
 export default function AuthScreen() {
   const router = useRouter();
+  const { t } = useTranslation();
+  const { colors, isDark } = useTheme();
   const [activeTab, setActiveTab] = useState<Tab>("signup");
   const [showPassword, setShowPassword] = useState(false);
   const [formData, setFormData] = useState<FormData>({
@@ -77,10 +81,18 @@ export default function AuthScreen() {
     router.push("/otp");
   };
 
-  const iconColor = "rgba(234, 234, 234, 0.6)";
+  const iconColor = colors.textSecondary;
+  const themeOverrides = {
+    container: { backgroundColor: colors.background },
+    surface: { backgroundColor: colors.surface, borderColor: colors.border },
+    text: { color: colors.text },
+    textSecondary: { color: colors.textSecondary },
+    textMuted: { color: colors.textMuted },
+    primary: { backgroundColor: colors.primary },
+  };
 
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView style={[styles.container, themeOverrides.container]}>
       <KeyboardAvoidingView
         behavior={Platform.OS === "ios" ? "padding" : "height"}
         style={styles.flex}
@@ -108,7 +120,7 @@ export default function AuthScreen() {
                   },
                 ]}
               >
-                Connexion
+                {t("auth.tabLogin")}
               </Text>
             </TouchableOpacity>
 
@@ -128,7 +140,7 @@ export default function AuthScreen() {
                   },
                 ]}
               >
-                Inscription
+                {t("auth.tabSignup")}
               </Text>
             </TouchableOpacity>
           </View>
@@ -141,7 +153,7 @@ export default function AuthScreen() {
                 <View style={styles.inputRow}>
                   <User size={20} color={iconColor} strokeWidth={1.5} />
                   <TextInput
-                    placeholder="Nom complet"
+                    placeholder={t("auth.namePlaceholder")}
                     placeholderTextColor="rgba(234, 234, 234, 0.4)"
                     value={formData.name}
                     onChangeText={(text) =>
@@ -156,7 +168,7 @@ export default function AuthScreen() {
                 <View style={styles.inputRow}>
                   <Mail size={20} color={iconColor} strokeWidth={1.5} />
                   <TextInput
-                    placeholder="Adresse e-mail"
+                    placeholder={t("auth.emailPlaceholder")}
                     placeholderTextColor="rgba(234, 234, 234, 0.4)"
                     value={formData.email}
                     onChangeText={(text) =>
@@ -173,7 +185,7 @@ export default function AuthScreen() {
                   <Phone size={20} color={iconColor} strokeWidth={1.5} />
                   <Text style={styles.phonePrefix}>+33</Text>
                   <TextInput
-                    placeholder="6 12 34 56 78"
+                    placeholder={t("auth.phonePlaceholder")}
                     placeholderTextColor="rgba(234, 234, 234, 0.4)"
                     value={formData.phone}
                     onChangeText={(text) =>
@@ -190,7 +202,7 @@ export default function AuthScreen() {
               <View style={styles.inputRow}>
                 <Mail size={20} color={iconColor} strokeWidth={1.5} />
                 <TextInput
-                  placeholder="E-mail ou téléphone"
+                  placeholder={t("auth.emailOrPhonePlaceholder")}
                   placeholderTextColor="rgba(234, 234, 234, 0.4)"
                   value={formData.email}
                   onChangeText={(text) =>
@@ -206,7 +218,7 @@ export default function AuthScreen() {
             <View style={styles.inputRow}>
               <Lock size={20} color={iconColor} strokeWidth={1.5} />
               <TextInput
-                placeholder="Mot de passe"
+                placeholder={t("auth.passwordPlaceholder")}
                 placeholderTextColor="rgba(234, 234, 234, 0.4)"
                 value={formData.password}
                 onChangeText={(text) =>
@@ -231,21 +243,21 @@ export default function AuthScreen() {
             {/* Forgot Password */}
             {activeTab === "login" && (
               <TouchableOpacity style={styles.forgotRow} activeOpacity={0.7}>
-                <Text style={styles.forgotText}>Mot de passe oublié ?</Text>
+                <Text style={styles.forgotText}>{t("auth.forgotPassword")}</Text>
               </TouchableOpacity>
             )}
 
             {/* Submit Button */}
             <View style={styles.submitContainer}>
               <Button fullWidth onPress={handleSubmit}>
-                {activeTab === "signup" ? "Créer mon compte" : "Se connecter"}
+                {activeTab === "signup" ? t("auth.submitSignup") : t("auth.submitLogin")}
               </Button>
             </View>
 
             {/* Social Divider */}
             <View style={styles.dividerContainer}>
               <View style={styles.dividerLine} />
-              <Text style={styles.dividerText}>ou continuer avec</Text>
+              <Text style={styles.dividerText}>{t("auth.dividerText")}</Text>
               <View style={styles.dividerLine} />
             </View>
 
@@ -253,12 +265,16 @@ export default function AuthScreen() {
             <View style={styles.socialRow}>
               <TouchableOpacity style={styles.socialButton} activeOpacity={0.85}>
                 <GoogleIcon />
-                <Text style={styles.socialText}>Google</Text>
+                <Text style={styles.socialText}>{t("auth.socialGoogle")}</Text>
               </TouchableOpacity>
 
-              <TouchableOpacity style={styles.socialButton} activeOpacity={0.85}>
+              <TouchableOpacity
+                style={styles.socialButton}
+                activeOpacity={0.85}
+                onPress={() => router.replace("/home")}
+              >
                 <AppleIcon />
-                <Text style={styles.socialText}>Apple</Text>
+                <Text style={styles.socialText}>{t("auth.socialApple")}</Text>
               </TouchableOpacity>
             </View>
 
@@ -266,8 +282,8 @@ export default function AuthScreen() {
             <View style={styles.bottomLink}>
               <Text style={styles.bottomLinkSecondary}>
                 {activeTab === "signup"
-                  ? "Déjà un compte ? "
-                  : "Pas encore de compte ? "}
+                  ? t("auth.hasAccount")
+                  : t("auth.noAccount")}
               </Text>
               <TouchableOpacity
                 onPress={() =>
@@ -276,7 +292,7 @@ export default function AuthScreen() {
                 activeOpacity={0.7}
               >
                 <Text style={styles.bottomLinkPrimary}>
-                  {activeTab === "signup" ? "Se connecter" : "S'inscrire"}
+                  {activeTab === "signup" ? t("auth.switchToLogin") : t("auth.switchToSignup")}
                 </Text>
               </TouchableOpacity>
             </View>

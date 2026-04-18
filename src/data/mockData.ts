@@ -1,3 +1,14 @@
+export interface DeliveryConfig {
+  enabled: boolean;
+  basePointLabel: string;
+  basePointLat: number;
+  basePointLng: number;
+  ratePerKm: number;
+  currency: string;
+  minFee?: number;
+  maxDistanceKm?: number;
+}
+
 export interface Agency {
   id: string;
   name: string;
@@ -9,6 +20,7 @@ export interface Agency {
   verified: boolean;
   logo: string;
   description: string;
+  deliveryConfig: DeliveryConfig;
 }
 
 export interface Vehicle {
@@ -35,6 +47,8 @@ export interface Vehicle {
     deposit: number;
     kmPerDay: number;
   };
+  /** Local image require() refs. When present, prefer over `vehicleImages` Unsplash fallbacks. */
+  images?: number[];
 }
 
 export const agencies: Agency[] = [
@@ -50,6 +64,16 @@ export const agencies: Agency[] = [
     logo: "P",
     description:
       "Leader de la location de véhicules de prestige sur la Côte d'Azur depuis 2010.",
+    deliveryConfig: {
+      enabled: true,
+      basePointLabel: "42 Promenade des Anglais, Nice",
+      basePointLat: 43.6956,
+      basePointLng: 7.2651,
+      ratePerKm: 2.0,
+      currency: "€",
+      minFee: 20,
+      maxDistanceKm: 60,
+    },
   },
   {
     id: "2",
@@ -63,6 +87,16 @@ export const agencies: Agency[] = [
     logo: "R",
     description:
       "Spécialiste de la location de voitures de luxe à Cannes et sur toute la Côte d'Azur.",
+    deliveryConfig: {
+      enabled: true,
+      basePointLabel: "Boulevard de la Croisette, Cannes",
+      basePointLat: 43.5513,
+      basePointLng: 7.0175,
+      ratePerKm: 2.5,
+      currency: "€",
+      minFee: 30,
+      maxDistanceKm: 80,
+    },
   },
   {
     id: "3",
@@ -76,6 +110,16 @@ export const agencies: Agency[] = [
     logo: "M",
     description:
       "La référence monégasque pour la location de véhicules d'exception.",
+    deliveryConfig: {
+      enabled: true,
+      basePointLabel: "Avenue de Monte-Carlo, Monaco",
+      basePointLat: 43.7384,
+      basePointLng: 7.4246,
+      ratePerKm: 3.0,
+      currency: "€",
+      minFee: 40,
+      maxDistanceKm: 50,
+    },
   },
   {
     id: "4",
@@ -89,6 +133,15 @@ export const agencies: Agency[] = [
     logo: "C",
     description:
       "Agence familiale offrant un service personnalisé et une sélection raffinée.",
+    deliveryConfig: {
+      // Not offered by this agency — livraison option must be hidden
+      enabled: false,
+      basePointLabel: "Port Vauban, Antibes",
+      basePointLat: 43.5853,
+      basePointLng: 7.1255,
+      ratePerKm: 0,
+      currency: "€",
+    },
   },
 ];
 
@@ -313,7 +366,138 @@ export const vehicles: Vehicle[] = [
     chauffeurPrice: 175,
     conditions: { minAge: 28, licenseYears: 5, deposit: 9500, kmPerDay: 250 },
   },
+  // ── Prestige Auto Nice (agency "1") — real-photo fleet ──────────────
+  {
+    id: "12",
+    name: "Audi Q5",
+    year: 2024,
+    transmission: "Auto",
+    fuel: "Hybride",
+    power: "265 ch",
+    seats: 5,
+    doors: 5,
+    trunk: "520 L",
+    price: 180,
+    agencyId: "1",
+    agencyName: "Prestige Auto Nice",
+    category: "SUV",
+    features: ["Climatisation", "GPS intégré", "Bluetooth", "Sièges cuir", "Toit panoramique"],
+    description: "Le SUV premium d'Audi combine confort, polyvalence et efficience hybride. Intérieur raffiné et dernières technologies de sécurité pour vos trajets sur la Côte d'Azur.",
+    chauffeurAvailable: true,
+    chauffeurPrice: 90,
+    conditions: { minAge: 23, licenseYears: 2, deposit: 3500, kmPerDay: 300 },
+    images: [
+      require("../../assets/Audi Q5/Audi Q5 - 1.jpg"),
+      require("../../assets/Audi Q5/Audi Q5 - 2.jpg"),
+      require("../../assets/Audi Q5/Audi Q5 - 3.jpg"),
+      require("../../assets/Audi Q5/Audi Q5 - 4.jpg"),
+      require("../../assets/Audi Q5/Audi Q5 - 5.jpg"),
+    ],
+  },
+  {
+    id: "13",
+    name: "BMW X1",
+    year: 2024,
+    transmission: "Auto",
+    fuel: "Essence",
+    power: "204 ch",
+    seats: 5,
+    doors: 5,
+    trunk: "500 L",
+    price: 140,
+    agencyId: "1",
+    agencyName: "Prestige Auto Nice",
+    category: "SUV",
+    features: ["Climatisation", "GPS intégré", "Bluetooth", "Caméra de recul"],
+    description: "SUV compact premium, la BMW X1 offre agilité urbaine et confort pour toutes vos escapades. Parfait équilibre entre design moderne et efficacité.",
+    chauffeurAvailable: true,
+    chauffeurPrice: 85,
+    conditions: { minAge: 23, licenseYears: 2, deposit: 3000, kmPerDay: 300 },
+    images: [
+      require("../../assets/BMW X1/X1 - 1.jpg"),
+      require("../../assets/BMW X1/X1 - 2.jpg"),
+      require("../../assets/BMW X1/X1 - 3.jpg"),
+      require("../../assets/BMW X1/X1 - 4.jpg"),
+    ],
+  },
+  {
+    id: "14",
+    name: "BMW X3",
+    year: 2024,
+    transmission: "Auto",
+    fuel: "Essence",
+    power: "245 ch",
+    seats: 5,
+    doors: 5,
+    trunk: "550 L",
+    price: 200,
+    agencyId: "1",
+    agencyName: "Prestige Auto Nice",
+    category: "SUV",
+    features: ["Climatisation", "GPS intégré", "Bluetooth", "Sièges cuir", "Harman Kardon"],
+    description: "Le SUV dynamique par excellence. La BMW X3 marie plaisir de conduite BMW et polyvalence d'un SUV, avec un intérieur cossu et des performances affirmées.",
+    chauffeurAvailable: true,
+    chauffeurPrice: 95,
+    conditions: { minAge: 25, licenseYears: 3, deposit: 4000, kmPerDay: 300 },
+    images: [
+      require("../../assets/BMW X3/BMW X3 - 1.jpg"),
+      require("../../assets/BMW X3/BMW X3 - 2.jpg"),
+      require("../../assets/BMW X3/BMW X3 - 3.jpg"),
+      require("../../assets/BMW X3/BMW X3 - 4.jpg"),
+      require("../../assets/BMW X3/BMW X3 - 5.jpg"),
+    ],
+  },
+  {
+    id: "15",
+    name: "Mercedes Classe A",
+    year: 2024,
+    transmission: "Auto",
+    fuel: "Essence",
+    power: "163 ch",
+    seats: 5,
+    doors: 5,
+    trunk: "370 L",
+    price: 130,
+    agencyId: "1",
+    agencyName: "Prestige Auto Nice",
+    category: "Berline",
+    features: ["Climatisation", "GPS intégré", "Bluetooth", "MBUX", "Caméra de recul"],
+    description: "Compacte élégante et connectée. La Classe A offre la signature Mercedes dans un format urbain, avec l'interface MBUX intuitive et un confort premium.",
+    chauffeurAvailable: true,
+    chauffeurPrice: 80,
+    conditions: { minAge: 21, licenseYears: 2, deposit: 2500, kmPerDay: 350 },
+    images: [
+      require("../../assets/Classe A/Classe A - 1.jpg"),
+      require("../../assets/Classe A/Classe A - 2.jpg"),
+      require("../../assets/Classe A/Classe A - 3.jpg"),
+      require("../../assets/Classe A/Classe A - 4.jpg"),
+      require("../../assets/Classe A/Classe A - 5.jpg"),
+      require("../../assets/Classe A/Classe A - 6.jpg"),
+      require("../../assets/Classe A/Classe A - 7.jpg"),
+      require("../../assets/Classe A/Classe A - 8.jpg"),
+    ],
+  },
 ];
+
+/**
+ * Resolve the image source for a vehicle.
+ *
+ * Returns local `require()` results when the vehicle has its own photo set,
+ * otherwise falls back to the Unsplash URIs shared across mock vehicles.
+ */
+export function getVehicleImages(vehicle: Vehicle): Array<number | { uri: string }> {
+  if (vehicle.images && vehicle.images.length > 0) return vehicle.images;
+  // Stable fallback: derive index from the vehicle id so the same vehicle
+  // always gets the same photo on every render.
+  const idx = Math.max(0, Number(vehicle.id) - 1) % vehicleImages.length;
+  return [{ uri: vehicleImages[idx]! }];
+}
+
+export function getVehicleCover(vehicle: Vehicle): number | { uri: string } {
+  return getVehicleImages(vehicle)[0]!;
+}
+
+export type VehicleFinalState = "ok" | "minor-damage" | "major-damage";
 
 export interface Booking {
   id: string;
@@ -330,6 +514,18 @@ export interface Booking {
   pickupMethod: string;
   deliveryAddress?: string;
   withChauffeur: boolean;
+
+  // Post-rental summary (populated for completed bookings only)
+  startMileage?: number;
+  returnMileage?: number;
+  includedKm?: number;
+  /** Cost per km above includedKm (in €). */
+  extraKmRate?: number;
+  kmDriven?: number;
+  kmOverage?: number;
+  overageCost?: number;
+  vehicleFinalState?: VehicleFinalState;
+  postRentalPhotos?: string[];
 }
 
 export const bookings: Booking[] = [
@@ -378,6 +574,20 @@ export const bookings: Booking[] = [
     reference: "MF-2026-0789",
     pickupMethod: "agency",
     withChauffeur: false,
+    startMileage: 18420,
+    returnMileage: 19078,
+    includedKm: 500,
+    extraKmRate: 1.2,
+    kmDriven: 658,
+    kmOverage: 158,
+    overageCost: 189.6,
+    vehicleFinalState: "minor-damage",
+    postRentalPhotos: [
+      "https://images.unsplash.com/photo-1606664515524-ed2f786a0bd6?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1000",
+      "https://images.unsplash.com/photo-1617531653332-bd46c24f2068?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1000",
+      "https://images.unsplash.com/photo-1603584173870-7f23fdae1b7a?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1000",
+      "https://images.unsplash.com/photo-1605515589824-0a7d1d5a50cf?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1000",
+    ],
   },
 ];
 
@@ -536,7 +746,13 @@ export const reviews: Review[] = [
   },
 ];
 
-export type NotificationType = "booking" | "delivery" | "loyalty" | "kyc" | "review";
+export type NotificationType =
+  | "booking"
+  | "delivery"
+  | "loyalty"
+  | "kyc"
+  | "review"
+  | "return_summary_ready";
 
 export interface Notification {
   id: string;
@@ -544,9 +760,19 @@ export interface Notification {
   title: string;
   time: string;
   read: boolean;
+  /** Deep-link route for notifications that open a specific screen. */
+  route?: string;
 }
 
 export const notifications: Notification[] = [
+  {
+    id: "0",
+    type: "return_summary_ready",
+    title: "Votre résumé de retour MF-2026-0789 est disponible",
+    time: "1h",
+    read: false,
+    route: "/booking-summary/3",
+  },
   {
     id: "1",
     type: "booking",

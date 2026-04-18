@@ -39,3 +39,7 @@ yarn-error.*
 # generated native folders
 /ios
 /android
+
+# Large video files (interior clips — too big for GitHub, not used by the app)
+*.MOV
+*.mov

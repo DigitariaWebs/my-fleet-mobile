@@ -22,6 +22,7 @@ import Animated, {
   Easing,
 } from "react-native-reanimated";
 import { LinearGradient } from "expo-linear-gradient";
+import { useTranslation } from "react-i18next";
 import { bookings, agencies } from "@/data/mockData";
 
 function formatDuration(seconds: number): string {
@@ -92,6 +93,7 @@ function PulseRings() {
 
 export default function CallScreen() {
   const router = useRouter();
+  const { t } = useTranslation();
   const { id } = useLocalSearchParams<{ id: string }>();
   const [isMuted, setIsMuted] = useState(false);
   const [callDuration, setCallDuration] = useState(0);
@@ -101,7 +103,7 @@ export default function CallScreen() {
     (a) => booking && a.name === booking.agencyName
   );
   const agencyLogo = agency?.logo ?? "P";
-  const agencyName = booking?.agencyName ?? "Prestige Auto Nice";
+  const agencyName = booking?.agencyName ?? t("call.fallbackAgency");
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -118,7 +120,7 @@ export default function CallScreen() {
       <SafeAreaView style={styles.safeArea}>
         {/* ─── Top: Call status ─── */}
         <View style={styles.topSection}>
-          <Text style={styles.callLabel}>Appel en cours</Text>
+          <Text style={styles.callLabel}>{t("call.status")}</Text>
           <Text style={styles.callDuration}>
             {formatDuration(callDuration)}
           </Text>
@@ -138,7 +140,7 @@ export default function CallScreen() {
             </LinearGradient>
           </View>
           <Text style={styles.agencyName}>{agencyName}</Text>
-          <Text style={styles.phoneNumber}>+33 4 93 88 00 00</Text>
+          <Text style={styles.phoneNumber}>{t("call.phoneNumber")}</Text>
         </View>
 
         {/* ─── Bottom: Controls ─── */}
@@ -149,7 +151,7 @@ export default function CallScreen() {
               <View style={styles.controlCircle}>
                 <Volume2 size={24} color="#EAEAEA" strokeWidth={1.5} />
               </View>
-              <Text style={styles.controlLabel}>Haut-parleur</Text>
+              <Text style={styles.controlLabel}>{t("call.speaker")}</Text>
             </TouchableOpacity>
 
             {/* Mute */}
@@ -171,7 +173,7 @@ export default function CallScreen() {
                 )}
               </View>
               <Text style={styles.controlLabel}>
-                {isMuted ? "Muet" : "Micro"}
+                {isMuted ? t("call.muted") : t("call.mic")}
               </Text>
             </TouchableOpacity>
           </View>

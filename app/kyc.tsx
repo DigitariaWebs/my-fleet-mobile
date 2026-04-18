@@ -23,6 +23,7 @@ import Animated, {
   withSequence,
   Easing,
 } from "react-native-reanimated";
+import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/Button";
 
 interface Uploads {
@@ -36,6 +37,7 @@ type UploadKey = keyof Uploads;
 
 export default function KYCScreen() {
   const router = useRouter();
+  const { t } = useTranslation();
   const [step, setStep] = useState(1);
   const [uploads, setUploads] = useState<Uploads>({
     idFront: false,
@@ -90,7 +92,7 @@ export default function KYCScreen() {
           >
             <ArrowLeft size={24} color="#EAEAEA" strokeWidth={1.5} />
           </TouchableOpacity>
-          <Text style={styles.stepLabel}>Étape {step}/3</Text>
+          <Text style={styles.stepLabel}>{t("kyc.stepLabel", { current: step, total: 3 })}</Text>
         </View>
 
         {/* Progress Bar */}
@@ -127,18 +129,18 @@ function Step1({
   onContinue: () => void;
   onSkip: () => void;
 }) {
+  const { t } = useTranslation();
   const benefits = [
-    "Location sécurisée et garantie",
-    "Badge vérifié sur votre profil",
-    "Accès à l'ensemble des véhicules",
+    t("kyc.step1.benefit1"),
+    t("kyc.step1.benefit2"),
+    t("kyc.step1.benefit3"),
   ];
 
   return (
     <>
-      <Text style={styles.title}>Vérification d'identité</Text>
+      <Text style={styles.title}>{t("kyc.step1.title")}</Text>
       <Text style={styles.description}>
-        Pour votre sécurité et celle de nos agences partenaires, nous devons
-        vérifier votre identité
+        {t("kyc.step1.description")}
       </Text>
 
       {/* Icon Card */}
@@ -159,7 +161,7 @@ function Step1({
       </View>
 
       <Button fullWidth onPress={onContinue}>
-        Commencer la vérification
+        {t("kyc.step1.startButton")}
       </Button>
 
       <TouchableOpacity
@@ -167,7 +169,7 @@ function Step1({
         style={styles.skipButton}
         activeOpacity={0.7}
       >
-        <Text style={styles.skipText}>Plus tard</Text>
+        <Text style={styles.skipText}>{t("kyc.step1.laterButton")}</Text>
       </TouchableOpacity>
     </>
   );
@@ -239,26 +241,27 @@ function Step2({
   onContinue: () => void;
   allUploaded: boolean;
 }) {
+  const { t } = useTranslation();
   return (
     <>
-      <Text style={styles.title}>Pièce d'identité</Text>
+      <Text style={styles.title}>{t("kyc.step2.title")}</Text>
       <Text style={styles.description}>
-        Prenez en photo le recto et le verso de votre carte d'identité nationale
+        {t("kyc.step2.description")}
       </Text>
 
       {/* ID Card */}
       <View style={styles.uploadSection}>
-        <Text style={styles.uploadSectionLabel}>Carte d'identité</Text>
+        <Text style={styles.uploadSectionLabel}>{t("kyc.step2.idCardLabel")}</Text>
         <View style={styles.uploadGrid}>
           <UploadBox
             uploaded={uploads.idFront}
-            label="Recto"
+            label={t("kyc.step2.front")}
             icon="camera"
             onToggle={() => onToggle("idFront")}
           />
           <UploadBox
             uploaded={uploads.idBack}
-            label="Verso"
+            label={t("kyc.step2.back")}
             icon="camera"
             onToggle={() => onToggle("idBack")}
           />
@@ -267,17 +270,17 @@ function Step2({
 
       {/* Driver's License */}
       <View style={styles.uploadSection}>
-        <Text style={styles.uploadSectionLabel}>Permis de conduire</Text>
+        <Text style={styles.uploadSectionLabel}>{t("kyc.step2.licenseLabel")}</Text>
         <View style={styles.uploadGrid}>
           <UploadBox
             uploaded={uploads.licenseFront}
-            label="Recto"
+            label={t("kyc.step2.front")}
             icon="upload"
             onToggle={() => onToggle("licenseFront")}
           />
           <UploadBox
             uploaded={uploads.licenseBack}
-            label="Verso"
+            label={t("kyc.step2.back")}
             icon="upload"
             onToggle={() => onToggle("licenseBack")}
           />
@@ -287,13 +290,12 @@ function Step2({
       {/* Tip */}
       <View style={styles.tipBox}>
         <Text style={styles.tipText}>
-          💡 Assurez-vous que la photo est nette, bien éclairée et que tous les
-          textes sont lisibles
+          {t("kyc.step2.tip")}
         </Text>
       </View>
 
       <Button fullWidth onPress={onContinue} disabled={!allUploaded}>
-        Continuer
+        {t("common.continue")}
       </Button>
     </>
   );
@@ -326,14 +328,14 @@ function PulsingCircle() {
 }
 
 function Step3({ onContinue }: { onContinue: () => void }) {
+  const { t } = useTranslation();
   return (
     <>
       <Text style={[styles.title, styles.textCenter]}>
-        Vérification en cours
+        {t("kyc.step3.title")}
       </Text>
       <Text style={[styles.description, styles.textCenter]}>
-        Nous vérifions vos documents. Vous recevrez une notification dès que
-        votre profil sera validé. Cela prend généralement moins de 24 heures.
+        {t("kyc.step3.description")}
       </Text>
 
       {/* Pulsing Icon Card */}
@@ -344,12 +346,12 @@ function Step3({ onContinue }: { onContinue: () => void }) {
       {/* Status Badge */}
       <View style={styles.badgeContainer}>
         <View style={styles.statusBadge}>
-          <Text style={styles.statusBadgeText}>En attente de vérification</Text>
+          <Text style={styles.statusBadgeText}>{t("kyc.step3.statusBadge")}</Text>
         </View>
       </View>
 
       <Button fullWidth onPress={onContinue}>
-        Retour à l'accueil
+        {t("kyc.step3.homeButton")}
       </Button>
     </>
   );

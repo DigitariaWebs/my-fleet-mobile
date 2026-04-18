@@ -10,6 +10,7 @@ import {
 } from "react-native";
 import { useRouter, useLocalSearchParams } from "expo-router";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { StatusBar } from "expo-status-bar";
 import {
   ArrowLeft,
   Share2,
@@ -23,8 +24,9 @@ import {
   Car,
 } from "lucide-react-native";
 import type { LucideIcon } from "lucide-react-native";
-import { vehicles, agencies, vehicleImages } from "@/data/mockData";
-import { Button } from "@/components/ui/Button";
+import { useTranslation } from "react-i18next";
+import { vehicles, agencies, getVehicleCover } from "@/data/mockData";
+import { useTheme } from "@/context/ThemeContext";
 
 const { width: SCREEN_WIDTH } = Dimensions.get("window");
 const GRID_GAP = 8;
@@ -36,12 +38,10 @@ interface Spec {
   value: string;
 }
 
-const vehicleImagesHQ = vehicleImages.map((u) =>
-  u.replace("w=400", "w=1080")
-);
-
 export default function VehicleDetailScreen() {
   const router = useRouter();
+  const { t } = useTranslation();
+  const { colors, isDark } = useTheme();
   const { id } = useLocalSearchParams<{ id: string }>();
   const [withChauffeur, setWithChauffeur] = useState(false);
 
@@ -51,62 +51,72 @@ export default function VehicleDetailScreen() {
   if (!vehicle || !agency) return null;
 
   const specs: Spec[] = [
-    { icon: Gauge, label: "Transmission", value: vehicle.transmission },
-    { icon: Fuel, label: "Carburant", value: vehicle.fuel },
-    { icon: Gauge, label: "Puissance", value: vehicle.power },
-    { icon: Users, label: "Places", value: `${vehicle.seats} places` },
-    { icon: DoorClosed, label: "Portes", value: `${vehicle.doors} portes` },
-    { icon: Package, label: "Coffre", value: vehicle.trunk },
+    { icon: Gauge, label: t("vehicle.specs.transmission"), value: vehicle.transmission },
+    { icon: Fuel, label: t("vehicle.specs.fuel"), value: vehicle.fuel },
+    { icon: Gauge, label: t("vehicle.specs.power"), value: vehicle.power },
+    { icon: Users, label: t("vehicle.specs.seats"), value: t("vehicle.specs.seatsValue", { count: vehicle.seats }) },
+    { icon: DoorClosed, label: t("vehicle.specs.doors"), value: t("vehicle.specs.doorsValue", { count: vehicle.doors }) },
+    { icon: Package, label: t("vehicle.specs.trunk"), value: vehicle.trunk },
   ];
 
+  const totalImages = vehicle.images?.length ?? 1;
+  const accentSoft = isDark ? "rgba(74, 25, 66, 0.25)" : "rgba(74, 25, 66, 0.08)";
+
   return (
-    <View style={styles.container}>
+    <View style={{ flex: 1, backgroundColor: colors.background }}>
+      <StatusBar style="light" />
       <ScrollView
         showsVerticalScrollIndicator={false}
-        contentContainerStyle={styles.scrollContent}
+        contentContainerStyle={{ paddingBottom: 110 }}
       >
         {/* ─── Hero Image ─── */}
         <View style={styles.hero}>
           <Image
-            source={{ uri: vehicleImagesHQ[Number(id) - 1] }}
+            source={getVehicleCover(vehicle) as any}
             style={styles.heroImage}
           />
 
-          {/* Nav buttons */}
           <SafeAreaView style={styles.heroNavRow} edges={["top"]}>
             <TouchableOpacity
               onPress={() => router.back()}
               style={styles.heroBtn}
               activeOpacity={0.7}
             >
-              <ArrowLeft size={20} color="#EAEAEA" strokeWidth={1.5} />
+              <ArrowLeft size={20} color="#FFFFFF" strokeWidth={1.8} />
             </TouchableOpacity>
 
             <View style={styles.heroRightBtns}>
               <TouchableOpacity style={styles.heroBtn} activeOpacity={0.7}>
-                <Share2 size={20} color="#EAEAEA" strokeWidth={1.5} />
+                <Share2 size={20} color="#FFFFFF" strokeWidth={1.8} />
               </TouchableOpacity>
               <TouchableOpacity style={styles.heroBtn} activeOpacity={0.7}>
-                <Heart size={20} color="#EAEAEA" strokeWidth={1.5} />
+                <Heart size={20} color="#FFFFFF" strokeWidth={1.8} />
               </TouchableOpacity>
             </View>
           </SafeAreaView>
 
-          {/* Image counter */}
           <View style={styles.imageCounter}>
-            <Text style={styles.imageCounterText}>1/8</Text>
+            <Text style={styles.imageCounterText}>
+              {t("vehicle.imageCounter", { current: 1, total: totalImages })}
+            </Text>
           </View>
         </View>
 
         <View style={styles.body}>
           {/* ─── Header ─── */}
           <View style={styles.headerBlock}>
-            <Text style={styles.vehicleName}>{vehicle.name}</Text>
-            <Text style={styles.vehicleYear}>{vehicle.year}</Text>
+            <Text style={[styles.vehicleName, { color: colors.text }]}>
+              {vehicle.name}
+            </Text>
+            <Text style={[styles.vehicleYear, { color: colors.textSecondary }]}>
+              {vehicle.year}
+            </Text>
 
-            <View style={styles.pricePill}>
-              <Text style={styles.priceValue}>{vehicle.price} €</Text>
-              <Text style={styles.priceUnit}> / jour</Text>
+            <View style={[styles.pricePill, { backgroundColor: colors.primary }]}>
+              <Text style={styles.priceValue}>
+                {t("common.priceEuro", { price: vehicle.price })}
+              </Text>
+              <Text style={styles.priceUnit}> {t("common.perDay")}</Text>
             </View>
 
             <TouchableOpacity
@@ -114,42 +124,62 @@ export default function VehicleDetailScreen() {
               activeOpacity={0.7}
               onPress={() => router.push(`/agency/${agency.id}` as any)}
             >
-              <View style={styles.agencyDot}>
+              <View style={[styles.agencyDot, { backgroundColor: colors.primary }]}>
                 <Text style={styles.agencyDotText}>{agency.logo}</Text>
               </View>
-              <Text style={styles.agencyLinkName}>{agency.name}</Text>
-              <Check size={14} color="#2ECC71" strokeWidth={1.5} />
+              <Text style={[styles.agencyLinkName, { color: colors.textSecondary }]}>
+                {agency.name}
+              </Text>
+              <Check size={14} color="#2ECC71" strokeWidth={1.8} />
             </TouchableOpacity>
           </View>
 
-          {/* ─── Specifications ─── */}
+          {/* ─── Specs ─── */}
           <View style={styles.section}>
-            <Text style={styles.sectionTitle}>Spécifications</Text>
+            <Text style={[styles.sectionTitle, { color: colors.text }]}>
+              {t("vehicle.specsTitle")}
+            </Text>
             <View style={styles.specsGrid}>
               {specs.map((spec, index) => {
                 const Icon = spec.icon;
                 return (
-                  <View key={index} style={styles.specCard}>
-                    <Icon
-                      size={24}
-                      color="rgba(234, 234, 234, 0.6)"
-                      strokeWidth={1.5}
-                    />
-                    <Text style={styles.specLabel}>{spec.label}</Text>
-                    <Text style={styles.specValue}>{spec.value}</Text>
+                  <View
+                    key={index}
+                    style={[
+                      styles.specCard,
+                      { backgroundColor: colors.surface, borderColor: colors.border },
+                    ]}
+                  >
+                    <Icon size={24} color={colors.textSecondary} strokeWidth={1.5} />
+                    <Text style={[styles.specLabel, { color: colors.textMuted }]}>
+                      {spec.label}
+                    </Text>
+                    <Text style={[styles.specValue, { color: colors.text }]}>
+                      {spec.value}
+                    </Text>
                   </View>
                 );
               })}
             </View>
           </View>
 
-          {/* ─── Équipements ─── */}
+          {/* ─── Features ─── */}
           <View style={styles.section}>
-            <Text style={styles.sectionTitle}>Équipements</Text>
+            <Text style={[styles.sectionTitle, { color: colors.text }]}>
+              {t("vehicle.featuresTitle")}
+            </Text>
             <View style={styles.featuresWrap}>
               {vehicle.features.map((feature, index) => (
-                <View key={index} style={styles.featurePill}>
-                  <Text style={styles.featurePillText}>{feature}</Text>
+                <View
+                  key={index}
+                  style={[
+                    styles.featurePill,
+                    { backgroundColor: colors.surface, borderColor: colors.border },
+                  ]}
+                >
+                  <Text style={[styles.featurePillText, { color: colors.text }]}>
+                    {feature}
+                  </Text>
                 </View>
               ))}
             </View>
@@ -157,23 +187,37 @@ export default function VehicleDetailScreen() {
 
           {/* ─── Description ─── */}
           <View style={styles.section}>
-            <Text style={styles.sectionTitle}>Description</Text>
-            <Text style={styles.descriptionText}>{vehicle.description}</Text>
+            <Text style={[styles.sectionTitle, { color: colors.text }]}>
+              {t("vehicle.descriptionTitle")}
+            </Text>
+            <Text style={[styles.descriptionText, { color: colors.textSecondary }]}>
+              {vehicle.description}
+            </Text>
           </View>
 
           {/* ─── Chauffeur Option ─── */}
           {vehicle.chauffeurAvailable && (
-            <View style={styles.chauffeurCard}>
-              <Car size={24} color="#EAEAEA" strokeWidth={1.5} />
+            <View
+              style={[
+                styles.chauffeurCard,
+                {
+                  backgroundColor: colors.surface,
+                  borderColor: isDark
+                    ? "rgba(74, 25, 66, 0.6)"
+                    : "rgba(74, 25, 66, 0.35)",
+                },
+              ]}
+            >
+              <Car size={24} color={colors.primary} strokeWidth={1.8} />
               <View style={styles.chauffeurInfo}>
-                <Text style={styles.chauffeurTitle}>
-                  Avec chauffeur privé
+                <Text style={[styles.chauffeurTitle, { color: colors.text }]}>
+                  {t("vehicle.chauffeur.title")}
                 </Text>
-                <Text style={styles.chauffeurPrice}>
-                  +{vehicle.chauffeurPrice} € / jour
+                <Text style={[styles.chauffeurPrice, { color: colors.primary }]}>
+                  {t("vehicle.chauffeur.price", { price: vehicle.chauffeurPrice })}
                 </Text>
-                <Text style={styles.chauffeurSub}>
-                  Chauffeur professionnel bilingue français-anglais
+                <Text style={[styles.chauffeurSub, { color: colors.textMuted }]}>
+                  {t("vehicle.chauffeur.sub")}
                 </Text>
               </View>
               <TouchableOpacity
@@ -183,16 +227,15 @@ export default function VehicleDetailScreen() {
                   styles.toggle,
                   {
                     backgroundColor: withChauffeur
-                      ? "#4A1942"
-                      : "rgba(234, 234, 234, 0.15)",
+                      ? colors.primary
+                      : isDark
+                        ? "rgba(234, 234, 234, 0.15)"
+                        : "rgba(0, 0, 0, 0.1)",
                   },
                 ]}
               >
                 <View
-                  style={[
-                    styles.toggleThumb,
-                    { left: withChauffeur ? 24 : 4 },
-                  ]}
+                  style={[styles.toggleThumb, { left: withChauffeur ? 24 : 4 }]}
                 />
               </TouchableOpacity>
             </View>
@@ -200,21 +243,35 @@ export default function VehicleDetailScreen() {
 
           {/* ─── Conditions ─── */}
           <View style={styles.section}>
-            <Text style={styles.sectionTitle}>Conditions de location</Text>
-            <View style={styles.conditionsList}>
+            <Text style={[styles.sectionTitle, { color: colors.text }]}>
+              {t("vehicle.conditionsTitle")}
+            </Text>
+            <View
+              style={[
+                styles.conditionsCard,
+                { backgroundColor: colors.surface, borderColor: colors.border },
+              ]}
+            >
               {[
-                `Age minimum : ${vehicle.conditions.minAge} ans`,
-                `Permis de conduire valide depuis ${vehicle.conditions.licenseYears} ans`,
-                `Caution : ${vehicle.conditions.deposit.toLocaleString()} €`,
-                `Kilométrage : ${vehicle.conditions.kmPerDay} km/jour inclus`,
+                t("vehicle.conditions.minAge", { age: vehicle.conditions.minAge }),
+                t("vehicle.conditions.license", { years: vehicle.conditions.licenseYears }),
+                t("vehicle.conditions.deposit", {
+                  amount: vehicle.conditions.deposit.toLocaleString(),
+                }),
+                t("vehicle.conditions.km", { km: vehicle.conditions.kmPerDay }),
               ].map((text, index) => (
                 <View key={index} style={styles.conditionRow}>
-                  <Check
-                    size={16}
-                    color="rgba(234, 234, 234, 0.5)"
-                    strokeWidth={1.5}
-                  />
-                  <Text style={styles.conditionText}>{text}</Text>
+                  <View
+                    style={[
+                      styles.conditionCheck,
+                      { backgroundColor: accentSoft },
+                    ]}
+                  >
+                    <Check size={13} color={colors.primary} strokeWidth={2.2} />
+                  </View>
+                  <Text style={[styles.conditionText, { color: colors.textSecondary }]}>
+                    {text}
+                  </Text>
                 </View>
               ))}
             </View>
@@ -223,35 +280,37 @@ export default function VehicleDetailScreen() {
       </ScrollView>
 
       {/* ─── Sticky Bottom Bar ─── */}
-      <View style={styles.bottomBar}>
+      <View
+        style={[
+          styles.bottomBar,
+          { backgroundColor: colors.surface, borderColor: colors.border },
+        ]}
+      >
         <View style={styles.bottomPriceRow}>
-          <Text style={styles.bottomPrice}>{vehicle.price} €</Text>
-          <Text style={styles.bottomUnit}> / jour</Text>
+          <Text style={[styles.bottomPrice, { color: colors.text }]}>
+            {t("common.priceEuro", { price: vehicle.price })}
+          </Text>
+          <Text style={[styles.bottomUnit, { color: colors.textSecondary }]}>
+            {" "}
+            {t("common.perDay")}
+          </Text>
         </View>
-        <Button onPress={() => router.push(`/booking/${vehicle.id}` as any)}>Réserver</Button>
+        <TouchableOpacity
+          onPress={() => router.push(`/booking/${vehicle.id}` as any)}
+          style={[styles.bookBtn, { backgroundColor: colors.primary }]}
+          activeOpacity={0.9}
+        >
+          <Text style={styles.bookBtnText}>{t("vehicle.bookButton")}</Text>
+        </TouchableOpacity>
       </View>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: "#050404",
-  },
-  scrollContent: {
-    paddingBottom: 100,
-  },
-
-  /* ─── Hero ─── */
-  hero: {
-    height: 300,
-    position: "relative",
-  },
-  heroImage: {
-    width: "100%",
-    height: 300,
-  },
+  /* Hero */
+  hero: { height: 320, position: "relative" },
+  heroImage: { width: "100%", height: 320 },
   heroNavRow: {
     position: "absolute",
     top: 0,
@@ -266,16 +325,13 @@ const styles = StyleSheet.create({
     width: 40,
     height: 40,
     borderRadius: 999,
-    backgroundColor: "rgba(46, 28, 43, 0.85)",
+    backgroundColor: "rgba(5, 4, 4, 0.55)",
     borderWidth: 1,
-    borderColor: "rgba(234, 234, 234, 0.08)",
+    borderColor: "rgba(255, 255, 255, 0.15)",
     alignItems: "center",
     justifyContent: "center",
   },
-  heroRightBtns: {
-    flexDirection: "row",
-    gap: 8,
-  },
+  heroRightBtns: { flexDirection: "row", gap: 8 },
   imageCounter: {
     position: "absolute",
     top: 56,
@@ -288,36 +344,23 @@ const styles = StyleSheet.create({
   imageCounterText: {
     fontFamily: "Poppins_500Medium",
     fontSize: 13,
-    color: "#EAEAEA",
+    color: "#FFFFFF",
   },
 
-  /* ─── Body ─── */
-  body: {
-    paddingHorizontal: 20,
-    paddingTop: 24,
-  },
-
-  /* Header */
-  headerBlock: {
-    marginBottom: 24,
-  },
+  /* Body */
+  body: { paddingHorizontal: 20, paddingTop: 24 },
+  headerBlock: { marginBottom: 24 },
   vehicleName: {
     fontFamily: "Poppins_700Bold",
     fontSize: 22,
-    color: "#EAEAEA",
     marginBottom: 4,
+    letterSpacing: -0.3,
   },
-  vehicleYear: {
-    fontFamily: "Poppins_400Regular",
-    fontSize: 15,
-    color: "rgba(234, 234, 234, 0.6)",
-    marginBottom: 12,
-  },
+  vehicleYear: { fontFamily: "Poppins_400Regular", fontSize: 15, marginBottom: 12 },
   pricePill: {
     flexDirection: "row",
     alignItems: "baseline",
     alignSelf: "flex-start",
-    backgroundColor: "#4A1942",
     paddingHorizontal: 16,
     paddingVertical: 8,
     borderRadius: 999,
@@ -326,12 +369,12 @@ const styles = StyleSheet.create({
   priceValue: {
     fontFamily: "Poppins_700Bold",
     fontSize: 24,
-    color: "#EAEAEA",
+    color: "#FFFFFF",
   },
   priceUnit: {
     fontFamily: "Poppins_400Regular",
     fontSize: 14,
-    color: "rgba(234, 234, 234, 0.8)",
+    color: "rgba(255, 255, 255, 0.85)",
   },
   agencyLink: {
     flexDirection: "row",
@@ -342,29 +385,21 @@ const styles = StyleSheet.create({
     width: 24,
     height: 24,
     borderRadius: 999,
-    backgroundColor: "#4A1942",
     alignItems: "center",
     justifyContent: "center",
   },
   agencyDotText: {
     fontFamily: "Poppins_600SemiBold",
     fontSize: 11,
-    color: "#EAEAEA",
+    color: "#FFFFFF",
   },
-  agencyLinkName: {
-    fontFamily: "Poppins_400Regular",
-    fontSize: 14,
-    color: "rgba(234, 234, 234, 0.7)",
-  },
+  agencyLinkName: { fontFamily: "Poppins_500Medium", fontSize: 14 },
 
   /* Sections */
-  section: {
-    marginBottom: 24,
-  },
+  section: { marginBottom: 24 },
   sectionTitle: {
     fontFamily: "Poppins_600SemiBold",
     fontSize: 17,
-    color: "#EAEAEA",
     marginBottom: 12,
   },
 
@@ -376,50 +411,29 @@ const styles = StyleSheet.create({
   },
   specCard: {
     width: GRID_ITEM_WIDTH,
-    backgroundColor: "#2E1C2B",
     borderRadius: 22,
     padding: 14,
     alignItems: "center",
     gap: 6,
     borderWidth: 1,
-    borderColor: "rgba(234, 234, 234, 0.06)",
   },
-  specLabel: {
-    fontFamily: "Poppins_400Regular",
-    fontSize: 11,
-    color: "rgba(234, 234, 234, 0.5)",
-  },
-  specValue: {
-    fontFamily: "Poppins_600SemiBold",
-    fontSize: 13,
-    color: "#EAEAEA",
-  },
+  specLabel: { fontFamily: "Poppins_400Regular", fontSize: 11 },
+  specValue: { fontFamily: "Poppins_600SemiBold", fontSize: 13 },
 
   /* Features */
-  featuresWrap: {
-    flexDirection: "row",
-    flexWrap: "wrap",
-    gap: 8,
-  },
+  featuresWrap: { flexDirection: "row", flexWrap: "wrap", gap: 8 },
   featurePill: {
     paddingHorizontal: 16,
     paddingVertical: 8,
     borderRadius: 999,
-    backgroundColor: "#2E1C2B",
     borderWidth: 1,
-    borderColor: "rgba(234, 234, 234, 0.1)",
   },
-  featurePillText: {
-    fontFamily: "Poppins_400Regular",
-    fontSize: 12,
-    color: "#EAEAEA",
-  },
+  featurePillText: { fontFamily: "Poppins_500Medium", fontSize: 12 },
 
   /* Description */
   descriptionText: {
     fontFamily: "Poppins_400Regular",
     fontSize: 14,
-    color: "rgba(234, 234, 234, 0.7)",
     lineHeight: 21,
   },
 
@@ -428,32 +442,22 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     gap: 12,
-    backgroundColor: "#2E1C2B",
     borderRadius: 24,
     padding: 14,
     paddingLeft: 18,
     borderWidth: 1,
-    borderColor: "rgba(74, 25, 66, 0.6)",
     marginBottom: 18,
   },
-  chauffeurInfo: {
-    flex: 1,
-  },
+  chauffeurInfo: { flex: 1 },
   chauffeurTitle: {
     fontFamily: "Poppins_600SemiBold",
     fontSize: 15,
-    color: "#EAEAEA",
     marginBottom: 4,
   },
-  chauffeurPrice: {
-    fontFamily: "Poppins_400Regular",
-    fontSize: 13,
-    color: "rgba(234, 234, 234, 0.6)",
-  },
+  chauffeurPrice: { fontFamily: "Poppins_600SemiBold", fontSize: 13 },
   chauffeurSub: {
     fontFamily: "Poppins_400Regular",
     fontSize: 12,
-    color: "rgba(234, 234, 234, 0.5)",
     marginTop: 4,
   },
   toggle: {
@@ -468,25 +472,35 @@ const styles = StyleSheet.create({
     width: 20,
     height: 20,
     borderRadius: 999,
-    backgroundColor: "#EAEAEA",
+    backgroundColor: "#FFFFFF",
   },
 
   /* Conditions */
-  conditionsList: {
-    gap: 8,
+  conditionsCard: {
+    borderRadius: 22,
+    padding: 16,
+    borderWidth: 1,
+    gap: 10,
   },
   conditionRow: {
     flexDirection: "row",
     alignItems: "center",
-    gap: 8,
+    gap: 10,
+  },
+  conditionCheck: {
+    width: 22,
+    height: 22,
+    borderRadius: 999,
+    alignItems: "center",
+    justifyContent: "center",
   },
   conditionText: {
+    flex: 1,
     fontFamily: "Poppins_400Regular",
-    fontSize: 14,
-    color: "rgba(234, 234, 234, 0.7)",
+    fontSize: 13.5,
   },
 
-  /* ─── Sticky Bottom ─── */
+  /* Bottom bar */
   bottomBar: {
     position: "absolute",
     bottom: 12,
@@ -495,25 +509,31 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
-    paddingHorizontal: 18,
-    paddingVertical: 10,
-    backgroundColor: "#2E1C2B",
+    paddingLeft: 18,
+    paddingRight: 6,
+    paddingVertical: 6,
     borderWidth: 1,
-    borderColor: "rgba(234, 234, 234, 0.08)",
     borderRadius: 999,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 8 },
+    shadowOpacity: 0.15,
+    shadowRadius: 20,
+    elevation: 10,
   },
-  bottomPriceRow: {
-    flexDirection: "row",
-    alignItems: "baseline",
+  bottomPriceRow: { flexDirection: "row", alignItems: "baseline" },
+  bottomPrice: { fontFamily: "Poppins_700Bold", fontSize: 17 },
+  bottomUnit: { fontFamily: "Poppins_400Regular", fontSize: 13 },
+  bookBtn: {
+    height: 44,
+    paddingHorizontal: 24,
+    borderRadius: 999,
+    alignItems: "center",
+    justifyContent: "center",
   },
-  bottomPrice: {
+  bookBtnText: {
     fontFamily: "Poppins_600SemiBold",
-    fontSize: 16,
-    color: "#EAEAEA",
-  },
-  bottomUnit: {
-    fontFamily: "Poppins_400Regular",
-    fontSize: 13,
-    color: "rgba(234, 234, 234, 0.6)",
+    fontSize: 14,
+    color: "#FFFFFF",
+    letterSpacing: 0.3,
   },
 });

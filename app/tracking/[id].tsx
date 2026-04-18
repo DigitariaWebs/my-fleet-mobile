@@ -36,7 +36,9 @@ import Animated, {
   interpolate,
   useDerivedValue,
 } from "react-native-reanimated";
+import { useTranslation } from "react-i18next";
 import { bookings, agencies } from "@/data/mockData";
+import { useTheme } from "@/context/ThemeContext";
 
 const { width: SCREEN_WIDTH } = Dimensions.get("window");
 const MAP_HEIGHT = 380;
@@ -153,6 +155,7 @@ function MapRoads() {
 
 /* ─── Animated Map ─── */
 function AnimatedMap() {
+  const { t } = useTranslation();
   const progress = useSharedValue(0);
 
   useEffect(() => {
@@ -307,12 +310,12 @@ function AnimatedMap() {
 
       {/* Start label text */}
       <View style={[styles.markerLabel, { left: startPt.x - 30, top: startPt.y + 20 }]}>
-        <Text style={[styles.markerLabelText, { color: "#2ECC71" }]}>Départ</Text>
+        <Text style={[styles.markerLabelText, { color: "#2ECC71" }]}>{t("tracking.mapStart")}</Text>
       </View>
 
       {/* End label text */}
       <View style={[styles.markerLabel, { left: endPt.x - 25, top: endPt.y - 33 }]}>
-        <Text style={[styles.markerLabelText, { color: "#E74C3C" }]}>Arrivée</Text>
+        <Text style={[styles.markerLabelText, { color: "#E74C3C" }]}>{t("tracking.mapEnd")}</Text>
       </View>
 
       {/* Pulsing ring behind car */}
@@ -356,33 +359,35 @@ function PulsingDot({ color }: { color: string }) {
 
 /* ─── Timeline steps ─── */
 interface TimelineStep {
-  status: string;
-  time: string;
+  statusKey: string;
+  timeKey: string;
   completed: boolean;
   active: boolean;
 }
 
 const timelineSteps: TimelineStep[] = [
-  { status: "Réservation confirmée", time: "12 Juin, 09:00", completed: true, active: false },
-  { status: "Véhicule en préparation", time: "12 Juin, 09:30", completed: true, active: false },
-  { status: "En route vers vous", time: "Arrivée estimée : 10:15", completed: false, active: true },
-  { status: "Livré", time: "", completed: false, active: false },
+  { statusKey: "tracking.timeline.confirmed", timeKey: "tracking.timeline.confirmedTime", completed: true, active: false },
+  { statusKey: "tracking.timeline.preparing", timeKey: "tracking.timeline.preparingTime", completed: true, active: false },
+  { statusKey: "tracking.timeline.enRoute", timeKey: "tracking.timeline.enRouteTime", completed: false, active: true },
+  { statusKey: "tracking.timeline.delivered", timeKey: "", completed: false, active: false },
 ];
 
 /* ─── Main Screen ─── */
 export default function TrackingScreen() {
   const router = useRouter();
+  const { t } = useTranslation();
   const { id } = useLocalSearchParams<{ id: string }>();
+  const { colors, isDark } = useTheme();
 
   const booking = bookings.find((b) => b.id === id);
   const agency = agencies.find(
     (a) => booking && a.name === booking.agencyName
   );
   const agencyLogo = agency?.logo ?? "P";
-  const agencyName = booking?.agencyName ?? "Prestige Auto Nice";
+  const agencyName = booking?.agencyName ?? t("tracking.fallbackAgency");
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, { backgroundColor: colors.background }]}>
       {/* ─── Map Section ─── */}
       <View style={styles.mapSection}>
         <AnimatedMap />
@@ -399,12 +404,12 @@ export default function TrackingScreen() {
 
         <TouchableOpacity style={styles.fullscreenBtn} activeOpacity={0.7}>
           <Navigation size={16} color="#EAEAEA" strokeWidth={1.5} />
-          <Text style={styles.fullscreenText}>Plein écran</Text>
+          <Text style={styles.fullscreenText}>{t("tracking.fullscreen")}</Text>
         </TouchableOpacity>
       </View>
 
       {/* ─── Bottom Card ─── */}
-      <View style={styles.bottomCard}>
+      <View style={[styles.bottomCard, { backgroundColor: colors.background }]}>
         <View style={styles.dragHandle} />
 
         <ScrollView
@@ -416,7 +421,7 @@ export default function TrackingScreen() {
             {timelineSteps.map((step, index) => (
               <View key={index} style={styles.timelineRow}>
                 {step.active ? (
-                  <PulsingDot color="#4A1942" />
+                  <PulsingDot color={colors.primary} />
                 ) : (
                   <View
                     style={[
@@ -424,15 +429,19 @@ export default function TrackingScreen() {
                       {
                         backgroundColor: step.completed
                           ? "#2ECC71"
-                          : "rgba(234, 234, 234, 0.1)",
+                          : colors.border,
                       },
                     ]}
                   />
                 )}
                 <View style={styles.timelineTextBlock}>
-                  <Text style={styles.timelineStatus}>{step.status}</Text>
-                  {step.time !== "" && (
-                    <Text style={styles.timelineTime}>{step.time}</Text>
+                  <Text style={[styles.timelineStatus, { color: colors.text }]}>
+                    {t(step.statusKey)}
+                  </Text>
+                  {step.timeKey !== "" && (
+                    <Text style={[styles.timelineTime, { color: colors.textSecondary }]}>
+                      {t(step.timeKey)}
+                    </Text>
                   )}
                 </View>
               </View>
@@ -441,27 +450,51 @@ export default function TrackingScreen() {
 
           {/* ETA */}
           <View style={styles.etaBlock}>
-            <Text style={styles.etaValue}>15 min</Text>
-            <Text style={styles.etaLabel}>Temps d'arrivée estimé</Text>
+            <Text style={[styles.etaValue, { color: colors.text }]}>
+              {t("tracking.etaValue")}
+            </Text>
+            <Text style={[styles.etaLabel, { color: colors.textSecondary }]}>
+              {t("tracking.etaLabel")}
+            </Text>
           </View>
 
           {/* Driver Card */}
-          <View style={styles.driverCard}>
+          <View
+            style={[
+              styles.driverCard,
+              { backgroundColor: colors.surface, borderColor: colors.border, borderWidth: 1 },
+            ]}
+          >
             <View style={styles.driverLeft}>
-              <View style={styles.driverAvatar}>
+              <View style={[styles.driverAvatar, { backgroundColor: colors.primary }]}>
                 <Text style={styles.driverAvatarText}>{agencyLogo}</Text>
               </View>
               <View>
-                <Text style={styles.driverName}>{agencyName}</Text>
-                <Text style={styles.driverStatusText}>Livraison en cours</Text>
+                <Text style={[styles.driverName, { color: colors.text }]}>
+                  {agencyName}
+                </Text>
+                <Text style={[styles.driverStatusText, { color: colors.textSecondary }]}>
+                  {t("tracking.driverStatus")}
+                </Text>
               </View>
             </View>
             <View style={styles.driverActions}>
-              <TouchableOpacity style={styles.actionBtnPrimary} activeOpacity={0.7} onPress={() => router.push(`/call/${id}` as any)}>
-                <Phone size={18} color="#EAEAEA" strokeWidth={1.5} />
+              <TouchableOpacity
+                style={[styles.actionBtnPrimary, { backgroundColor: colors.primary }]}
+                activeOpacity={0.7}
+                onPress={() => router.push(`/call/${id}` as any)}
+              >
+                <Phone size={18} color="#FFFFFF" strokeWidth={1.8} />
               </TouchableOpacity>
-              <TouchableOpacity style={styles.actionBtnSecondary} activeOpacity={0.7} onPress={() => router.push(`/messagerie/${id}` as any)}>
-                <MessageCircle size={18} color="#EAEAEA" strokeWidth={1.5} />
+              <TouchableOpacity
+                style={[
+                  styles.actionBtnSecondary,
+                  { backgroundColor: isDark ? "rgba(74,25,66,0.3)" : "rgba(74,25,66,0.12)" },
+                ]}
+                activeOpacity={0.7}
+                onPress={() => router.push(`/messagerie/${id}` as any)}
+              >
+                <MessageCircle size={18} color={colors.primary} strokeWidth={1.8} />
               </TouchableOpacity>
             </View>
           </View>

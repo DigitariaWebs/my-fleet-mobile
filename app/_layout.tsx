@@ -1,4 +1,8 @@
 import "../global.css";
+// Initialize i18next before any component mounts so the first render has
+// translations available. Import ordering here matters — keep above providers.
+import "@/i18n";
+
 import { View, ActivityIndicator } from "react-native";
 import { Stack } from "expo-router";
 import { StatusBar } from "expo-status-bar";

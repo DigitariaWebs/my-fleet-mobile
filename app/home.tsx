@@ -1,4 +1,4 @@
-import { useState, useCallback, useMemo } from "react";
+import { useMemo, useState } from "react";
 import {
   View,
   Text,
@@ -6,309 +6,593 @@ import {
   ScrollView,
   Image,
   StyleSheet,
+  Dimensions,
 } from "react-native";
 import { useRouter } from "expo-router";
 import { SafeAreaView } from "react-native-safe-area-context";
 import {
-  Bell,
-  Search,
-  SlidersHorizontal,
+  Share2,
+  ScanLine,
+  MapPin,
   Star,
+  CheckCircle,
 } from "lucide-react-native";
+import { LinearGradient } from "expo-linear-gradient";
+import { StatusBar } from "expo-status-bar";
+import { useTranslation } from "react-i18next";
 import { BottomNav } from "@/components/BottomNav";
 import { useTheme } from "@/context/ThemeContext";
 import {
   agencies,
   vehicles,
-  categories,
-  vehicleImages,
+  reviews,
+  getVehicleCover,
 } from "@/data/mockData";
+
+const { width: SCREEN_WIDTH } = Dimensions.get("window");
+const CONNECTED_AGENCY_ID = "1";
+
+type Tab = "vehicles" | "reviews";
 
 export default function HomeScreen() {
   const router = useRouter();
-  const { colors } = useTheme();
-  const [selectedCategory, setSelectedCategory] = useState("Toutes");
+  const { t } = useTranslation();
+  const { colors, isDark } = useTheme();
+  const [activeTab, setActiveTab] = useState<Tab>("vehicles");
 
-  // Filter vehicles by category
-  const filteredVehicles = useMemo(() => {
-    if (selectedCategory === "Toutes") return vehicles;
-    if (selectedCategory === "Avec chauffeur")
-      return vehicles.filter((v) => v.chauffeurAvailable);
-    return vehicles.filter((v) => v.category === selectedCategory);
-  }, [selectedCategory]);
+  const agency = useMemo(
+    () => agencies.find((a) => a.id === CONNECTED_AGENCY_ID)!,
+    [],
+  );
+  const agencyVehicles = useMemo(
+    () => vehicles.filter((v) => v.agencyId === CONNECTED_AGENCY_ID),
+    [],
+  );
+  const agencyReviews = useMemo(
+    () => reviews.filter((r) => r.agencyId === CONNECTED_AGENCY_ID),
+    [],
+  );
+  const heroCover = useMemo(() => {
+    const withLocal = agencyVehicles.find((v) => v.images?.length);
+    return withLocal
+      ? getVehicleCover(withLocal)
+      : getVehicleCover(agencyVehicles[0]!);
+  }, [agencyVehicles]);
 
-
+  // Hero gradient stays dark so overlay text on the photo is always legible.
+  const heroGradientColors: [string, string] = [
+    "transparent",
+    "rgba(5, 4, 4, 0.9)",
+  ];
 
   return (
-    <SafeAreaView style={[styles.safeArea, { backgroundColor: colors.background }]} edges={["top"]}>
-      <View style={[styles.container, { backgroundColor: colors.background }]}>
-        <ScrollView
-          showsVerticalScrollIndicator={false}
-          contentContainerStyle={styles.scrollContent}
-        >
-          {/* ─── Header ─── */}
-          <View style={styles.headerSection}>
-            <View style={styles.headerRow}>
-              <Text style={[styles.greeting, { color: colors.text }]}>Bonjour, Jean-Pierre</Text>
-              <TouchableOpacity
-                style={styles.bellWrapper}
-                activeOpacity={0.7}
-                onPress={() => router.push("/notifications")}
-              >
-                <Bell size={24} color="#EAEAEA" strokeWidth={1.5} />
-                <View style={styles.bellDot} />
-              </TouchableOpacity>
-            </View>
+    <View style={[styles.container, { backgroundColor: colors.background }]}>
+      <StatusBar style="light" />
 
-            {/* Search Bar */}
+      <ScrollView
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={{ paddingBottom: 110 }}
+      >
+        {/* ── Hero ───────────────────────────────────────────── */}
+        <View style={styles.hero}>
+          <Image source={heroCover as any} style={styles.heroImage} />
+          <LinearGradient
+            colors={heroGradientColors}
+            locations={[0.3, 1]}
+            style={StyleSheet.absoluteFillObject}
+          />
+
+          <SafeAreaView style={styles.heroNav} edges={["top"]}>
             <TouchableOpacity
-              style={[styles.searchBar, { backgroundColor: colors.surface, borderColor: colors.border }]}
-              activeOpacity={0.85}
-              onPress={() => router.push("/search")}
+              onPress={() => router.push("/scan")}
+              style={styles.heroButton}
+              activeOpacity={0.7}
             >
-              <Search size={20} color={colors.textSecondary} strokeWidth={1.5} />
-              <Text
-                style={[styles.searchPlaceholder, { color: colors.textSecondary }]}
-                numberOfLines={1}
-                ellipsizeMode="tail"
-              >
-                Rechercher un véhicule, une agence...
-              </Text>
-              <SlidersHorizontal size={20} color={colors.textSecondary} strokeWidth={1.5} />
+              <ScanLine size={20} color="#EAEAEA" strokeWidth={1.5} />
             </TouchableOpacity>
+            <TouchableOpacity style={styles.heroButton} activeOpacity={0.7}>
+              <Share2 size={20} color="#EAEAEA" strokeWidth={1.5} />
+            </TouchableOpacity>
+          </SafeAreaView>
 
+          <View
+            style={[
+              styles.heroLogo,
+              { borderColor: colors.background, backgroundColor: colors.primary },
+            ]}
+          >
+            <Text style={styles.heroLogoText}>{agency.logo}</Text>
+          </View>
+        </View>
+
+        {/* ── Info section ───────────────────────────────────── */}
+        <View style={styles.infoSection}>
+          <Text style={[styles.agencyName, { color: colors.text }]}>
+            {agency.name}
+          </Text>
+
+          <View style={styles.addressRow}>
+            <MapPin size={16} color={colors.textSecondary} strokeWidth={1.5} />
+            <Text style={[styles.addressText, { color: colors.textSecondary }]}>
+              {agency.address}
+            </Text>
           </View>
 
-          {/* ─── Catégories ─── */}
-          <View style={styles.section}>
-            <View style={styles.sectionHeaderPadded}>
-              <Text style={styles.sectionTitle}>Catégories</Text>
-            </View>
-            <ScrollView
-              horizontal
-              showsHorizontalScrollIndicator={false}
-              contentContainerStyle={styles.categoriesScroll}
+          <View style={styles.metaRow}>
+            <View
+              style={[
+                styles.ratingRow,
+                {
+                  backgroundColor: isDark
+                    ? "rgba(241, 196, 15, 0.1)"
+                    : "rgba(241, 196, 15, 0.14)",
+                },
+              ]}
             >
-              {categories.map((cat) => {
-                const isActive = selectedCategory === cat;
-                return (
+              <Star size={16} fill="#F1C40F" color="#F1C40F" strokeWidth={1.5} />
+              <Text style={[styles.ratingValue, { color: colors.text }]}>
+                {agency.rating}
+              </Text>
+              <Text style={[styles.ratingCount, { color: colors.textMuted }]}>
+                {t("agency.reviewsCount", { count: agency.reviews })}
+              </Text>
+            </View>
+            <View style={styles.verifiedBadge}>
+              <CheckCircle size={12} color="#2ECC71" strokeWidth={1.5} />
+              <Text style={styles.verifiedText}>{t("agency.verified")}</Text>
+            </View>
+          </View>
+
+          <Text style={[styles.description, { color: colors.textSecondary }]}>
+            {agency.description}
+          </Text>
+
+          {/* ── Tabs ─────────────────────────────────────────── */}
+          <View
+            style={[
+              styles.tabContainer,
+              { backgroundColor: colors.surface, borderColor: colors.border },
+            ]}
+          >
+            <TouchableOpacity
+              onPress={() => setActiveTab("vehicles")}
+              style={[
+                styles.tab,
+                activeTab === "vehicles" && { backgroundColor: colors.primary },
+              ]}
+              activeOpacity={0.7}
+            >
+              <Text
+                style={[
+                  styles.tabText,
+                  {
+                    color:
+                      activeTab === "vehicles" ? "#FFFFFF" : colors.textSecondary,
+                  },
+                ]}
+              >
+                {t("agency.tabVehicles")}
+              </Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              onPress={() => setActiveTab("reviews")}
+              style={[
+                styles.tab,
+                activeTab === "reviews" && { backgroundColor: colors.primary },
+              ]}
+              activeOpacity={0.7}
+            >
+              <Text
+                style={[
+                  styles.tabText,
+                  {
+                    color:
+                      activeTab === "reviews" ? "#FFFFFF" : colors.textSecondary,
+                  },
+                ]}
+              >
+                {t("agency.tabReviews")}
+              </Text>
+            </TouchableOpacity>
+          </View>
+
+          {/* ── Vehicles Tab ─────────────────────────────────── */}
+          {activeTab === "vehicles" && (
+            <View>
+              <Text style={[styles.vehicleCount, { color: colors.textMuted }]}>
+                {agencyVehicles.length === 1
+                  ? t("agency.vehicleAvailable", { count: 1 })
+                  : t("agency.vehiclesAvailable", { count: agencyVehicles.length })}
+              </Text>
+              <View style={styles.vehiclesGrid}>
+                {agencyVehicles.map((vehicle) => (
                   <TouchableOpacity
-                    key={cat}
-                    onPress={() => setSelectedCategory(cat)}
-                    activeOpacity={0.85}
+                    key={vehicle.id}
+                    activeOpacity={0.9}
                     style={[
-                      styles.categoryPill,
-                      isActive ? styles.categoryPillActive : styles.categoryPillInactive,
+                      styles.vehicleMiniCard,
+                      { borderColor: colors.border },
+                    ]}
+                    onPress={() =>
+                      router.push(`/vehicle/${vehicle.id}` as any)
+                    }
+                  >
+                    <Image
+                      source={getVehicleCover(vehicle) as any}
+                      style={styles.vehicleMiniImage}
+                    />
+                    <View
+                      style={[
+                        styles.vehicleMiniInfo,
+                        { backgroundColor: colors.surface },
+                      ]}
+                    >
+                      <Text
+                        style={[styles.vehicleMiniName, { color: colors.text }]}
+                        numberOfLines={1}
+                      >
+                        {vehicle.name}
+                      </Text>
+                      <View style={styles.vehicleMiniPriceRow}>
+                        <Text
+                          style={[styles.vehicleMiniPrice, { color: colors.text }]}
+                        >
+                          {t("common.priceEuro", { price: vehicle.price })}
+                        </Text>
+                        <Text
+                          style={[styles.vehicleMiniUnit, { color: colors.textMuted }]}
+                        >
+                          {" "}
+                          {t("common.perDay")}
+                        </Text>
+                      </View>
+                    </View>
+                  </TouchableOpacity>
+                ))}
+              </View>
+            </View>
+          )}
+
+          {/* ── Reviews Tab ──────────────────────────────────── */}
+          {activeTab === "reviews" && (
+            <View>
+              <View
+                style={[
+                  styles.ratingSummary,
+                  { backgroundColor: colors.surface, borderColor: colors.border },
+                ]}
+              >
+                <View style={styles.ratingSummaryTop}>
+                  <Text
+                    style={[styles.ratingSummaryBig, { color: colors.text }]}
+                  >
+                    {agency.rating}
+                  </Text>
+                  <Text
+                    style={[styles.ratingSummaryMax, { color: colors.textMuted }]}
+                  >
+                    /5
+                  </Text>
+                </View>
+                <View style={styles.starsRow}>
+                  {[1, 2, 3, 4, 5].map((s) => (
+                    <Star
+                      key={s}
+                      size={16}
+                      fill="#F1C40F"
+                      color="#F1C40F"
+                      strokeWidth={1.5}
+                    />
+                  ))}
+                </View>
+                <Text
+                  style={[
+                    styles.ratingSummaryCount,
+                    { color: colors.textSecondary },
+                  ]}
+                >
+                  {t("agency.reviewsBasedOn", { count: agency.reviews })}
+                </Text>
+              </View>
+
+              <View style={styles.reviewsList}>
+                {agencyReviews.map((review) => (
+                  <View
+                    key={review.id}
+                    style={[
+                      styles.reviewCard,
+                      { backgroundColor: colors.surface, borderColor: colors.border },
                     ]}
                   >
-                    <Text style={[styles.categoryPillText, { color: "#EAEAEA" }]}>
-                      {cat}
-                    </Text>
-                  </TouchableOpacity>
-                );
-              })}
-            </ScrollView>
-          </View>
-
-          {/* ─── Agences populaires ─── */}
-          <View style={styles.section}>
-            <View style={styles.sectionHeaderRow}>
-              <Text style={styles.sectionTitle}>Agences populaires</Text>
-              <TouchableOpacity activeOpacity={0.7} onPress={() => router.push("/agencies")}>
-                <Text style={styles.seeAll}>Voir tout</Text>
-              </TouchableOpacity>
-            </View>
-            <ScrollView
-              horizontal
-              showsHorizontalScrollIndicator={false}
-              contentContainerStyle={styles.carouselScroll}
-            >
-              {agencies.slice(0, 3).map((agency, index) => (
-                <TouchableOpacity
-                  key={agency.id}
-                  activeOpacity={0.9}
-                  style={styles.agencyCard}
-                  onPress={() => router.push(`/agency/${agency.id}` as any)}
-                >
-                  <Image source={{ uri: vehicleImages[index] }} style={styles.agencyCover} />
-                  <View style={[styles.agencyInfo, { backgroundColor: colors.surface }]}>
-                    <View style={styles.agencyLogo}>
-                      <Text style={styles.agencyLogoText}>{agency.logo}</Text>
-                    </View>
-                    <View style={styles.agencyDetails}>
-                      <Text style={styles.agencyName} numberOfLines={1}>{agency.name}</Text>
-                      <View style={styles.agencyMeta}>
-                        <Text style={styles.agencyCity}>{agency.city}</Text>
-                        <View style={styles.ratingRow}>
-                          <Star size={14} fill="#F1C40F" color="#F1C40F" strokeWidth={1.5} />
-                          <Text style={styles.ratingText}>{agency.rating}</Text>
-                          <Text style={styles.reviewCount}>({agency.reviews})</Text>
+                    <View style={styles.reviewHeader}>
+                      <View style={styles.reviewUser}>
+                        <View
+                          style={[
+                            styles.reviewAvatar,
+                            { backgroundColor: colors.primary },
+                          ]}
+                        >
+                          <Text style={styles.reviewAvatarText}>
+                            {review.userName[0]}
+                          </Text>
                         </View>
+                        <Text
+                          style={[styles.reviewUserName, { color: colors.text }]}
+                        >
+                          {review.userName}
+                        </Text>
+                      </View>
+                      <View style={styles.reviewStars}>
+                        {[...Array(review.rating)].map((_, i) => (
+                          <Star
+                            key={i}
+                            size={12}
+                            fill="#F1C40F"
+                            color="#F1C40F"
+                            strokeWidth={1.5}
+                          />
+                        ))}
                       </View>
                     </View>
-                  </View>
-                </TouchableOpacity>
-              ))}
-            </ScrollView>
-          </View>
 
-          {/* ─── Véhicules recommandés (filtered) ─── */}
-          <View style={styles.section}>
-            <View style={styles.sectionHeaderRow}>
-              <Text style={styles.sectionTitle}>
-                {selectedCategory === "Toutes"
-                  ? "Véhicules recommandés"
-                  : `${selectedCategory}`}
-              </Text>
-              <TouchableOpacity activeOpacity={0.7} onPress={() => router.push("/agencies")}>
-                <Text style={styles.seeAll}>Voir tout</Text>
-              </TouchableOpacity>
-            </View>
-            {filteredVehicles.length === 0 ? (
-              <View style={styles.emptyState}>
-                <Text style={styles.emptyText}>Aucun véhicule dans cette catégorie</Text>
-              </View>
-            ) : (
-              <ScrollView
-                horizontal
-                showsHorizontalScrollIndicator={false}
-                contentContainerStyle={styles.carouselScroll}
-              >
-                {filteredVehicles.map((vehicle) => {
-                  const agency = agencies.find((a) => a.id === vehicle.agencyId);
-                  const imgIndex = vehicles.findIndex((v) => v.id === vehicle.id);
-                  return (
-                    <TouchableOpacity
-                      key={vehicle.id}
-                      activeOpacity={0.9}
-                      style={styles.vehicleCard}
-                      onPress={() => router.push(`/vehicle/${vehicle.id}` as any)}
+                    <Text
+                      style={[styles.reviewComment, { color: colors.textSecondary }]}
                     >
-                      <Image source={{ uri: vehicleImages[imgIndex] }} style={styles.vehicleImage} />
-                      <View style={[styles.vehicleInfo, { backgroundColor: colors.surface }]}>
-                        <Text style={styles.vehicleName} numberOfLines={1}>{vehicle.name}</Text>
-                        <View style={styles.vehicleSpecs}>
-                          <Text style={styles.specText}>{vehicle.year}</Text>
-                          <Text style={styles.specDot}>•</Text>
-                          <Text style={styles.specText}>{vehicle.transmission}</Text>
-                          <Text style={styles.specDot}>•</Text>
-                          <Text style={styles.specText}>{vehicle.fuel}</Text>
-                        </View>
-                        <View style={styles.vehicleBottom}>
-                          <View style={styles.priceRow}>
-                            <Text style={styles.priceValue}>{vehicle.price} €</Text>
-                            <Text style={styles.priceUnit}> / jour</Text>
-                          </View>
-                          <View style={styles.agencyBadge}>
-                            <View style={styles.agencyBadgeDot}>
-                              <Text style={styles.agencyBadgeLetter}>{agency?.logo}</Text>
-                            </View>
-                            <Text style={styles.agencyBadgeName}>
-                              {vehicle.agencyName.split(" ")[0]}
-                            </Text>
-                          </View>
-                        </View>
+                      {review.comment}
+                    </Text>
+                    <Text
+                      style={[styles.reviewDate, { color: colors.textMuted }]}
+                    >
+                      {review.date}
+                    </Text>
+
+                    {review.agencyResponse && (
+                      <View
+                        style={[
+                          styles.responseBox,
+                          {
+                            backgroundColor: isDark
+                              ? "rgba(74, 25, 66, 0.25)"
+                              : "rgba(74, 25, 66, 0.08)",
+                          },
+                        ]}
+                      >
+                        <Text
+                          style={[styles.responseLabel, { color: colors.text }]}
+                        >
+                          {t("agency.agencyResponse")}
+                        </Text>
+                        <Text
+                          style={[styles.responseText, { color: colors.textSecondary }]}
+                        >
+                          {review.agencyResponse}
+                        </Text>
                       </View>
-                    </TouchableOpacity>
-                  );
-                })}
-              </ScrollView>
-            )}
-          </View>
-        </ScrollView>
+                    )}
+                  </View>
+                ))}
+              </View>
+            </View>
+          )}
+        </View>
+      </ScrollView>
 
-        <BottomNav />
-      </View>
-
-    </SafeAreaView>
+      <BottomNav />
+    </View>
   );
 }
 
+const GRID_GAP = 12;
+const GRID_ITEM_WIDTH = (SCREEN_WIDTH - 32 - GRID_GAP) / 2;
+
 const styles = StyleSheet.create({
-  safeArea: { flex: 1, backgroundColor: "#050404" },
-  container: { flex: 1, backgroundColor: "#050404" },
-  scrollContent: { paddingBottom: 16 },
+  container: { flex: 1 },
 
-  /* Header */
-  headerSection: { paddingHorizontal: 16, paddingTop: 20, paddingBottom: 12 },
-  headerRow: { flexDirection: "row", alignItems: "center", justifyContent: "space-between", marginBottom: 14 },
-  greeting: { fontFamily: "Poppins_600SemiBold", fontSize: 18, color: "#EAEAEA" },
-  bellWrapper: { width: 40, height: 40, borderRadius: 999, backgroundColor: "#2E1C2B", borderWidth: 1, borderColor: "rgba(234, 234, 234, 0.08)", alignItems: "center", justifyContent: "center", position: "relative" },
-  bellDot: { position: "absolute", top: 8, right: 8, width: 8, height: 8, borderRadius: 4, backgroundColor: "#E74C3C" },
+  /* Hero */
+  hero: { height: 240, position: "relative" },
+  heroImage: { width: "100%", height: 240 },
+  heroNav: {
+    position: "absolute",
+    top: 0,
+    left: 0,
+    right: 0,
+    flexDirection: "row",
+    justifyContent: "space-between",
+    paddingHorizontal: 20,
+    paddingTop: 8,
+  },
+  heroButton: {
+    width: 40,
+    height: 40,
+    borderRadius: 999,
+    backgroundColor: "rgba(46, 28, 43, 0.85)",
+    borderWidth: 1,
+    borderColor: "rgba(234, 234, 234, 0.15)",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  heroLogo: {
+    position: "absolute",
+    bottom: -24,
+    left: 16,
+    width: 52,
+    height: 52,
+    borderRadius: 999,
+    borderWidth: 3,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  heroLogoText: {
+    fontFamily: "Poppins_700Bold",
+    fontSize: 20,
+    color: "#FFFFFF",
+  },
 
-  /* Search */
-  searchBar: { height: 46, borderRadius: 999, backgroundColor: "#2E1C2B", borderWidth: 1, borderColor: "rgba(234, 234, 234, 0.08)", flexDirection: "row", alignItems: "center", paddingHorizontal: 18, gap: 10, marginBottom: 12 },
-  searchPlaceholder: { flex: 1, minWidth: 0, fontFamily: "Poppins_400Regular", fontSize: 13, color: "rgba(234, 234, 234, 0.55)" },
+  /* Info */
+  infoSection: { paddingHorizontal: 16, paddingTop: 34, paddingBottom: 20 },
+  agencyName: {
+    fontFamily: "Poppins_700Bold",
+    fontSize: 22,
+    marginBottom: 6,
+    letterSpacing: -0.3,
+  },
+  addressRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 6,
+    marginBottom: 10,
+  },
+  addressText: { fontFamily: "Poppins_400Regular", fontSize: 13 },
+  metaRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 10,
+    marginBottom: 14,
+  },
+  ratingRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 4,
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+    borderRadius: 999,
+  },
+  ratingValue: { fontFamily: "Poppins_600SemiBold", fontSize: 13 },
+  ratingCount: { fontFamily: "Poppins_400Regular", fontSize: 11 },
+  verifiedBadge: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 4,
+    paddingHorizontal: 12,
+    paddingVertical: 4,
+    borderRadius: 999,
+    backgroundColor: "rgba(46, 204, 113, 0.15)",
+  },
+  verifiedText: {
+    fontFamily: "Poppins_500Medium",
+    fontSize: 12,
+    color: "#2ECC71",
+  },
+  description: {
+    fontFamily: "Poppins_400Regular",
+    fontSize: 13,
+    lineHeight: 19,
+    marginBottom: 16,
+  },
 
-  /* Filters */
-  filtersRow: { flexDirection: "row", gap: 8 },
-  filterChip: { flexDirection: "row", alignItems: "center", gap: 8, paddingHorizontal: 14, height: 32, borderRadius: 999, backgroundColor: "#2E1C2B", borderWidth: 1, borderColor: "rgba(234, 234, 234, 0.08)" },
-  filterChipActive: { backgroundColor: "rgba(74, 25, 66, 0.3)", borderColor: "#4A1942" },
-  filterChipText: { fontFamily: "Poppins_500Medium", fontSize: 12, color: "rgba(234, 234, 234, 0.6)" },
-  filterChipTextActive: { fontFamily: "Poppins_500Medium", fontSize: 12, color: "#EAEAEA" },
+  /* Tab pill */
+  tabContainer: {
+    flexDirection: "row",
+    padding: 4,
+    borderRadius: 999,
+    borderWidth: 1,
+    marginBottom: 18,
+  },
+  tab: {
+    flex: 1,
+    height: 36,
+    borderRadius: 999,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  tabText: {
+    fontFamily: "Poppins_600SemiBold",
+    fontSize: 12,
+    letterSpacing: 0.2,
+  },
 
-  /* Sections */
-  section: { marginBottom: 22 },
-  sectionHeaderPadded: { paddingHorizontal: 16, marginBottom: 10 },
-  sectionHeaderRow: { flexDirection: "row", alignItems: "center", justifyContent: "space-between", paddingHorizontal: 16, marginBottom: 10 },
-  sectionTitle: { fontFamily: "Poppins_600SemiBold", fontSize: 16, color: "#EAEAEA" },
-  seeAll: { fontFamily: "Poppins_500Medium", fontSize: 12, color: "rgba(234, 234, 234, 0.6)" },
+  /* Vehicles */
+  vehicleCount: {
+    fontFamily: "Poppins_500Medium",
+    fontSize: 12,
+    marginBottom: 12,
+  },
+  vehiclesGrid: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    gap: GRID_GAP,
+  },
+  vehicleMiniCard: {
+    width: GRID_ITEM_WIDTH,
+    borderRadius: 20,
+    overflow: "hidden",
+    borderWidth: 1,
+  },
+  vehicleMiniImage: { width: GRID_ITEM_WIDTH, height: 110 },
+  vehicleMiniInfo: { paddingHorizontal: 10, paddingVertical: 10 },
+  vehicleMiniName: {
+    fontFamily: "Poppins_600SemiBold",
+    fontSize: 13,
+    marginBottom: 4,
+  },
+  vehicleMiniPriceRow: {
+    flexDirection: "row",
+    alignItems: "baseline",
+  },
+  vehicleMiniPrice: { fontFamily: "Poppins_700Bold", fontSize: 14 },
+  vehicleMiniUnit: { fontFamily: "Poppins_400Regular", fontSize: 10 },
 
-  /* Categories */
-  categoriesScroll: { paddingHorizontal: 16, gap: 6 },
-  categoryPill: { paddingHorizontal: 16, height: 32, borderRadius: 999, alignItems: "center", justifyContent: "center" },
-  categoryPillActive: { backgroundColor: "#4A1942" },
-  categoryPillInactive: { backgroundColor: "#2E1C2B", borderWidth: 1, borderColor: "rgba(234, 234, 234, 0.08)" },
-  categoryPillText: { fontFamily: "Poppins_500Medium", fontSize: 12 },
-
-  /* Carousels */
-  carouselScroll: { paddingHorizontal: 16, gap: 12 },
-
-  /* Agency Card */
-  agencyCard: { width: 220, borderRadius: 24, overflow: "hidden", borderWidth: 1, borderColor: "rgba(234, 234, 234, 0.08)" },
-  agencyCover: { width: 220, height: 92 },
-  agencyInfo: { backgroundColor: "#2E1C2B", paddingHorizontal: 14, paddingTop: 18, paddingBottom: 14, position: "relative" },
-  agencyLogo: { position: "absolute", top: -18, left: 14, width: 36, height: 36, borderRadius: 999, backgroundColor: "#4A1942", borderWidth: 2, borderColor: "#2E1C2B", alignItems: "center", justifyContent: "center" },
-  agencyLogoText: { fontFamily: "Poppins_600SemiBold", fontSize: 14, color: "#EAEAEA" },
-  agencyDetails: { marginTop: 14 },
-  agencyName: { fontFamily: "Poppins_600SemiBold", fontSize: 14, color: "#EAEAEA", marginBottom: 4 },
-  agencyMeta: { flexDirection: "row", alignItems: "center", justifyContent: "space-between" },
-  agencyCity: { fontFamily: "Poppins_400Regular", fontSize: 12, color: "rgba(234, 234, 234, 0.55)" },
-  ratingRow: { flexDirection: "row", alignItems: "center", gap: 4 },
-  ratingText: { fontFamily: "Poppins_600SemiBold", fontSize: 12, color: "#EAEAEA" },
-  reviewCount: { fontFamily: "Poppins_400Regular", fontSize: 10, color: "rgba(234, 234, 234, 0.55)" },
-
-  /* Vehicle Card */
-  vehicleCard: { width: 260, borderRadius: 24, overflow: "hidden", borderWidth: 1, borderColor: "rgba(234, 234, 234, 0.08)" },
-  vehicleImage: { width: 260, height: 150 },
-  vehicleInfo: { backgroundColor: "#2E1C2B", paddingHorizontal: 14, paddingVertical: 14 },
-  vehicleName: { fontFamily: "Poppins_600SemiBold", fontSize: 15, color: "#EAEAEA", marginBottom: 6 },
-  vehicleSpecs: { flexDirection: "row", alignItems: "center", gap: 6, marginBottom: 12 },
-  specText: { fontFamily: "Poppins_400Regular", fontSize: 12, color: "rgba(234, 234, 234, 0.55)" },
-  specDot: { fontFamily: "Poppins_400Regular", fontSize: 12, color: "rgba(234, 234, 234, 0.35)" },
-  vehicleBottom: { flexDirection: "row", alignItems: "center", justifyContent: "space-between" },
-  priceRow: { flexDirection: "row", alignItems: "baseline" },
-  priceValue: { fontFamily: "Poppins_700Bold", fontSize: 17, color: "#EAEAEA" },
-  priceUnit: { fontFamily: "Poppins_400Regular", fontSize: 12, color: "rgba(234, 234, 234, 0.55)" },
-  agencyBadge: { flexDirection: "row", alignItems: "center", gap: 6, paddingHorizontal: 8, paddingVertical: 4, borderRadius: 999, backgroundColor: "rgba(74, 25, 66, 0.25)" },
-  agencyBadgeDot: { width: 18, height: 18, borderRadius: 999, backgroundColor: "#4A1942", alignItems: "center", justifyContent: "center" },
-  agencyBadgeLetter: { fontFamily: "Poppins_600SemiBold", fontSize: 9, color: "#EAEAEA" },
-  agencyBadgeName: { fontFamily: "Poppins_500Medium", fontSize: 11, color: "#EAEAEA" },
-
-  /* Empty state */
-  emptyState: { paddingHorizontal: 16, paddingVertical: 32, alignItems: "center" },
-  emptyText: { fontFamily: "Poppins_400Regular", fontSize: 13, color: "rgba(234, 234, 234, 0.5)" },
-
-  /* ─── Modal ─── */
-  modalOverlay: { flex: 1, backgroundColor: "rgba(0, 0, 0, 0.6)", justifyContent: "flex-end" },
-  modalSheet: { backgroundColor: "#0d0a0c", borderTopLeftRadius: 24, borderTopRightRadius: 24, paddingBottom: 40 },
-  modalDragHandle: { width: 40, height: 4, borderRadius: 2, backgroundColor: "rgba(234, 234, 234, 0.3)", alignSelf: "center", marginTop: 12, marginBottom: 20 },
-  modalHeader: { flexDirection: "row", alignItems: "center", justifyContent: "space-between", paddingHorizontal: 20, marginBottom: 16 },
-  modalTitle: { fontFamily: "Poppins_600SemiBold", fontSize: 18, color: "#EAEAEA" },
-  modalList: { paddingHorizontal: 20, gap: 4 },
-  modalRow: { flexDirection: "row", alignItems: "center", justifyContent: "space-between", paddingHorizontal: 16, paddingVertical: 14, borderRadius: 12 },
-  modalRowSelected: { backgroundColor: "rgba(74, 25, 66, 0.15)" },
-  modalRowLeft: { flexDirection: "row", alignItems: "center", gap: 12 },
-  modalRowText: { fontFamily: "Poppins_400Regular", fontSize: 15, color: "rgba(234, 234, 234, 0.7)" },
-  modalRowTextSelected: { fontFamily: "Poppins_500Medium", color: "#EAEAEA" },
+  /* Reviews */
+  ratingSummary: {
+    borderRadius: 28,
+    padding: 22,
+    alignItems: "center",
+    marginBottom: 18,
+    borderWidth: 1,
+  },
+  ratingSummaryTop: {
+    flexDirection: "row",
+    alignItems: "baseline",
+    gap: 4,
+    marginBottom: 8,
+  },
+  ratingSummaryBig: { fontFamily: "Poppins_700Bold", fontSize: 40 },
+  ratingSummaryMax: { fontFamily: "Poppins_400Regular", fontSize: 20 },
+  starsRow: { flexDirection: "row", gap: 4, marginBottom: 8 },
+  ratingSummaryCount: { fontFamily: "Poppins_400Regular", fontSize: 13 },
+  reviewsList: { gap: 12 },
+  reviewCard: {
+    borderRadius: 24,
+    padding: 16,
+    borderWidth: 1,
+  },
+  reviewHeader: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    marginBottom: 8,
+  },
+  reviewUser: { flexDirection: "row", alignItems: "center", gap: 8 },
+  reviewAvatar: {
+    width: 32,
+    height: 32,
+    borderRadius: 999,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  reviewAvatarText: {
+    fontFamily: "Poppins_600SemiBold",
+    fontSize: 14,
+    color: "#FFFFFF",
+  },
+  reviewUserName: { fontFamily: "Poppins_600SemiBold", fontSize: 14 },
+  reviewStars: { flexDirection: "row", gap: 2 },
+  reviewComment: {
+    fontFamily: "Poppins_400Regular",
+    fontSize: 14,
+    lineHeight: 20,
+    marginBottom: 8,
+  },
+  reviewDate: { fontFamily: "Poppins_400Regular", fontSize: 11 },
+  responseBox: { marginTop: 12, padding: 12, borderRadius: 18 },
+  responseLabel: {
+    fontFamily: "Poppins_500Medium",
+    fontSize: 12,
+    marginBottom: 4,
+  },
+  responseText: {
+    fontFamily: "Poppins_400Regular",
+    fontSize: 13,
+    lineHeight: 19,
+  },
 });

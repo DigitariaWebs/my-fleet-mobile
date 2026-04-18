@@ -1,0 +1,589 @@
+{
+  "common": {
+    "continue": "Continue",
+    "confirm": "Confirm",
+    "cancel": "Cancel",
+    "close": "Close",
+    "back": "Back",
+    "next": "Next",
+    "save": "Save",
+    "edit": "Edit",
+    "delete": "Delete",
+    "search": "Search",
+    "loading": "Loading…",
+    "error": "Error",
+    "success": "Success",
+    "yes": "Yes",
+    "no": "No",
+    "ok": "OK",
+    "day": "day",
+    "days": "days",
+    "hour": "hour",
+    "hours": "hours",
+    "euro": "€",
+    "comingSoon": "Coming soon",
+    "perDay": "/ day",
+    "pricePerDay": "€{{price}} / day",
+    "priceEuro": "€{{price}}",
+    "dayCount_one": "{{count}} day",
+    "dayCount_other": "{{count}} days",
+    "skip": "Skip",
+    "all": "All",
+    "france": "France"
+  },
+  "onboarding": {
+    "skip": "Skip",
+    "getStarted": "Get started",
+    "next": "Next",
+    "stepIndicator": "{{current}}/{{total}}",
+    "screen1": {
+      "title": "Rent with ease",
+      "subtitle": "Browse the best agencies and book in just a few seconds.",
+      "chip1": "Verified agencies",
+      "chip2": "Instant booking",
+      "chip3": "Best prices"
+    },
+    "screen2": {
+      "title": "Trusted by thousands",
+      "subtitle": "All our partners are verified and rated by the community.",
+      "chip1": "Real reviews",
+      "chip2": "Secure payment",
+      "chip3": "Full insurance"
+    },
+    "screen3": {
+      "title": "Your fleet, your choice",
+      "subtitle": "Sedans, SUVs, sports cars, convertibles — with or without a chauffeur.",
+      "chip1": "Premium fleet",
+      "chip2": "With chauffeur",
+      "chip3": "Delivery included"
+    }
+  },
+  "auth": {
+    "tabLogin": "Sign in",
+    "tabSignup": "Sign up",
+    "namePlaceholder": "Full name",
+    "emailPlaceholder": "Email address",
+    "phonePlaceholder": "6 12 34 56 78",
+    "emailOrPhonePlaceholder": "Email or phone",
+    "passwordPlaceholder": "Password",
+    "forgotPassword": "Forgot your password?",
+    "submitSignup": "Create my account",
+    "submitLogin": "Sign in",
+    "dividerText": "or continue with",
+    "socialGoogle": "Google",
+    "socialApple": "Apple",
+    "hasAccount": "Already have an account? ",
+    "noAccount": "Don't have an account yet? ",
+    "switchToLogin": "Sign in",
+    "switchToSignup": "Sign up"
+  },
+  "otp": {
+    "title": "Verify your number",
+    "subtitle": "A code has been sent to +33 6 ** ** **42",
+    "resend": "Resend code",
+    "resendWithCountdown": "Resend code ({{seconds}}s)",
+    "verify": "Verify"
+  },
+  "kyc": {
+    "stepLabel": "Step {{current}}/{{total}}",
+    "step1": {
+      "title": "Identity verification",
+      "description": "For your safety and that of our partner agencies, we need to verify your identity",
+      "benefit1": "Secure and guaranteed rental",
+      "benefit2": "Verified badge on your profile",
+      "benefit3": "Access to all vehicles",
+      "startButton": "Start verification",
+      "laterButton": "Later"
+    },
+    "step2": {
+      "title": "ID document",
+      "description": "Take a photo of the front and back of your national ID card",
+      "idCardLabel": "ID card",
+      "licenseLabel": "Driver's license",
+      "front": "Front",
+      "back": "Back",
+      "tip": "💡 Make sure the photo is sharp, well-lit and all text is readable"
+    },
+    "step3": {
+      "title": "Verification in progress",
+      "description": "We are verifying your documents. You will receive a notification as soon as your profile is validated. This usually takes less than 24 hours.",
+      "statusBadge": "Pending verification",
+      "homeButton": "Back to home"
+    }
+  },
+  "scan": {
+    "title": "Agency QR",
+    "live": "Live",
+    "holdSteady": "Hold steady…",
+    "headline": "Scan your agency's QR code",
+    "subline": "Place the code in the frame. You will be connected automatically.",
+    "analyzing": "Analyzing…",
+    "simulateButton": "Simulate scan",
+    "enterCode": "Enter code manually",
+    "connecting": "Connecting to {{name}}…",
+    "chip1": "Agencies only",
+    "chip2": "Instant pairing",
+    "chip3": "Secure"
+  },
+  "home": {
+    "greeting": "Hello, Jean-Pierre",
+    "searchPlaceholder": "Search for a vehicle, an agency...",
+    "categoriesTitle": "Categories",
+    "popularAgenciesTitle": "Popular agencies",
+    "recommendedTitle": "Recommended vehicles",
+    "seeAll": "See all",
+    "emptyCategory": "No vehicles in this category",
+    "categoryAll": "All",
+    "categoryWithChauffeur": "With chauffeur"
+  },
+  "calendar": {
+    "months": [
+      "January",
+      "February",
+      "March",
+      "April",
+      "May",
+      "June",
+      "July",
+      "August",
+      "September",
+      "October",
+      "November",
+      "December"
+    ],
+    "shortMonths": [
+      "Jan",
+      "Feb",
+      "Mar",
+      "Apr",
+      "May",
+      "Jun",
+      "Jul",
+      "Aug",
+      "Sep",
+      "Oct",
+      "Nov",
+      "Dec"
+    ],
+    "daysOfWeek": [
+      "Mo",
+      "Tu",
+      "We",
+      "Th",
+      "Fr",
+      "Sa",
+      "Su"
+    ]
+  },
+  "search": {
+    "inputPlaceholder": "Vehicle name...",
+    "categoryInputPlaceholder": "Category: {{category}}",
+    "chooseDates": "Pick dates",
+    "locationLabel": "{{city}}, France",
+    "resultsCount_one": "{{count}} result",
+    "resultsCount_other": "{{count}} results",
+    "typeVehicle": "Vehicle",
+    "typeAgency": "Agency",
+    "noResultsTitle": "No results",
+    "noResultsText": "Try a different search term",
+    "recentTitle": "Recent searches",
+    "popularCategoriesTitle": "Popular categories",
+    "suggestionsTitle": "Suggestions",
+    "cityModalTitle": "Location",
+    "citySearchPlaceholder": "Search for a city...",
+    "noCityFound": "No city found",
+    "cityRegion": "{{region}}, France",
+    "unavailableJune": "Unavailable in June — already booked",
+    "unavailableMaxDays": "Max duration 4 days for this vehicle",
+    "calendarModalTitle": "Pick dates",
+    "calendarStart": "Start",
+    "calendarEnd": "End",
+    "calendarDuration": "Duration",
+    "calendarDurationDays": "{{count}}d",
+    "calendarEmpty": "—",
+    "timePickupTitle": "Pickup time",
+    "timeReturnTitle": "Return time",
+    "confirmButton": "Confirm",
+    "popular": {
+      "sportives": "Sports cars",
+      "suv": "SUVs",
+      "berlines": "Sedans",
+      "cabriolets": "Convertibles",
+      "electriques": "Electric",
+      "withChauffeur": "With chauffeur"
+    }
+  },
+  "agencies": {
+    "title": "Agencies",
+    "cityAll": "All",
+    "vehiclesCount": "{{city}} — {{count}} vehicles",
+    "reviewsCount": "({{count}} reviews)"
+  },
+  "agency": {
+    "verified": "Verified agency",
+    "tabVehicles": "Vehicles",
+    "tabReviews": "Reviews",
+    "vehiclesAvailable": "{{count}} vehicles available",
+    "vehicleAvailable": "{{count}} vehicle available",
+    "reviewsBasedOn": "Based on {{count}} reviews",
+    "reviewsCount": "({{count}} reviews)",
+    "agencyResponse": "Agency response",
+    "connected": "Connected",
+    "browseFleet": "Browse the fleet",
+    "recentReviews": "Recent reviews",
+    "callAgency": "Call",
+    "messageAgency": "Message"
+  },
+  "vehicle": {
+    "imageCounter": "{{current}}/{{total}}",
+    "specsTitle": "Specifications",
+    "specs": {
+      "transmission": "Transmission",
+      "fuel": "Fuel",
+      "power": "Power",
+      "seats": "Seats",
+      "seatsValue": "{{count}} seats",
+      "doors": "Doors",
+      "doorsValue": "{{count}} doors",
+      "trunk": "Trunk"
+    },
+    "featuresTitle": "Features",
+    "descriptionTitle": "Description",
+    "chauffeur": {
+      "title": "With private chauffeur",
+      "price": "+€{{price}} / day",
+      "sub": "Professional bilingual French-English chauffeur"
+    },
+    "conditionsTitle": "Rental conditions",
+    "conditions": {
+      "minAge": "Minimum age: {{age}} years",
+      "license": "Valid driver's license for at least {{years}} years",
+      "deposit": "Deposit: €{{amount}}",
+      "km": "Mileage: {{km}} km/day included"
+    },
+    "bookButton": "Book"
+  },
+  "booking": {
+    "title": "Booking",
+    "stepLabel": "{{current}}/{{total}}",
+    "datesTitle": "Rental dates",
+    "dateLabel": "{{start}} — {{end}} ({{count}} days)",
+    "dateLabelSingle": "{{start}} — {{end}} ({{count}} day)",
+    "modify": "Modify",
+    "timePickupLabel": "Pickup time",
+    "timeReturnLabel": "Return time",
+    "pickupTitle": "Pickup method",
+    "pickupAgency": "At agency",
+    "pickupDelivery": "Delivery",
+    "deliveryRate": "{{rate}} {{currency}}/km",
+    "delivery": {
+      "addressLabel": "Delivery address",
+      "addressPlaceholder": "Street, number, postcode, city",
+      "hintBase": "Starting point: {{label}}",
+      "hintRadius": " · Max radius {{km}} km",
+      "computing": "Computing route…",
+      "distance": "Distance",
+      "distanceKm": "{{km}} km",
+      "feeLabel": "Delivery fee",
+      "feeValue": "{{fee}} {{currency}}",
+      "minFeeApplied": "Minimum fee applied ({{min}} {{currency}})"
+    },
+    "chauffeur": {
+      "title": "Add a private chauffeur",
+      "price": "+€{{price}} / day"
+    },
+    "summaryTitle": "Summary",
+    "summary": {
+      "rental_one": "Rental ({{count}} day)",
+      "rental_other": "Rental ({{count}} days)",
+      "deliveryLine": "Delivery",
+      "deliveryLineWithKm": "Delivery ({{km}} km)",
+      "chauffeurLine_one": "Chauffeur ({{count}} day)",
+      "chauffeurLine_other": "Chauffeur ({{count}} days)",
+      "total": "Total",
+      "valueEuro": "€{{value}}"
+    },
+    "continueToPayment": "Continue to payment",
+    "calendarModalTitle": "Pick dates",
+    "calendarStart": "Start",
+    "calendarEnd": "End",
+    "calendarDuration": "Duration",
+    "calendarDurationDays": "{{count}}d",
+    "calendarEmpty": "—",
+    "confirm": "Confirm"
+  },
+  "payment": {
+    "title": "Payment",
+    "stepLabel": "{{current}}/{{total}}",
+    "methodTitle": "Payment method",
+    "cardNumber": "**** **** **** 4242",
+    "cardExpiry": "Exp: 09/27",
+    "cardBrand": "VISA",
+    "addCard": "+ Add a card",
+    "securePayment": "Secure payment",
+    "guaranteed": "Guaranteed protection",
+    "confirmPay": "Confirm and pay — €{{amount}}"
+  },
+  "confirmation": {
+    "stepLabel": "{{current}}/{{total}}",
+    "title": "Booking confirmed",
+    "subtitle": "Your vehicle is booked. You will receive a confirmation email.",
+    "reference": "Ref. #{{ref}}",
+    "vehicleFallback": "Vehicle",
+    "agencyFallback": "Agency",
+    "deliveryLine": "Delivery: {{address}}",
+    "withChauffeur": "With chauffeur",
+    "totalLine": "Total: €{{total}}",
+    "trackBooking": "Track my booking",
+    "backHome": "Back to home",
+    "months": {
+      "jan": "Jan",
+      "feb": "Feb",
+      "mar": "Mar",
+      "apr": "Apr",
+      "may": "May",
+      "jun": "Jun",
+      "jul": "Jul",
+      "aug": "Aug",
+      "sep": "Sep",
+      "oct": "Oct",
+      "nov": "Nov",
+      "dec": "Dec"
+    }
+  },
+  "bookings": {
+    "title": "My bookings",
+    "tabs": {
+      "active": "Active",
+      "upcoming": "Upcoming",
+      "history": "History"
+    },
+    "status": {
+      "active": "Active",
+      "confirmed": "Confirmed",
+      "completed": "Completed"
+    },
+    "totalLabel": "Total",
+    "seeDetails": "See details"
+  },
+  "bookingSummary": {
+    "title": "Return summary",
+    "notFound": "Booking not found",
+    "back": "Back",
+    "reference": "Ref. #{{ref}}",
+    "mileageTitle": "Mileage",
+    "mileage": {
+      "start": "Start mileage",
+      "return": "Return mileage",
+      "driven": "Km driven",
+      "included": "Km included",
+      "overage": "Overage",
+      "overageCost": "Extra cost",
+      "kmUnit": "{{value}} km",
+      "overageUnit": "+{{value}} km",
+      "overageZero": "0 km",
+      "overageCostZero": "€0.00",
+      "overageCostUnit": "€{{value}}",
+      "rateNote": "Rate per extra km: €{{rate}}"
+    },
+    "stateTitle": "Vehicle condition",
+    "state": {
+      "okLabel": "In perfect condition",
+      "okDescription": "No damage observed upon return.",
+      "minorLabel": "Minor damage",
+      "minorDescription": "A slight imperfection was noted — not charged.",
+      "majorLabel": "Major damage",
+      "majorDescription": "Repairs are needed. Your agency will contact you."
+    },
+    "gallery": {
+      "title": "Photos after rental",
+      "hint": "Swipe to browse",
+      "counter": "{{current}}/{{total}}"
+    },
+    "invoice": {
+      "title": "View invoice",
+      "subtitle": "Total: €{{total}}",
+      "subtitleWithOverage": "Total: €{{total}} (+ €{{overage}} overage)"
+    }
+  },
+  "notifications": {
+    "title": "Notifications",
+    "agoPrefix": "{{time}} ago"
+  },
+  "tracking": {
+    "mapStart": "Start",
+    "mapEnd": "Arrival",
+    "fullscreen": "Fullscreen",
+    "timeline": {
+      "confirmed": "Booking confirmed",
+      "confirmedTime": "12 June, 09:00",
+      "preparing": "Vehicle being prepared",
+      "preparingTime": "12 June, 09:30",
+      "enRoute": "On the way",
+      "enRouteTime": "Estimated arrival: 10:15",
+      "delivered": "Delivered"
+    },
+    "etaValue": "15 min",
+    "etaLabel": "Estimated time of arrival",
+    "driverStatus": "Delivery in progress",
+    "fallbackAgency": "Prestige Auto Nice"
+  },
+  "call": {
+    "status": "Call in progress",
+    "phoneNumber": "+33 4 93 88 00 00",
+    "speaker": "Speaker",
+    "mic": "Mic",
+    "muted": "Muted",
+    "fallbackAgency": "Prestige Auto Nice"
+  },
+  "messagerie": {
+    "online": "Online",
+    "inputPlaceholder": "Write a message...",
+    "fallbackAgency": "Prestige Auto Nice",
+    "seed": {
+      "msg1": "Hello, your vehicle is being prepared.",
+      "msg2": "Thank you! What time do you expect to arrive?",
+      "msg3": "We will arrive in about 15 minutes.",
+      "msg4": "Perfect, I'll be waiting."
+    }
+  },
+  "bottomNav": {
+    "home": "Home",
+    "bookings": "Bookings",
+    "profile": "Profile",
+    "settings": "Settings"
+  },
+  "settings": {
+    "title": "Settings",
+    "sectionPreferences": "Preferences",
+    "sectionAccount": "Account",
+    "sectionSupport": "Support",
+    "sectionLegal": "Legal",
+    "notifications": "Notifications",
+    "language": "Language",
+    "darkMode": "Dark mode",
+    "paymentMethods": "Payment methods",
+    "documents": "My documents",
+    "help": "Help center",
+    "contact": "Contact support",
+    "feedback": "Send feedback",
+    "terms": "Terms of service",
+    "privacy": "Privacy policy",
+    "about": "About",
+    "version": "Version {{version}}"
+  },
+  "paymentMethods": {
+    "title": "Payment methods",
+    "subtitle": "Cards used to pay for your bookings",
+    "primary": "Primary",
+    "addCard": "Add a card",
+    "remove": "Remove",
+    "expiry": "Expires {{month}}/{{year}}",
+    "brandVisa": "Visa",
+    "brandMastercard": "Mastercard",
+    "brandAmex": "American Express"
+  },
+  "documents": {
+    "title": "My documents",
+    "subtitle": "Identity and driving verification",
+    "idFront": "ID card — front",
+    "idBack": "ID card — back",
+    "license": "Driver's license",
+    "proofAddress": "Proof of address",
+    "statusVerified": "Verified",
+    "statusPending": "Pending",
+    "statusMissing": "Missing",
+    "replace": "Replace",
+    "upload": "Upload"
+  },
+  "help": {
+    "title": "Help center",
+    "subtitle": "Browse frequently asked questions",
+    "searchPlaceholder": "Search a topic…",
+    "topicBooking": "Booking a vehicle",
+    "topicPayment": "Payment & pricing",
+    "topicDelivery": "Delivery & pickup",
+    "topicReturn": "Returning the car",
+    "topicAccount": "My account & documents",
+    "topicSafety": "Safety & insurance",
+    "readMore": "Read article"
+  },
+  "contact": {
+    "title": "Contact support",
+    "subtitle": "We're here 7 days a week",
+    "chatTitle": "Live chat",
+    "chatHint": "Usually replies in a few minutes",
+    "emailTitle": "Email us",
+    "emailAddress": "support@myfleet.app",
+    "phoneTitle": "Call support",
+    "phoneNumber": "+33 4 93 00 00 00",
+    "phoneHint": "Mon–Sun, 8am–10pm"
+  },
+  "feedback": {
+    "title": "Send feedback",
+    "subtitle": "Help us make My Fleet better",
+    "ratingLabel": "How was your experience?",
+    "commentLabel": "Tell us more",
+    "commentPlaceholder": "What did you love, or what should we fix?",
+    "submit": "Send feedback",
+    "thanks": "Thanks! Your feedback was sent."
+  },
+  "terms": {
+    "title": "Terms of service",
+    "subtitle": "Last updated April 2026",
+    "intro": "By using My Fleet you agree to these terms. Please read them carefully.",
+    "sec1Title": "1. Using the service",
+    "sec1Body": "My Fleet connects you with verified rental agencies. Bookings are subject to the terms of the agency you rent from.",
+    "sec2Title": "2. Account & identity",
+    "sec2Body": "You must provide accurate personal information and valid identity documents. We may suspend your account if we detect fraud.",
+    "sec3Title": "3. Payments",
+    "sec3Body": "Prices are set by each agency. You authorise My Fleet to charge your payment method for bookings, extras, deposits and any reported damages.",
+    "sec4Title": "4. Cancellation",
+    "sec4Body": "Each agency publishes its own cancellation policy. Refund timelines follow your bank's processing window.",
+    "sec5Title": "5. Liability",
+    "sec5Body": "My Fleet is a marketplace; the physical rental is operated by the agency. Your rental contract governs the use of the vehicle."
+  },
+  "privacy": {
+    "title": "Privacy policy",
+    "subtitle": "How we handle your data",
+    "intro": "We take your privacy seriously. This policy explains what data we collect and why.",
+    "sec1Title": "Data we collect",
+    "sec1Body": "Identity documents, contact details, location while using the app, booking and payment history.",
+    "sec2Title": "How we use it",
+    "sec2Body": "To verify your identity, match you with agencies, process payments, and communicate about your bookings.",
+    "sec3Title": "Sharing",
+    "sec3Body": "We share only the data necessary with the agency you book with. We never sell your data.",
+    "sec4Title": "Your rights",
+    "sec4Body": "You can access, export, correct or delete your data at any time from Settings or by contacting support."
+  },
+  "about": {
+    "title": "About",
+    "subtitle": "My Fleet",
+    "tagline": "Premium vehicle rentals, simplified.",
+    "version": "Version {{version}}",
+    "build": "Build {{build}}",
+    "website": "Website",
+    "twitter": "Twitter",
+    "linkedin": "LinkedIn",
+    "copyright": "© 2026 My Fleet. All rights reserved."
+  },
+  "profile": {
+    "memberSince": "Member since {{date}}",
+    "verified": "Verified",
+    "programTitle": "MyFleet Program",
+    "pointsLabel": "{{value}} points",
+    "nextTier": "Next tier: {{name}} — {{value}} points",
+    "benefitsTitle": "Your benefits — {{tier}}",
+    "loyaltyHistory": "Loyalty history",
+    "accountInfo": "My personal information",
+    "accountCards": "My payment cards",
+    "accountDocuments": "My documents",
+    "notifications": "Notifications",
+    "language": "Language",
+    "languageFr": "Français",
+    "languageEn": "English",
+    "languageSheetTitle": "Choose language",
+    "darkMode": "Dark mode",
+    "logout": "Log out"
+  }
+}

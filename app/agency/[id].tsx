@@ -18,11 +18,13 @@ import {
   CheckCircle,
 } from "lucide-react-native";
 import { LinearGradient } from "expo-linear-gradient";
+import { useTranslation } from "react-i18next";
 import {
   agencies,
   vehicles,
   reviews,
   vehicleImages,
+  getVehicleCover,
 } from "@/data/mockData";
 
 const { width: SCREEN_WIDTH } = Dimensions.get("window");
@@ -31,6 +33,7 @@ type Tab = "vehicles" | "reviews";
 
 export default function AgencyDetailScreen() {
   const router = useRouter();
+  const { t } = useTranslation();
   const { id } = useLocalSearchParams<{ id: string }>();
   const [activeTab, setActiveTab] = useState<Tab>("vehicles");
 
@@ -92,11 +95,11 @@ export default function AgencyDetailScreen() {
             <View style={styles.ratingRow}>
               <Star size={16} fill="#F1C40F" color="#F1C40F" strokeWidth={1.5} />
               <Text style={styles.ratingValue}>{agency.rating}</Text>
-              <Text style={styles.ratingCount}>({agency.reviews} avis)</Text>
+              <Text style={styles.ratingCount}>{t("agency.reviewsCount", { count: agency.reviews })}</Text>
             </View>
             <View style={styles.verifiedBadge}>
               <CheckCircle size={12} color="#2ECC71" strokeWidth={1.5} />
-              <Text style={styles.verifiedText}>Agence vérifiée</Text>
+              <Text style={styles.verifiedText}>{t("agency.verified")}</Text>
             </View>
           </View>
 
@@ -120,7 +123,7 @@ export default function AgencyDetailScreen() {
                   },
                 ]}
               >
-                Véhicules
+                {t("agency.tabVehicles")}
               </Text>
             </TouchableOpacity>
             <TouchableOpacity
@@ -139,7 +142,7 @@ export default function AgencyDetailScreen() {
                   },
                 ]}
               >
-                Avis
+                {t("agency.tabReviews")}
               </Text>
             </TouchableOpacity>
           </View>
@@ -148,7 +151,9 @@ export default function AgencyDetailScreen() {
           {activeTab === "vehicles" && (
             <View>
               <Text style={styles.vehicleCount}>
-                {agencyVehicles.length} véhicules disponibles
+                {agencyVehicles.length === 1
+                  ? t("agency.vehicleAvailable", { count: 1 })
+                  : t("agency.vehiclesAvailable", { count: agencyVehicles.length })}
               </Text>
               <View style={styles.vehiclesGrid}>
                 {agencyVehicles.map((vehicle) => (
@@ -161,9 +166,7 @@ export default function AgencyDetailScreen() {
                     }
                   >
                     <Image
-                      source={{
-                        uri: vehicleImages[Number(vehicle.id) - 1],
-                      }}
+                      source={getVehicleCover(vehicle) as any}
                       style={styles.vehicleMiniImage}
                     />
                     <View style={styles.vehicleMiniInfo}>
@@ -172,9 +175,9 @@ export default function AgencyDetailScreen() {
                       </Text>
                       <View style={styles.vehicleMiniPriceRow}>
                         <Text style={styles.vehicleMiniPrice}>
-                          {vehicle.price} €
+                          {t("common.priceEuro", { price: vehicle.price })}
                         </Text>
-                        <Text style={styles.vehicleMiniUnit}> / jour</Text>
+                        <Text style={styles.vehicleMiniUnit}> {t("common.perDay")}</Text>
                       </View>
                     </View>
                   </TouchableOpacity>
@@ -204,7 +207,7 @@ export default function AgencyDetailScreen() {
                   ))}
                 </View>
                 <Text style={styles.ratingSummaryCount}>
-                  Basé sur {agency.reviews} avis
+                  {t("agency.reviewsBasedOn", { count: agency.reviews })}
                 </Text>
               </View>
 
@@ -244,7 +247,7 @@ export default function AgencyDetailScreen() {
                     {review.agencyResponse && (
                       <View style={styles.responseBox}>
                         <Text style={styles.responseLabel}>
-                          Réponse de l'agence
+                          {t("agency.agencyResponse")}
                         </Text>
                         <Text style={styles.responseText}>
                           {review.agencyResponse}

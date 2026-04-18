@@ -26,6 +26,7 @@ import {
   AlertCircle,
   MapPin,
 } from "lucide-react-native";
+import { useTranslation } from "react-i18next";
 import {
   vehicles,
   agencies,
@@ -35,14 +36,11 @@ import {
 
 const { width: SCREEN_WIDTH } = Dimensions.get("window");
 
-const MONTHS = ["Janvier","Février","Mars","Avril","Mai","Juin","Juillet","Août","Septembre","Octobre","Novembre","Décembre"];
-const SHORT_MONTHS = ["Jan","Fév","Mars","Avr","Mai","Juin","Juil","Août","Sep","Oct","Nov","Déc"];
-const DAYS_OF_WEEK = ["Lu","Ma","Me","Je","Ve","Sa","Di"];
 const HOURS = ["08:00","09:00","10:00","11:00","12:00","13:00","14:00","15:00","16:00","17:00","18:00","19:00","20:00"];
 
 function getDaysInMonth(y: number, m: number) { return new Date(y, m + 1, 0).getDate(); }
 function getFirstDayOfMonth(y: number, m: number) { const d = new Date(y, m, 1).getDay(); return d === 0 ? 6 : d - 1; }
-function formatDateShort(d: Date) { return `${d.getDate()} ${SHORT_MONTHS[d.getMonth()]}`; }
+function formatDateShort(d: Date, shortMonths: string[]) { return `${d.getDate()} ${shortMonths[d.getMonth()]}`; }
 function daysBetween(a: Date, b: Date) { return Math.round((b.getTime() - a.getTime()) / (1000 * 60 * 60 * 24)); }
 function isSameDay(a: Date, b: Date) { return a.getFullYear() === b.getFullYear() && a.getMonth() === b.getMonth() && a.getDate() === b.getDate(); }
 function isBetween(d: Date, s: Date, e: Date) { return d.getTime() > s.getTime() && d.getTime() < e.getTime(); }
@@ -57,23 +55,23 @@ function isVehicleUnavailable(vehicleId: string, start: Date, end: Date): boolea
   return false;
 }
 
-function getUnavailabilityReason(vehicleId: string, start: Date, end: Date): string {
+function getUnavailabilityReasonKey(vehicleId: string, start: Date, end: Date): string {
   const id = Number(vehicleId);
-  if ((id === 2 || id === 5) && start.getMonth() === 5) return "Indisponible en Juin — déjà réservé";
-  if (id === 4 && daysBetween(start, end) > 4) return "Durée max. 4 jours pour ce véhicule";
+  if ((id === 2 || id === 5) && start.getMonth() === 5) return "search.unavailableJune";
+  if (id === 4 && daysBetween(start, end) > 4) return "search.unavailableMaxDays";
   return "";
 }
 
 const initialRecentSearches = ["Porsche 911", "Monaco Premium Fleet", "SUV Nice"];
 
-interface PopularCategory { name: string; icon: string; filter: string; }
+interface PopularCategory { nameKey: string; icon: string; filter: string; }
 const popularCategories: PopularCategory[] = [
-  { name: "Sportives", icon: "🏎️", filter: "Sportive" },
-  { name: "SUV", icon: "🚙", filter: "SUV" },
-  { name: "Berlines", icon: "🚗", filter: "Berline" },
-  { name: "Cabriolets", icon: "🚗", filter: "Cabriolet" },
-  { name: "Électriques", icon: "⚡", filter: "Électrique" },
-  { name: "Avec chauffeur", icon: "👔", filter: "chauffeur" },
+  { nameKey: "search.popular.sportives", icon: "🏎️", filter: "Sportive" },
+  { nameKey: "search.popular.suv", icon: "🚙", filter: "SUV" },
+  { nameKey: "search.popular.berlines", icon: "🚗", filter: "Berline" },
+  { nameKey: "search.popular.cabriolets", icon: "🚗", filter: "Cabriolet" },
+  { nameKey: "search.popular.electriques", icon: "⚡", filter: "Électrique" },
+  { nameKey: "search.popular.withChauffeur", icon: "👔", filter: "chauffeur" },
 ];
 
 // Extended city list for autocomplete
@@ -106,6 +104,7 @@ function CityAutocompleteModal({
   onSelect: (city: string) => void;
   onClose: () => void;
 }) {
+  const { t } = useTranslation();
   const [query, setQuery] = useState("");
   const cityInputRef = useRef<TextInput>(null);
 
@@ -132,7 +131,7 @@ function CityAutocompleteModal({
         <Pressable style={cityStyles.sheet} onPress={() => {}}>
           <View style={cityStyles.dragHandle} />
           <View style={cityStyles.header}>
-            <Text style={cityStyles.title}>Localisation</Text>
+            <Text style={cityStyles.title}>{t("search.cityModalTitle")}</Text>
             <TouchableOpacity onPress={onClose} activeOpacity={0.7}>
               <X size={24} color="#EAEAEA" strokeWidth={1.5} />
             </TouchableOpacity>
@@ -145,7 +144,7 @@ function CityAutocompleteModal({
               ref={cityInputRef}
               value={query}
               onChangeText={setQuery}
-              placeholder="Rechercher une ville..."
+              placeholder={t("search.citySearchPlaceholder")}
               placeholderTextColor="rgba(234, 234, 234, 0.4)"
               style={cityStyles.input}
               returnKeyType="search"
@@ -178,7 +177,7 @@ function CityAutocompleteModal({
                           <Text style={[cityStyles.cityName, isSel && cityStyles.cityNameSelected]}>
                             {city.name}
                           </Text>
-                          <Text style={cityStyles.regionName}>{city.region}, France</Text>
+                          <Text style={cityStyles.regionName}>{t("search.cityRegion", { region: city.region })}</Text>
                         </View>
                       </View>
                       {isSel && <Check size={18} color="#4A1942" strokeWidth={2} />}
@@ -188,7 +187,7 @@ function CityAutocompleteModal({
               </View>
             ) : (
               <View style={cityStyles.empty}>
-                <Text style={cityStyles.emptyText}>Aucune ville trouvée</Text>
+                <Text style={cityStyles.emptyText}>{t("search.noCityFound")}</Text>
               </View>
             )}
           </ScrollView>
@@ -237,6 +236,7 @@ interface SearchResult {
 
 export default function SearchScreen() {
   const router = useRouter();
+  const { t } = useTranslation();
   const inputRef = useRef<TextInput>(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [searches, setSearches] = useState(initialRecentSearches);
@@ -274,26 +274,26 @@ export default function SearchScreen() {
         const match = categoryFilter === "chauffeur" ? v.chauffeurAvailable : v.category.toLowerCase() === categoryFilter.toLowerCase();
         if (match) {
           const unavailable = datesSelected && isVehicleUnavailable(v.id, startDate, endDate);
-          out.push({ type: "vehicle", id: v.id, title: v.name, subtitle: `${v.year} • ${v.transmission} • ${v.fuel}`, imageUri: vehicleImages[i], price: v.price, unavailable, unavailableReason: unavailable ? getUnavailabilityReason(v.id, startDate, endDate) : undefined });
+          out.push({ type: "vehicle", id: v.id, title: v.name, subtitle: `${v.year} • ${v.transmission} • ${v.fuel}`, imageUri: vehicleImages[i], price: v.price, unavailable, unavailableReason: unavailable ? t(getUnavailabilityReasonKey(v.id, startDate, endDate)) : undefined });
         }
       });
     } else if (q) {
       vehicles.forEach((v, i) => {
         if (v.name.toLowerCase().includes(q) || v.category.toLowerCase().includes(q) || v.fuel.toLowerCase().includes(q) || v.agencyName.toLowerCase().includes(q)) {
           const unavailable = datesSelected && isVehicleUnavailable(v.id, startDate, endDate);
-          out.push({ type: "vehicle", id: v.id, title: v.name, subtitle: `${v.year} • ${v.transmission} • ${v.fuel}`, imageUri: vehicleImages[i], price: v.price, unavailable, unavailableReason: unavailable ? getUnavailabilityReason(v.id, startDate, endDate) : undefined });
+          out.push({ type: "vehicle", id: v.id, title: v.name, subtitle: `${v.year} • ${v.transmission} • ${v.fuel}`, imageUri: vehicleImages[i], price: v.price, unavailable, unavailableReason: unavailable ? t(getUnavailabilityReasonKey(v.id, startDate, endDate)) : undefined });
         }
       });
       agencies.forEach((a, i) => {
         if (a.name.toLowerCase().includes(q) || a.city.toLowerCase().includes(q)) {
-          out.push({ type: "agency", id: a.id, title: a.name, subtitle: `${a.city} — ${a.vehicles} véhicules`, imageUri: vehicleImages[i % vehicleImages.length], rating: a.rating });
+          out.push({ type: "agency", id: a.id, title: a.name, subtitle: t("agencies.vehiclesCount", { city: a.city, count: a.vehicles }), imageUri: vehicleImages[i % vehicleImages.length], rating: a.rating });
         }
       });
     }
     // Sort: available first, unavailable last
     out.sort((a, b) => (a.unavailable ? 1 : 0) - (b.unavailable ? 1 : 0));
     return out;
-  }, [searchQuery, categoryFilter, datesSelected, startDate, endDate]);
+  }, [searchQuery, categoryFilter, datesSelected, startDate, endDate, t]);
 
   const isSearching = searchQuery.length > 0 || categoryFilter !== null;
 
@@ -324,7 +324,11 @@ export default function SearchScreen() {
   const firstDay = getFirstDayOfMonth(calYear, calMonth);
   const calendarDays = Array.from({ length: firstDay }, () => 0).concat(Array.from({ length: daysInMonth }, (_, i) => i + 1));
 
-  const dateLabel = datesSelected ? `${formatDateShort(startDate)} — ${formatDateShort(endDate)}` : "Choisir les dates";
+  const shortMonths = t("calendar.shortMonths", { returnObjects: true }) as string[];
+  const monthNames = t("calendar.months", { returnObjects: true }) as string[];
+  const daysOfWeek = t("calendar.daysOfWeek", { returnObjects: true }) as string[];
+
+  const dateLabel = datesSelected ? `${formatDateShort(startDate, shortMonths)} — ${formatDateShort(endDate, shortMonths)}` : t("search.chooseDates");
   const timeLabel = `${pickupTime} — ${returnTime}`;
 
   return (
@@ -337,7 +341,7 @@ export default function SearchScreen() {
           </TouchableOpacity>
           <View style={styles.searchInputWrapper}>
             <SearchIcon size={20} color="rgba(234, 234, 234, 0.6)" strokeWidth={1.5} />
-            <TextInput ref={inputRef} value={categoryFilter ? "" : searchQuery} onChangeText={(t) => { setSearchQuery(t); setCategoryFilter(null); }} placeholder={categoryFilter ? `Catégorie: ${categoryFilter}` : "Nom du véhicule..."} placeholderTextColor="rgba(234, 234, 234, 0.4)" style={styles.searchInput} returnKeyType="search" />
+            <TextInput ref={inputRef} value={categoryFilter ? "" : searchQuery} onChangeText={(text) => { setSearchQuery(text); setCategoryFilter(null); }} placeholder={categoryFilter ? t("search.categoryInputPlaceholder", { category: categoryFilter }) : t("search.inputPlaceholder")} placeholderTextColor="rgba(234, 234, 234, 0.4)" style={styles.searchInput} returnKeyType="search" />
             {isSearching && <TouchableOpacity onPress={() => { setSearchQuery(""); setCategoryFilter(null); }} activeOpacity={0.7}><X size={18} color="rgba(234, 234, 234, 0.5)" strokeWidth={1.5} /></TouchableOpacity>}
           </View>
         </View>
@@ -346,7 +350,7 @@ export default function SearchScreen() {
         {/* ─── Filter Bar ─── */}
         <TouchableOpacity style={[styles.locationBtn, styles.filterBtnActive]} activeOpacity={0.85} onPress={() => setShowCityModal(true)}>
           <MapPin size={16} color="#EAEAEA" strokeWidth={1.5} />
-          <Text style={styles.filterBtnTextActive}>{selectedCity}, France</Text>
+          <Text style={styles.filterBtnTextActive}>{t("search.locationLabel", { city: selectedCity })}</Text>
         </TouchableOpacity>
         <View style={styles.filterBar}>
           <TouchableOpacity style={[styles.filterBtn, datesSelected && styles.filterBtnActive]} activeOpacity={0.85} onPress={openDateModal}>
@@ -363,7 +367,7 @@ export default function SearchScreen() {
         {categoryFilter && (
           <View style={styles.activeBadgeRow}>
             <View style={styles.activeBadge}><Text style={styles.activeBadgeText}>{categoryFilter}</Text><TouchableOpacity onPress={() => setCategoryFilter(null)} activeOpacity={0.7}><X size={14} color="#EAEAEA" strokeWidth={2} /></TouchableOpacity></View>
-            <Text style={styles.resultCount}>{results.length} résultat{results.length !== 1 ? "s" : ""}</Text>
+            <Text style={styles.resultCount}>{t("search.resultsCount", { count: results.length })}</Text>
           </View>
         )}
 
@@ -389,7 +393,7 @@ export default function SearchScreen() {
                     </View>
                     <View style={styles.resultInfo}>
                       <View style={styles.resultTypeBadge}>
-                        <Text style={styles.resultTypeText}>{result.type === "vehicle" ? "Véhicule" : "Agence"}</Text>
+                        <Text style={styles.resultTypeText}>{result.type === "vehicle" ? t("search.typeVehicle") : t("search.typeAgency")}</Text>
                       </View>
                       <Text style={[styles.resultTitle, result.unavailable && styles.resultTitleGrayed]} numberOfLines={1}>{result.title}</Text>
                       <Text style={styles.resultSubtitle} numberOfLines={1}>{result.subtitle}</Text>
@@ -399,7 +403,7 @@ export default function SearchScreen() {
                         </View>
                       ) : (
                         <>
-                          {result.price != null && <View style={styles.resultPriceRow}><Text style={styles.resultPrice}>{result.price} €</Text><Text style={styles.resultPriceUnit}> / jour</Text></View>}
+                          {result.price != null && <View style={styles.resultPriceRow}><Text style={styles.resultPrice}>{t("common.priceEuro", { price: result.price })}</Text><Text style={styles.resultPriceUnit}> {t("common.perDay")}</Text></View>}
                           {result.rating != null && <View style={styles.resultRatingRow}><Star size={12} fill="#F1C40F" color="#F1C40F" strokeWidth={1.5} /><Text style={styles.resultRating}>{result.rating}</Text></View>}
                         </>
                       )}
@@ -408,7 +412,7 @@ export default function SearchScreen() {
                 ))}
               </View>
             ) : (
-              <View style={styles.noResults}><Text style={styles.noResultsEmoji}>🔍</Text><Text style={styles.noResultsTitle}>Aucun résultat</Text><Text style={styles.noResultsText}>Essayez un autre terme de recherche</Text></View>
+              <View style={styles.noResults}><Text style={styles.noResultsEmoji}>🔍</Text><Text style={styles.noResultsTitle}>{t("search.noResultsTitle")}</Text><Text style={styles.noResultsText}>{t("search.noResultsText")}</Text></View>
             )}
           </View>
         )}
@@ -418,7 +422,7 @@ export default function SearchScreen() {
           <>
             {searches.length > 0 && (
               <View style={styles.section}>
-                <Text style={styles.sectionTitle}>Recherches récentes</Text>
+                <Text style={styles.sectionTitle}>{t("search.recentTitle")}</Text>
                 <View style={styles.recentList}>
                   {searches.map((s) => (
                     <View key={s} style={styles.recentRow}>
@@ -430,22 +434,22 @@ export default function SearchScreen() {
               </View>
             )}
             <View style={styles.section}>
-              <Text style={styles.sectionTitle}>Catégories populaires</Text>
+              <Text style={styles.sectionTitle}>{t("search.popularCategoriesTitle")}</Text>
               <View style={styles.categoriesGrid}>
                 {popularCategories.map((c) => (
-                  <TouchableOpacity key={c.name} style={styles.categoryCard} activeOpacity={0.85} onPress={() => { setCategoryFilter(c.filter); setSearchQuery(""); }}>
-                    <Text style={styles.categoryIcon}>{c.icon}</Text><Text style={styles.categoryName}>{c.name}</Text>
+                  <TouchableOpacity key={c.nameKey} style={styles.categoryCard} activeOpacity={0.85} onPress={() => { setCategoryFilter(c.filter); setSearchQuery(""); }}>
+                    <Text style={styles.categoryIcon}>{c.icon}</Text><Text style={styles.categoryName}>{t(c.nameKey)}</Text>
                   </TouchableOpacity>
                 ))}
               </View>
             </View>
             <View style={styles.section}>
-              <Text style={styles.sectionTitle}>Suggestions</Text>
+              <Text style={styles.sectionTitle}>{t("search.suggestionsTitle")}</Text>
               <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.suggestionsScroll}>
                 {vehicles.slice(0, 4).map((v, i) => (
                   <TouchableOpacity key={v.id} style={styles.suggestionCard} activeOpacity={0.85} onPress={() => router.push(`/vehicle/${v.id}` as any)}>
                     <Image source={{ uri: vehicleImages[i] }} style={styles.suggestionImage} />
-                    <View style={styles.suggestionInfo}><Text style={styles.suggestionName} numberOfLines={1}>{v.name}</Text><Text style={styles.suggestionPrice}>{v.price} € / jour</Text></View>
+                    <View style={styles.suggestionInfo}><Text style={styles.suggestionName} numberOfLines={1}>{v.name}</Text><Text style={styles.suggestionPrice}>{t("common.pricePerDay", { price: v.price })}</Text></View>
                   </TouchableOpacity>
                 ))}
               </ScrollView>
@@ -459,20 +463,20 @@ export default function SearchScreen() {
         <Pressable style={styles.modalOverlay} onPress={() => setShowDateModal(false)}>
           <Pressable style={styles.modalSheet} onPress={() => {}}>
             <View style={styles.modalDragHandle} />
-            <View style={styles.modalHeader}><Text style={styles.modalTitle}>Choisir les dates</Text><TouchableOpacity onPress={() => setShowDateModal(false)} activeOpacity={0.7}><X size={24} color="#EAEAEA" strokeWidth={1.5} /></TouchableOpacity></View>
+            <View style={styles.modalHeader}><Text style={styles.modalTitle}>{t("search.calendarModalTitle")}</Text><TouchableOpacity onPress={() => setShowDateModal(false)} activeOpacity={0.7}><X size={24} color="#EAEAEA" strokeWidth={1.5} /></TouchableOpacity></View>
             <View style={styles.calSummary}>
-              <View style={styles.calSummaryItem}><Text style={styles.calSummaryLabel}>Début</Text><Text style={styles.calSummaryValue}>{formatDateShort(tempStart)}</Text></View>
+              <View style={styles.calSummaryItem}><Text style={styles.calSummaryLabel}>{t("search.calendarStart")}</Text><Text style={styles.calSummaryValue}>{formatDateShort(tempStart, shortMonths)}</Text></View>
               <View style={styles.calSummaryDivider} />
-              <View style={styles.calSummaryItem}><Text style={styles.calSummaryLabel}>Fin</Text><Text style={styles.calSummaryValue}>{tempEnd > tempStart ? formatDateShort(tempEnd) : "—"}</Text></View>
+              <View style={styles.calSummaryItem}><Text style={styles.calSummaryLabel}>{t("search.calendarEnd")}</Text><Text style={styles.calSummaryValue}>{tempEnd > tempStart ? formatDateShort(tempEnd, shortMonths) : t("search.calendarEmpty")}</Text></View>
               <View style={styles.calSummaryDivider} />
-              <View style={styles.calSummaryItem}><Text style={styles.calSummaryLabel}>Durée</Text><Text style={styles.calSummaryValue}>{tempEnd > tempStart ? `${daysBetween(tempStart, tempEnd)}j` : "—"}</Text></View>
+              <View style={styles.calSummaryItem}><Text style={styles.calSummaryLabel}>{t("search.calendarDuration")}</Text><Text style={styles.calSummaryValue}>{tempEnd > tempStart ? t("search.calendarDurationDays", { count: daysBetween(tempStart, tempEnd) }) : t("search.calendarEmpty")}</Text></View>
             </View>
             <View style={styles.calMonthNav}>
               <TouchableOpacity onPress={prevMonth} activeOpacity={0.7} style={styles.calNavBtn}><ChevronLeft size={20} color="#EAEAEA" strokeWidth={1.5} /></TouchableOpacity>
-              <Text style={styles.calMonthLabel}>{MONTHS[calMonth]} {calYear}</Text>
+              <Text style={styles.calMonthLabel}>{monthNames[calMonth]} {calYear}</Text>
               <TouchableOpacity onPress={nextMonth} activeOpacity={0.7} style={styles.calNavBtn}><ChevronRight size={20} color="#EAEAEA" strokeWidth={1.5} /></TouchableOpacity>
             </View>
-            <View style={styles.calWeekRow}>{DAYS_OF_WEEK.map((d) => <Text key={d} style={styles.calWeekDay}>{d}</Text>)}</View>
+            <View style={styles.calWeekRow}>{daysOfWeek.map((d) => <Text key={d} style={styles.calWeekDay}>{d}</Text>)}</View>
             <View style={styles.calGrid}>
               {calendarDays.map((day, i) => {
                 if (day === 0) return <View key={`e-${i}`} style={styles.calCell} />;
@@ -490,7 +494,7 @@ export default function SearchScreen() {
               })}
             </View>
             <View style={styles.calFooter}>
-              <TouchableOpacity style={styles.confirmBtn} activeOpacity={0.85} onPress={confirmDates}><Text style={styles.confirmBtnText}>Confirmer</Text></TouchableOpacity>
+              <TouchableOpacity style={styles.confirmBtn} activeOpacity={0.85} onPress={confirmDates}><Text style={styles.confirmBtnText}>{t("search.confirmButton")}</Text></TouchableOpacity>
             </View>
           </Pressable>
         </Pressable>
@@ -501,7 +505,7 @@ export default function SearchScreen() {
         <Pressable style={styles.modalOverlay} onPress={() => setShowTimeModal(null)}>
           <Pressable style={styles.modalSheet} onPress={() => {}}>
             <View style={styles.modalDragHandle} />
-            <View style={styles.modalHeader}><Text style={styles.modalTitle}>{showTimeModal === "pickup" ? "Heure de prise en charge" : "Heure de retour"}</Text><TouchableOpacity onPress={() => setShowTimeModal(null)} activeOpacity={0.7}><X size={24} color="#EAEAEA" strokeWidth={1.5} /></TouchableOpacity></View>
+            <View style={styles.modalHeader}><Text style={styles.modalTitle}>{showTimeModal === "pickup" ? t("search.timePickupTitle") : t("search.timeReturnTitle")}</Text><TouchableOpacity onPress={() => setShowTimeModal(null)} activeOpacity={0.7}><X size={24} color="#EAEAEA" strokeWidth={1.5} /></TouchableOpacity></View>
             <View style={styles.timeGrid}>
               {HOURS.map((h) => {
                 const sel = showTimeModal === "pickup" ? pickupTime === h : returnTime === h;
