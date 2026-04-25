@@ -425,6 +425,16 @@
     },
     "etaValue": "15 min",
     "etaLabel": "Temps d'arrivée estimé",
+    "contract": {
+      "title": "Générer mon contrat",
+      "subtitle": "PDF prêt à partager",
+      "generating": "Génération en cours...",
+      "shareTitle": "Contrat de location My Fleet",
+      "generatedTitle": "Contrat généré",
+      "generatedMessage": "Le PDF du contrat a été créé sur cet appareil.",
+      "errorTitle": "Contrat indisponible",
+      "errorMessage": "Impossible de générer le PDF pour le moment."
+    },
     "driverStatus": "Livraison en cours",
     "fallbackAgency": "Prestige Auto Nice"
   },
@@ -485,11 +495,14 @@
   },
   "documents": {
     "title": "Mes documents",
-    "subtitle": "Identité et permis",
+    "subtitle": "Identité, permis et adresse",
     "idFront": "Carte d'identité — recto",
     "idBack": "Carte d'identité — verso",
     "license": "Permis de conduire",
     "proofAddress": "Justificatif de domicile",
+    "addressTitle": "Adresse complète",
+    "addressValue": "14 Rue de France, 06000 Nice",
+    "addressStatus": "Renseignée",
     "statusVerified": "Vérifié",
     "statusPending": "En attente",
     "statusMissing": "Manquant",

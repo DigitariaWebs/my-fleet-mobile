@@ -425,6 +425,16 @@
     },
     "etaValue": "15 min",
     "etaLabel": "Estimated time of arrival",
+    "contract": {
+      "title": "Generate my contract",
+      "subtitle": "PDF ready to share",
+      "generating": "Generating...",
+      "shareTitle": "My Fleet rental contract",
+      "generatedTitle": "Contract generated",
+      "generatedMessage": "The contract PDF was created on this device.",
+      "errorTitle": "Contract unavailable",
+      "errorMessage": "Unable to generate the PDF right now."
+    },
     "driverStatus": "Delivery in progress",
     "fallbackAgency": "Prestige Auto Nice"
   },
@@ -485,11 +495,14 @@
   },
   "documents": {
     "title": "My documents",
-    "subtitle": "Identity and driving verification",
+    "subtitle": "Identity, license, and address",
     "idFront": "ID card — front",
     "idBack": "ID card — back",
     "license": "Driver's license",
     "proofAddress": "Proof of address",
+    "addressTitle": "Full address",
+    "addressValue": "14 Rue de France, 06000 Nice",
+    "addressStatus": "Provided",
     "statusVerified": "Verified",
     "statusPending": "Pending",
     "statusMissing": "Missing",

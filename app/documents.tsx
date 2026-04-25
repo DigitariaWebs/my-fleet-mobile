@@ -7,6 +7,7 @@ import {
   AlertCircle,
   ChevronRight,
   FileText,
+  MapPin,
 } from "lucide-react-native";
 import type { LucideIcon } from "lucide-react-native";
 import { ScreenContainer } from "@/components/ScreenContainer";
@@ -24,7 +25,6 @@ const documents: DocumentItem[] = [
   { id: "id-front", labelKey: "documents.idFront", status: "verified" },
   { id: "id-back", labelKey: "documents.idBack", status: "verified" },
   { id: "license", labelKey: "documents.license", status: "pending" },
-  { id: "proof", labelKey: "documents.proofAddress", status: "missing" },
 ];
 
 export default function DocumentsScreen() {
@@ -111,6 +111,36 @@ export default function DocumentsScreen() {
             </Pressable>
           );
         })}
+
+        <View
+          style={[
+            styles.row,
+            { backgroundColor: colors.surface, borderColor: colors.border },
+          ]}
+        >
+          <View
+            style={[
+              styles.thumb,
+              { backgroundColor: isDark ? "rgba(46, 204, 113, 0.16)" : "rgba(46, 204, 113, 0.1)" },
+            ]}
+          >
+            <MapPin size={20} color="#2ECC71" strokeWidth={1.8} />
+          </View>
+          <View style={{ flex: 1 }}>
+            <Text style={[styles.label, { color: colors.text }]}>
+              {t("documents.addressTitle")}
+            </Text>
+            <Text style={[styles.addressText, { color: colors.textSecondary }]}>
+              {t("documents.addressValue")}
+            </Text>
+          </View>
+          <View style={[styles.statusChip, { backgroundColor: "rgba(46, 204, 113, 0.14)" }]}>
+            <CheckCircle2 size={11} color="#2ECC71" strokeWidth={2} />
+            <Text style={[styles.statusText, { color: "#2ECC71" }]}>
+              {t("documents.addressStatus")}
+            </Text>
+          </View>
+        </View>
       </View>
     </ScreenContainer>
   );
@@ -150,6 +180,11 @@ const styles = StyleSheet.create({
     fontFamily: "Poppins_500Medium",
     fontSize: 10.5,
     letterSpacing: 0.2,
+  },
+  addressText: {
+    fontFamily: "Poppins_400Regular",
+    fontSize: 12,
+    lineHeight: 18,
   },
   cta: {
     flexDirection: "row",
