@@ -3,6 +3,7 @@ import "../global.css";
 // translations available. Import ordering here matters — keep above providers.
 import "@/i18n";
 
+import { useEffect } from "react";
 import { View, ActivityIndicator } from "react-native";
 import { Stack } from "expo-router";
 import { StatusBar } from "expo-status-bar";
@@ -33,16 +34,32 @@ function RootContent() {
 }
 
 export default function RootLayout() {
-  const [fontsLoaded] = useFonts({
+  const [fontsLoaded, fontError] = useFonts({
     Poppins_400Regular,
     Poppins_500Medium,
     Poppins_600SemiBold,
     Poppins_700Bold,
   });
 
-  if (!fontsLoaded) {
+  useEffect(() => {
+    if (fontError) {
+      console.warn(
+        "[Fonts] Failed to load Poppins fallback in use:",
+        fontError,
+      );
+    }
+  }, [fontError]);
+
+  if (!fontsLoaded && !fontError) {
     return (
-      <View style={{ flex: 1, backgroundColor: "#050404", alignItems: "center", justifyContent: "center" }}>
+      <View
+        style={{
+          flex: 1,
+          backgroundColor: "#050404",
+          alignItems: "center",
+          justifyContent: "center",
+        }}
+      >
         <ActivityIndicator color="#4A1942" />
       </View>
     );

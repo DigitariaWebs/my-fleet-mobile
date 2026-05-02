@@ -30,6 +30,17 @@ import { BottomNav } from "@/components/BottomNav";
 import { useTheme } from "@/context/ThemeContext";
 import { loyaltyTiers, loyaltyHistory } from "@/data/mockData";
 import { setAppLocale, SUPPORTED_LOCALES, type AppLocale } from "@/i18n";
+import { useAuthStore } from "@/stores/useAuthStore";
+
+function getInitials(name: string | undefined, email: string | undefined) {
+  const source = (name ?? email ?? "").trim();
+  if (!source) return "?";
+  const parts = source.split(/\s+/).filter(Boolean);
+  if (parts.length >= 2) {
+    return (parts[0]![0]! + parts[parts.length - 1]![0]!).toUpperCase();
+  }
+  return source.slice(0, 2).toUpperCase();
+}
 
 const currentPoints = 2480;
 const currentTier = loyaltyTiers[1]!; // Argent
@@ -43,7 +54,11 @@ interface AccountItem {
 
 const accountItems: AccountItem[] = [
   { icon: User, labelKey: "profile.accountInfo" },
-  { icon: CreditCard, labelKey: "profile.accountCards", route: "/payment-methods" },
+  {
+    icon: CreditCard,
+    labelKey: "profile.accountCards",
+    route: "/payment-methods",
+  },
   { icon: FileText, labelKey: "profile.accountDocuments", route: "/documents" },
 ];
 
@@ -52,20 +67,24 @@ export default function ProfileScreen() {
   const { t } = useTranslation();
   const { colors, isDark } = useTheme();
   const [languageSheetOpen, setLanguageSheetOpen] = useState(false);
+  const user = useAuthStore((s) => s.user);
+  const logout = useAuthStore((s) => s.logout);
+
+  const initials = getInitials(user?.name, user?.email);
+  const displayName = user?.name?.trim() || user?.email || "—";
 
   const handleLogout = () => {
-    Alert.alert(
-      t("profile.logout"),
-      "",
-      [
-        { text: t("common.cancel"), style: "cancel" },
-        {
-          text: t("profile.logout"),
-          style: "destructive",
-          onPress: () => router.replace("/onboarding"),
+    Alert.alert(t("profile.logout"), "", [
+      { text: t("common.cancel"), style: "cancel" },
+      {
+        text: t("profile.logout"),
+        style: "destructive",
+        onPress: async () => {
+          await logout();
+          router.replace("/auth");
         },
-      ],
-    );
+      },
+    ]);
   };
 
   return (
@@ -76,8 +95,13 @@ export default function ProfileScreen() {
         contentContainerStyle={{ paddingBottom: 120 }}
       >
         {/* Header Card */}
-        <SafeAreaView edges={["top"]} style={{ backgroundColor: colors.surface }}>
-          <View style={[styles.headerCard, { backgroundColor: colors.surface }]}>
+        <SafeAreaView
+          edges={["top"]}
+          style={{ backgroundColor: colors.surface }}
+        >
+          <View
+            style={[styles.headerCard, { backgroundColor: colors.surface }]}
+          >
             <View
               style={[
                 styles.avatar,
@@ -87,14 +111,18 @@ export default function ProfileScreen() {
                 },
               ]}
             >
-              <Text style={styles.avatarText}>JD</Text>
+              <Text style={styles.avatarText}>{initials}</Text>
             </View>
             <Text style={[styles.userName, { color: colors.text }]}>
-              Jean-Pierre Dupont
+              {displayName}
             </Text>
-            <Text style={[styles.memberSince, { color: colors.textSecondary }]}>
-              {t("profile.memberSince", { date: "Janvier 2024" })}
-            </Text>
+            {user?.email ? (
+              <Text
+                style={[styles.memberSince, { color: colors.textSecondary }]}
+              >
+                {user.email}
+              </Text>
+            ) : null}
             <View style={styles.verifiedBadge}>
               <Text style={styles.verifiedText}>{t("profile.verified")}</Text>
             </View>
@@ -111,10 +139,14 @@ export default function ProfileScreen() {
           >
             <View style={styles.loyaltyHeader}>
               <Gift size={20} color="#FFFFFF" strokeWidth={1.5} />
-              <Text style={styles.loyaltyTitle}>{t("profile.programTitle")}</Text>
+              <Text style={styles.loyaltyTitle}>
+                {t("profile.programTitle")}
+              </Text>
             </View>
             <Text style={styles.loyaltyPoints}>
-              {t("profile.pointsLabel", { value: currentPoints.toLocaleString() })}
+              {t("profile.pointsLabel", {
+                value: currentPoints.toLocaleString(),
+              })}
             </Text>
             <Text style={styles.loyaltyNext}>
               {t("profile.nextTier", {
@@ -147,20 +179,37 @@ export default function ProfileScreen() {
                   key={item.id}
                   style={[
                     styles.historyRow,
-                    { backgroundColor: colors.surface, borderColor: colors.border },
+                    {
+                      backgroundColor: colors.surface,
+                      borderColor: colors.border,
+                    },
                   ]}
                 >
                   <View style={styles.historyLeft}>
                     {item.type === "earned" ? (
                       <TrendingUp size={20} color="#2ECC71" strokeWidth={1.5} />
                     ) : (
-                      <TrendingDown size={20} color={colors.error} strokeWidth={1.5} />
+                      <TrendingDown
+                        size={20}
+                        color={colors.error}
+                        strokeWidth={1.5}
+                      />
                     )}
                     <View>
-                      <Text style={[styles.historyDescription, { color: colors.text }]}>
+                      <Text
+                        style={[
+                          styles.historyDescription,
+                          { color: colors.text },
+                        ]}
+                      >
                         {item.description}
                       </Text>
-                      <Text style={[styles.historyDate, { color: colors.textSecondary }]}>
+                      <Text
+                        style={[
+                          styles.historyDate,
+                          { color: colors.textSecondary },
+                        ]}
+                      >
                         {item.date}
                       </Text>
                     </View>
@@ -168,7 +217,10 @@ export default function ProfileScreen() {
                   <Text
                     style={[
                       styles.historyAmount,
-                      { color: item.type === "earned" ? "#2ECC71" : colors.error },
+                      {
+                        color:
+                          item.type === "earned" ? "#2ECC71" : colors.error,
+                      },
                     ]}
                   >
                     {item.amount > 0 ? "+" : ""}
@@ -195,17 +247,28 @@ export default function ProfileScreen() {
                   onPress={() => item.route && router.push(item.route as never)}
                   style={[
                     styles.menuRow,
-                    !isLast && { borderBottomWidth: 1, borderBottomColor: colors.border },
+                    !isLast && {
+                      borderBottomWidth: 1,
+                      borderBottomColor: colors.border,
+                    },
                   ]}
                   activeOpacity={0.7}
                 >
                   <View style={styles.menuLeft}>
-                    <Icon size={20} color={colors.textSecondary} strokeWidth={1.5} />
+                    <Icon
+                      size={20}
+                      color={colors.textSecondary}
+                      strokeWidth={1.5}
+                    />
                     <Text style={[styles.menuLabel, { color: colors.text }]}>
                       {t(item.labelKey)}
                     </Text>
                   </View>
-                  <ChevronRight size={20} color={colors.textSecondary} strokeWidth={1.5} />
+                  <ChevronRight
+                    size={20}
+                    color={colors.textSecondary}
+                    strokeWidth={1.5}
+                  />
                 </TouchableOpacity>
               );
             })}
@@ -256,10 +319,7 @@ export default function ProfileScreen() {
                     setLanguageSheetOpen(false);
                     await setAppLocale(locale as AppLocale);
                   }}
-                  style={[
-                    styles.langRow,
-                    { borderBottomColor: colors.border },
-                  ]}
+                  style={[styles.langRow, { borderBottomColor: colors.border }]}
                 >
                   <Text style={[styles.langLabel, { color: colors.text }]}>
                     {label}

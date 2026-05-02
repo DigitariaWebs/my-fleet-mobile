@@ -11,18 +11,20 @@ import {
 } from "react-native";
 import { useRouter } from "expo-router";
 import { SafeAreaView } from "react-native-safe-area-context";
-import {
-  Mail,
-  Lock,
-  User,
-  Phone,
-  Eye,
-  EyeOff,
-} from "lucide-react-native";
+import { Mail, Lock, User, Phone, Eye, EyeOff } from "lucide-react-native";
 import Svg, { Path } from "react-native-svg";
 import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/Button";
 import { useTheme } from "@/context/ThemeContext";
+import { useAuthStore } from "@/stores/useAuthStore";
+import {
+  flattenZodErrors,
+  loginFormSchema,
+  signupFormSchema,
+  type FieldErrors,
+  type LoginForm,
+  type SignupForm,
+} from "@/lib/validation";
 
 type Tab = "login" | "signup";
 
@@ -76,9 +78,76 @@ export default function AuthScreen() {
     phone: "",
     password: "",
   });
+  const [errors, setErrors] = useState<FieldErrors<SignupForm & LoginForm>>({});
+  const [submitError, setSubmitError] = useState<string | null>(null);
+  const [successMessage, setSuccessMessage] = useState<string | null>(null);
 
-  const handleSubmit = () => {
-    router.push("/otp");
+  const isLoading = useAuthStore((s) => s.isLoading);
+  const login = useAuthStore((s) => s.login);
+  const signup = useAuthStore((s) => s.signup);
+
+  const switchTab = (tab: Tab, opts?: { keepSuccess?: boolean }) => {
+    setActiveTab(tab);
+    setErrors({});
+    setSubmitError(null);
+    if (!opts?.keepSuccess) setSuccessMessage(null);
+  };
+
+  const handleSubmit = async () => {
+    setSubmitError(null);
+    setSuccessMessage(null);
+
+    if (activeTab === "signup") {
+      const parsed = signupFormSchema.safeParse({
+        name: formData.name,
+        email: formData.email,
+        phone: formData.phone,
+        password: formData.password,
+      });
+      if (!parsed.success) {
+        setErrors(flattenZodErrors<SignupForm>(parsed.error));
+        return;
+      }
+      setErrors({});
+      try {
+        await signup({
+          name: parsed.data.name,
+          email: parsed.data.email,
+          phone: parsed.data.phone,
+          password: parsed.data.password,
+        });
+        setFormData({
+          name: "",
+          email: parsed.data.email,
+          phone: "",
+          password: "",
+        });
+        switchTab("login", { keepSuccess: true });
+        setSuccessMessage(
+          "Account created. Check your email to verify, then sign in.",
+        );
+      } catch (e) {
+        setSubmitError(e instanceof Error ? e.message : "Signup failed");
+      }
+      return;
+    }
+
+    const parsed = loginFormSchema.safeParse({
+      email: formData.email,
+      password: formData.password,
+    });
+    if (!parsed.success) {
+      setErrors(flattenZodErrors<LoginForm>(parsed.error));
+      return;
+    }
+    setErrors({});
+    try {
+      await login(parsed.data.email, parsed.data.password);
+      router.replace("/home");
+    } catch (e) {
+      console.error(e);
+      setSubmitError(e instanceof Error ? e.message : "Login failed");
+    }
   };
 
   const iconColor = colors.textSecondary;
@@ -102,12 +171,19 @@ export default function AuthScreen() {
           keyboardShouldPersistTaps="handled"
           showsVerticalScrollIndicator={false}
         >
+          {successMessage ? (
+            <View style={styles.successBanner}>
+              <Text style={styles.successText}>{successMessage}</Text>
+            </View>
+          ) : null}
+
           {/* Tab Toggle */}
           <View style={styles.tabContainer}>
             <TouchableOpacity
-              onPress={() => setActiveTab("login")}
+              onPress={() => switchTab("login")}
               style={[styles.tab, activeTab === "login" && styles.tabActive]}
               activeOpacity={0.7}
+              disabled={isLoading}
             >
               <Text
                 style={[
@@ -128,6 +204,7 @@ export default function AuthScreen() {
               onPress={() => setActiveTab("signup")}
               style={[styles.tab, activeTab === "signup" && styles.tabActive]}
               activeOpacity={0.7}
+              disabled={isLoading}
             >
               <Text
                 style={[
@@ -161,8 +238,12 @@ export default function AuthScreen() {
                     }
                     style={styles.input}
                     autoCapitalize="words"
+                    editable={!isLoading}
                   />
                 </View>
+                {errors.name ? (
+                  <Text style={styles.fieldError}>{errors.name}</Text>
+                ) : null}
 
                 {/* Email Input */}
                 <View style={styles.inputRow}>
@@ -177,8 +258,12 @@ export default function AuthScreen() {
                     style={styles.input}
                     keyboardType="email-address"
                     autoCapitalize="none"
+                    editable={!isLoading}
                   />
                 </View>
+                {errors.email ? (
+                  <Text style={styles.fieldError}>{errors.email}</Text>
+                ) : null}
 
                 {/* Phone Input */}
                 <View style={styles.inputRow}>
@@ -193,25 +278,35 @@ export default function AuthScreen() {
                     }
                     style={styles.input}
                     keyboardType="phone-pad"
+                    editable={!isLoading}
                   />
                 </View>
+                {errors.phone ? (
+                  <Text style={styles.fieldError}>{errors.phone}</Text>
+                ) : null}
               </>
             )}
 
             {activeTab === "login" && (
-              <View style={styles.inputRow}>
-                <Mail size={20} color={iconColor} strokeWidth={1.5} />
-                <TextInput
-                  placeholder={t("auth.emailOrPhonePlaceholder")}
-                  placeholderTextColor="rgba(234, 234, 234, 0.4)"
-                  value={formData.email}
-                  onChangeText={(text) =>
-                    setFormData({ ...formData, email: text })
-                  }
-                  style={styles.input}
-                  autoCapitalize="none"
-                />
-              </View>
+              <>
+                <View style={styles.inputRow}>
+                  <Mail size={20} color={iconColor} strokeWidth={1.5} />
+                  <TextInput
+                    placeholder={t("auth.emailOrPhonePlaceholder")}
+                    placeholderTextColor="rgba(234, 234, 234, 0.4)"
+                    value={formData.email}
+                    onChangeText={(text) =>
+                      setFormData({ ...formData, email: text })
+                    }
+                    style={styles.input}
+                    autoCapitalize="none"
+                    editable={!isLoading}
+                  />
+                </View>
+                {errors.email ? (
+                  <Text style={styles.fieldError}>{errors.email}</Text>
+                ) : null}
+              </>
             )}
 
             {/* Password Input */}
@@ -226,11 +321,13 @@ export default function AuthScreen() {
                 }
                 style={styles.input}
                 secureTextEntry={!showPassword}
+                editable={!isLoading}
               />
               <TouchableOpacity
                 onPress={() => setShowPassword(!showPassword)}
                 activeOpacity={0.7}
                 hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+                disabled={isLoading}
               >
                 {showPassword ? (
                   <EyeOff size={20} color={iconColor} strokeWidth={1.5} />
@@ -239,18 +336,28 @@ export default function AuthScreen() {
                 )}
               </TouchableOpacity>
             </View>
+            {errors.password ? (
+              <Text style={styles.fieldError}>{errors.password}</Text>
+            ) : null}
+            {submitError ? (
+              <Text style={styles.submitError}>{submitError}</Text>
+            ) : null}
 
             {/* Forgot Password */}
             {activeTab === "login" && (
               <TouchableOpacity style={styles.forgotRow} activeOpacity={0.7}>
-                <Text style={styles.forgotText}>{t("auth.forgotPassword")}</Text>
+                <Text style={styles.forgotText}>
+                  {t("auth.forgotPassword")}
+                </Text>
               </TouchableOpacity>
             )}
 
             {/* Submit Button */}
             <View style={styles.submitContainer}>
-              <Button fullWidth onPress={handleSubmit}>
-                {activeTab === "signup" ? t("auth.submitSignup") : t("auth.submitLogin")}
+              <Button fullWidth onPress={handleSubmit} disabled={isLoading}>
+                {activeTab === "signup"
+                  ? t("auth.submitSignup")
+                  : t("auth.submitLogin")}
               </Button>
             </View>
 
@@ -261,17 +368,21 @@ export default function AuthScreen() {
               <View style={styles.dividerLine} />
             </View>
 
-            {/* Social Buttons */}
+            {/* Social Buttons — not yet wired to a real provider */}
             <View style={styles.socialRow}>
-              <TouchableOpacity style={styles.socialButton} activeOpacity={0.85}>
+              <TouchableOpacity
+                style={[styles.socialButton, styles.socialButtonDisabled]}
+                activeOpacity={1}
+                disabled
+              >
                 <GoogleIcon />
                 <Text style={styles.socialText}>{t("auth.socialGoogle")}</Text>
               </TouchableOpacity>
 
               <TouchableOpacity
-                style={styles.socialButton}
-                activeOpacity={0.85}
-                onPress={() => router.replace("/home")}
+                style={[styles.socialButton, styles.socialButtonDisabled]}
+                activeOpacity={1}
+                disabled
               >
                 <AppleIcon />
                 <Text style={styles.socialText}>{t("auth.socialApple")}</Text>
@@ -287,12 +398,14 @@ export default function AuthScreen() {
               </Text>
               <TouchableOpacity
                 onPress={() =>
-                  setActiveTab(activeTab === "signup" ? "login" : "signup")
+                  switchTab(activeTab === "signup" ? "login" : "signup")
                 }
                 activeOpacity={0.7}
               >
                 <Text style={styles.bottomLinkPrimary}>
-                  {activeTab === "signup" ? t("auth.switchToLogin") : t("auth.switchToSignup")}
+                  {activeTab === "signup"
+                    ? t("auth.switchToLogin")
+                    : t("auth.switchToSignup")}
                 </Text>
               </TouchableOpacity>
             </View>
@@ -387,6 +500,35 @@ const styles = StyleSheet.create({
   submitContainer: {
     paddingTop: 6,
   },
+  fieldError: {
+    fontFamily: "Poppins_400Regular",
+    fontSize: 12,
+    color: "#FF6B6B",
+    paddingHorizontal: 18,
+    marginTop: -4,
+  },
+  submitError: {
+    fontFamily: "Poppins_500Medium",
+    fontSize: 13,
+    color: "#FF6B6B",
+    textAlign: "center",
+    paddingTop: 6,
+  },
+  successBanner: {
+    backgroundColor: "rgba(74, 222, 128, 0.12)",
+    borderWidth: 1,
+    borderColor: "rgba(74, 222, 128, 0.35)",
+    borderRadius: 16,
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    marginBottom: 16,
+  },
+  successText: {
+    fontFamily: "Poppins_500Medium",
+    fontSize: 13,
+    color: "#86EFAC",
+    textAlign: "center",
+  },
 
   // Social divider
   dividerContainer: {
@@ -423,6 +565,9 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     gap: 8,
+  },
+  socialButtonDisabled: {
+    opacity: 0.5,
   },
   socialText: {
     fontFamily: "Poppins_500Medium",

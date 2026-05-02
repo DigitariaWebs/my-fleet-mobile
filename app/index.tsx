@@ -7,12 +7,16 @@ import Animated, {
   withTiming,
   Easing,
 } from "react-native-reanimated";
+import { useAuthStore } from "@/stores/useAuthStore";
 
 const SPLASH_DURATION_MS = 1600;
 const LOGO_SIZE = 180;
 
 export default function SplashScreen() {
   const [splashDone, setSplashDone] = useState(false);
+  const initialize = useAuthStore((s) => s.initialize);
+  const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
+  const isHydrated = useAuthStore((s) => s.isHydrated);
 
   const opacity = useSharedValue(0);
 
@@ -21,15 +25,19 @@ export default function SplashScreen() {
       duration: 700,
       easing: Easing.out(Easing.quad),
     });
+    initialize();
     const timer = setTimeout(() => setSplashDone(true), SPLASH_DURATION_MS);
     return () => clearTimeout(timer);
-  }, []);
+  }, [initialize, opacity]);
 
   const logoStyle = useAnimatedStyle(() => ({
     opacity: opacity.value,
   }));
 
-  if (splashDone) {
+  if (splashDone && isHydrated) {
+    if (isAuthenticated) {
+      return <Redirect href="/home" />;
+    }
     return <Redirect href="/onboarding" />;
   }
 

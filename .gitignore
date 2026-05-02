@@ -43,3 +43,5 @@ yarn-error.*
 # Large video files (interior clips — too big for GitHub, not used by the app)
 *.MOV
 *.mov
+.env*
+!.env.example
