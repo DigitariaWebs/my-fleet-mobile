@@ -8,6 +8,7 @@ import Animated, {
   Easing,
 } from "react-native-reanimated";
 import { useAuthStore } from "@/stores/useAuthStore";
+import { useAgencyStore } from "@/stores/useAgencyStore";
 
 const SPLASH_DURATION_MS = 1600;
 const LOGO_SIZE = 180;
@@ -17,6 +18,7 @@ export default function SplashScreen() {
   const initialize = useAuthStore((s) => s.initialize);
   const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
   const isHydrated = useAuthStore((s) => s.isHydrated);
+  const pairedAgencyId = useAgencyStore((s) => s.paired?.id ?? null);
 
   const opacity = useSharedValue(0);
 
@@ -36,7 +38,10 @@ export default function SplashScreen() {
 
   if (splashDone && isHydrated) {
     if (isAuthenticated) {
-      return <Redirect href="/home" />;
+      if (pairedAgencyId) {
+        return <Redirect href="/home" />;
+      }
+      return <Redirect href="/scan" />;
     }
     return <Redirect href="/onboarding" />;
   }

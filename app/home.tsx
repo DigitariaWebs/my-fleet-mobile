@@ -8,7 +8,7 @@ import {
   StyleSheet,
   Dimensions,
 } from "react-native";
-import { useRouter } from "expo-router";
+import { Redirect, useRouter } from "expo-router";
 import { SafeAreaView } from "react-native-safe-area-context";
 import {
   Share2,
@@ -16,21 +16,19 @@ import {
   MapPin,
   Star,
   CheckCircle,
+  Mail,
+  Phone,
 } from "lucide-react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import { StatusBar } from "expo-status-bar";
 import { useTranslation } from "react-i18next";
 import { BottomNav } from "@/components/BottomNav";
 import { useTheme } from "@/context/ThemeContext";
-import {
-  agencies,
-  vehicles,
-  reviews,
-  getVehicleCover,
-} from "@/data/mockData";
+import { reviews } from "@/data/mockData";
+import { useAgencyStore } from "@/stores/useAgencyStore";
+import { useAgencyFleet } from "@/hooks/useAgencyFleet";
 
 const { width: SCREEN_WIDTH } = Dimensions.get("window");
-const CONNECTED_AGENCY_ID = "1";
 
 type Tab = "vehicles" | "reviews";
 
@@ -39,25 +37,37 @@ export default function HomeScreen() {
   const { t } = useTranslation();
   const { colors, isDark } = useTheme();
   const [activeTab, setActiveTab] = useState<Tab>("vehicles");
+  const paired = useAgencyStore((s) => s.paired);
 
-  const agency = useMemo(
-    () => agencies.find((a) => a.id === CONNECTED_AGENCY_ID)!,
-    [],
-  );
-  const agencyVehicles = useMemo(
-    () => vehicles.filter((v) => v.agencyId === CONNECTED_AGENCY_ID),
-    [],
-  );
+  const pairedId = paired?.id ?? null;
+
+  const fleetQuery = useAgencyFleet(pairedId);
+  const agencyVehicles = fleetQuery.data ?? [];
+
   const agencyReviews = useMemo(
-    () => reviews.filter((r) => r.agencyId === CONNECTED_AGENCY_ID),
-    [],
+    () => (pairedId ? reviews.filter((r) => r.agencyId === pairedId) : []),
+    [pairedId],
   );
-  const heroCover = useMemo(() => {
-    const withLocal = agencyVehicles.find((v) => v.images?.length);
-    return withLocal
-      ? getVehicleCover(withLocal)
-      : getVehicleCover(agencyVehicles[0]!);
+  const heroCoverUri = useMemo(() => {
+    const first = agencyVehicles.find((v) => v.thumbnailUrl);
+    return first?.thumbnailUrl ?? null;
   }, [agencyVehicles]);
+
+  const reviewStats = useMemo(() => {
+    if (agencyReviews.length === 0) return { rating: 0, count: 0 };
+    const sum = agencyReviews.reduce((acc, r) => acc + r.rating, 0);
+    return {
+      rating: Number((sum / agencyReviews.length).toFixed(1)),
+      count: agencyReviews.length,
+    };
+  }, [agencyReviews]);
+
+  if (!pairedId || !paired) {
+    return <Redirect href="/scan" />;
+  }
+
+  const avatarLetter = (paired.name ?? "?").charAt(0).toUpperCase();
+  const hasLogoUrl = !!paired.logo && /^https?:\/\//i.test(paired.logo);
 
   // Hero gradient stays dark so overlay text on the photo is always legible.
   const heroGradientColors: [string, string] = [
@@ -75,7 +85,13 @@ export default function HomeScreen() {
       >
         {/* ── Hero ───────────────────────────────────────────── */}
         <View style={styles.hero}>
-          <Image source={heroCover as any} style={styles.heroImage} />
+          {heroCoverUri ? (
+            <Image source={{ uri: heroCoverUri }} style={styles.heroImage} />
+          ) : (
+            <View
+              style={[styles.heroImage, { backgroundColor: colors.surface }]}
+            />
+          )}
           <LinearGradient
             colors={heroGradientColors}
             locations={[0.3, 1]}
@@ -98,25 +114,84 @@ export default function HomeScreen() {
           <View
             style={[
               styles.heroLogo,
-              { borderColor: colors.background, backgroundColor: colors.primary },
+              {
+                borderColor: colors.background,
+                backgroundColor: colors.primary,
+              },
             ]}
           >
-            <Text style={styles.heroLogoText}>{agency.logo}</Text>
+            {hasLogoUrl ? (
+              <Image
+                source={{ uri: paired.logo }}
+                style={styles.heroLogoImage}
+              />
+            ) : (
+              <Text style={styles.heroLogoText}>{avatarLetter}</Text>
+            )}
           </View>
         </View>
 
         {/* ── Info section ───────────────────────────────────── */}
         <View style={styles.infoSection}>
           <Text style={[styles.agencyName, { color: colors.text }]}>
-            {agency.name}
+            {paired.name}
           </Text>
 
-          <View style={styles.addressRow}>
-            <MapPin size={16} color={colors.textSecondary} strokeWidth={1.5} />
-            <Text style={[styles.addressText, { color: colors.textSecondary }]}>
-              {agency.address}
-            </Text>
-          </View>
+          {!!paired.address && (
+            <View style={styles.addressRow}>
+              <MapPin
+                size={16}
+                color={colors.textSecondary}
+                strokeWidth={1.5}
+              />
+              <Text
+                style={[styles.addressText, { color: colors.textSecondary }]}
+              >
+                {paired.address}
+              </Text>
+            </View>
+          )}
+
+          {(!!paired.email || !!paired.phone) && (
+            <View style={styles.contactRow}>
+              {!!paired.email && (
+                <View style={styles.contactItem}>
+                  <Mail
+                    size={14}
+                    color={colors.textSecondary}
+                    strokeWidth={1.5}
+                  />
+                  <Text
+                    style={[
+                      styles.contactText,
+                      { color: colors.textSecondary },
+                    ]}
+                    numberOfLines={1}
+                  >
+                    {paired.email}
+                  </Text>
+                </View>
+              )}
+              {!!paired.phone && (
+                <View style={styles.contactItem}>
+                  <Phone
+                    size={14}
+                    color={colors.textSecondary}
+                    strokeWidth={1.5}
+                  />
+                  <Text
+                    style={[
+                      styles.contactText,
+                      { color: colors.textSecondary },
+                    ]}
+                    numberOfLines={1}
+                  >
+                    {paired.phone}
+                  </Text>
+                </View>
+              )}
+            </View>
+          )}
 
           <View style={styles.metaRow}>
             <View
@@ -129,12 +204,17 @@ export default function HomeScreen() {
                 },
               ]}
             >
-              <Star size={16} fill="#F1C40F" color="#F1C40F" strokeWidth={1.5} />
+              <Star
+                size={16}
+                fill="#F1C40F"
+                color="#F1C40F"
+                strokeWidth={1.5}
+              />
               <Text style={[styles.ratingValue, { color: colors.text }]}>
-                {agency.rating}
+                {reviewStats.rating}
               </Text>
               <Text style={[styles.ratingCount, { color: colors.textMuted }]}>
-                {t("agency.reviewsCount", { count: agency.reviews })}
+                {t("agency.reviewsCount", { count: reviewStats.count })}
               </Text>
             </View>
             <View style={styles.verifiedBadge}>
@@ -142,10 +222,6 @@ export default function HomeScreen() {
               <Text style={styles.verifiedText}>{t("agency.verified")}</Text>
             </View>
           </View>
-
-          <Text style={[styles.description, { color: colors.textSecondary }]}>
-            {agency.description}
-          </Text>
 
           {/* ── Tabs ─────────────────────────────────────────── */}
           <View
@@ -167,7 +243,9 @@ export default function HomeScreen() {
                   styles.tabText,
                   {
                     color:
-                      activeTab === "vehicles" ? "#FFFFFF" : colors.textSecondary,
+                      activeTab === "vehicles"
+                        ? "#FFFFFF"
+                        : colors.textSecondary,
                   },
                 ]}
               >
@@ -187,7 +265,9 @@ export default function HomeScreen() {
                   styles.tabText,
                   {
                     color:
-                      activeTab === "reviews" ? "#FFFFFF" : colors.textSecondary,
+                      activeTab === "reviews"
+                        ? "#FFFFFF"
+                        : colors.textSecondary,
                   },
                 ]}
               >
@@ -202,7 +282,9 @@ export default function HomeScreen() {
               <Text style={[styles.vehicleCount, { color: colors.textMuted }]}>
                 {agencyVehicles.length === 1
                   ? t("agency.vehicleAvailable", { count: 1 })
-                  : t("agency.vehiclesAvailable", { count: agencyVehicles.length })}
+                  : t("agency.vehiclesAvailable", {
+                      count: agencyVehicles.length,
+                    })}
               </Text>
               <View style={styles.vehiclesGrid}>
                 {agencyVehicles.map((vehicle) => (
@@ -213,14 +295,21 @@ export default function HomeScreen() {
                       styles.vehicleMiniCard,
                       { borderColor: colors.border },
                     ]}
-                    onPress={() =>
-                      router.push(`/vehicle/${vehicle.id}` as any)
-                    }
+                    onPress={() => router.push(`/vehicle/${vehicle.id}` as any)}
                   >
-                    <Image
-                      source={getVehicleCover(vehicle) as any}
-                      style={styles.vehicleMiniImage}
-                    />
+                    {vehicle.thumbnailUrl ? (
+                      <Image
+                        source={{ uri: vehicle.thumbnailUrl }}
+                        style={styles.vehicleMiniImage}
+                      />
+                    ) : (
+                      <View
+                        style={[
+                          styles.vehicleMiniImage,
+                          { backgroundColor: colors.surface },
+                        ]}
+                      />
+                    )}
                     <View
                       style={[
                         styles.vehicleMiniInfo,
@@ -235,12 +324,18 @@ export default function HomeScreen() {
                       </Text>
                       <View style={styles.vehicleMiniPriceRow}>
                         <Text
-                          style={[styles.vehicleMiniPrice, { color: colors.text }]}
+                          style={[
+                            styles.vehicleMiniPrice,
+                            { color: colors.text },
+                          ]}
                         >
-                          {t("common.priceEuro", { price: vehicle.price })}
+                          {t("common.priceEuro", { price: vehicle.dailyRate })}
                         </Text>
                         <Text
-                          style={[styles.vehicleMiniUnit, { color: colors.textMuted }]}
+                          style={[
+                            styles.vehicleMiniUnit,
+                            { color: colors.textMuted },
+                          ]}
                         >
                           {" "}
                           {t("common.perDay")}
@@ -259,17 +354,23 @@ export default function HomeScreen() {
               <View
                 style={[
                   styles.ratingSummary,
-                  { backgroundColor: colors.surface, borderColor: colors.border },
+                  {
+                    backgroundColor: colors.surface,
+                    borderColor: colors.border,
+                  },
                 ]}
               >
                 <View style={styles.ratingSummaryTop}>
                   <Text
                     style={[styles.ratingSummaryBig, { color: colors.text }]}
                   >
-                    {agency.rating}
+                    {reviewStats.rating}
                   </Text>
                   <Text
-                    style={[styles.ratingSummaryMax, { color: colors.textMuted }]}
+                    style={[
+                      styles.ratingSummaryMax,
+                      { color: colors.textMuted },
+                    ]}
                   >
                     /5
                   </Text>
@@ -291,7 +392,7 @@ export default function HomeScreen() {
                     { color: colors.textSecondary },
                   ]}
                 >
-                  {t("agency.reviewsBasedOn", { count: agency.reviews })}
+                  {t("agency.reviewsBasedOn", { count: reviewStats.count })}
                 </Text>
               </View>
 
@@ -301,7 +402,10 @@ export default function HomeScreen() {
                     key={review.id}
                     style={[
                       styles.reviewCard,
-                      { backgroundColor: colors.surface, borderColor: colors.border },
+                      {
+                        backgroundColor: colors.surface,
+                        borderColor: colors.border,
+                      },
                     ]}
                   >
                     <View style={styles.reviewHeader}>
@@ -317,7 +421,10 @@ export default function HomeScreen() {
                           </Text>
                         </View>
                         <Text
-                          style={[styles.reviewUserName, { color: colors.text }]}
+                          style={[
+                            styles.reviewUserName,
+                            { color: colors.text },
+                          ]}
                         >
                           {review.userName}
                         </Text>
@@ -336,7 +443,10 @@ export default function HomeScreen() {
                     </View>
 
                     <Text
-                      style={[styles.reviewComment, { color: colors.textSecondary }]}
+                      style={[
+                        styles.reviewComment,
+                        { color: colors.textSecondary },
+                      ]}
                     >
                       {review.comment}
                     </Text>
@@ -363,7 +473,10 @@ export default function HomeScreen() {
                           {t("agency.agencyResponse")}
                         </Text>
                         <Text
-                          style={[styles.responseText, { color: colors.textSecondary }]}
+                          style={[
+                            styles.responseText,
+                            { color: colors.textSecondary },
+                          ]}
                         >
                           {review.agencyResponse}
                         </Text>
@@ -426,6 +539,28 @@ const styles = StyleSheet.create({
     fontFamily: "Poppins_700Bold",
     fontSize: 20,
     color: "#FFFFFF",
+  },
+  heroLogoImage: {
+    width: "100%",
+    height: "100%",
+    borderRadius: 999,
+  },
+  contactRow: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    gap: 14,
+    marginBottom: 12,
+  },
+  contactItem: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 6,
+    maxWidth: "100%",
+  },
+  contactText: {
+    fontFamily: "Poppins_400Regular",
+    fontSize: 12,
+    flexShrink: 1,
   },
 
   /* Info */

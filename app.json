@@ -36,7 +36,13 @@
     "plugins": [
       "expo-router",
       "expo-font",
-      "expo-video"
+      "expo-video",
+      [
+        "expo-camera",
+        {
+          "cameraPermission": "Allow My Fleet to access your camera to scan agency QR codes."
+        }
+      ]
     ],
     "extra": {
       "router": {},
