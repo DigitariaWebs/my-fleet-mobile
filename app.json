@@ -15,7 +15,7 @@
     },
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.myfleet.mobile",
+      "bundleIdentifier": "com.digitariawebs.myfleet.client",
       "icon": "./assets/logo.png",
       "infoPlist": {
         "ITSAppUsesNonExemptEncryption": false
@@ -27,7 +27,7 @@
         "backgroundColor": "#FFFFFF"
       },
       "edgeToEdgeEnabled": true,
-      "package": "com.myfleet.mobile"
+      "package": "com.digitariawebs.myfleet.client"
     },
     "web": {
       "favicon": "./assets/logo.png",
