@@ -5,9 +5,11 @@ import { createJSONStorage, persist } from "zustand/middleware";
 import { supabase } from "@/lib/supabase";
 import {
   logout as supabaseSignOut,
+  requestEmailOtp,
   signInWithEmail,
   signUpClient,
   validateSession,
+  verifyEmailOtp,
   type AuthUser,
 } from "@/services/authService";
 
@@ -30,6 +32,8 @@ interface AuthState {
 interface AuthActions {
   initialize: () => Promise<void>;
   login: (email: string, password: string) => Promise<void>;
+  requestOtp: (email: string) => Promise<void>;
+  loginWithOtp: (email: string, token: string) => Promise<void>;
   signup: (input: {
     name: string;
     email: string;
@@ -106,6 +110,30 @@ export const useAuthStore = create<AuthStore>()(
             isAuthenticated: true,
             isLoading: false,
           });
+        } catch (error) {
+          set({ isLoading: false });
+          throw error;
+        }
+      },
+
+      requestOtp: async (email) => {
+        await requestEmailOtp(email.trim().toLowerCase());
+      },
+
+      loginWithOtp: async (email, token) => {
+        set({ isLoading: true });
+        try {
+          const session = await verifyEmailOtp(
+            email.trim().toLowerCase(),
+            token.trim(),
+          );
+          const user = await validateSession(session.accessToken);
+          if (user.role !== "client") {
+            await supabaseSignOut();
+            set({ isLoading: false });
+            throw new WrongAppError();
+          }
+          set({ user, isAuthenticated: true, isLoading: false });
         } catch (error) {
           set({ isLoading: false });
           throw error;

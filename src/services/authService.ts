@@ -63,6 +63,36 @@ export async function signInWithEmail(
   };
 }
 
+// Passwordless email-OTP login. Used for accounts created on the
+// customer's behalf by an agency (no password set), and as an
+// alternative login path. shouldCreateUser:false — we never want this
+// surface to silently provision a new account.
+export async function requestEmailOtp(email: string): Promise<void> {
+  const { error } = await supabase.auth.signInWithOtp({
+    email,
+    options: { shouldCreateUser: false },
+  });
+  if (error) throw new Error(error.message);
+}
+
+export async function verifyEmailOtp(
+  email: string,
+  token: string,
+): Promise<{ accessToken: string; refreshToken: string }> {
+  const { data, error } = await supabase.auth.verifyOtp({
+    email,
+    token,
+    type: "email",
+  });
+  if (error || !data.session) {
+    throw new Error(error?.message ?? "Invalid or expired code");
+  }
+  return {
+    accessToken: data.session.access_token,
+    refreshToken: data.session.refresh_token,
+  };
+}
+
 export async function validateSession(accessToken: string): Promise<AuthUser> {
   return apiRequest<AuthUser>("/validate", {
     baseUrl: AUTH_BASE_URL,
