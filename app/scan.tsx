@@ -26,7 +26,7 @@ import { useTranslation } from "react-i18next";
 
 import { EmptyState } from "@/components/ui/EmptyState";
 import { ApiClientError } from "@/services/api";
-import { usePairWithAgency } from "@/hooks/usePairing";
+import { ProfileIncompleteError, usePairWithAgency } from "@/hooks/usePairing";
 
 const FRAME_SIZE = 272;
 const CORNER_SIZE = 40;
@@ -147,6 +147,18 @@ export default function ScanScreen() {
           router.replace("/home");
         }, 700);
       } catch (err) {
+        if (err instanceof ProfileIncompleteError) {
+          // Profile gating: customer must complete their identity fields
+          // before they can pair with an agency. Deep-link to the profile
+          // completion screen and let them retry the scan once done.
+          lastScannedRef.current = null;
+          setPhase({ kind: "idle" });
+          router.push({
+            pathname: "/profile-complete",
+            params: { missing: err.missingFields.join(",") },
+          });
+          return;
+        }
         const message =
           err instanceof ApiClientError && err.status === 404
             ? t("scan.unknownAgency")
