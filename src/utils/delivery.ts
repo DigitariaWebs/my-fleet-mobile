@@ -59,10 +59,7 @@ export function computeDeliveryFee(
 
   const distanceKm = mockDistanceKm(trimmed);
 
-  if (
-    config.maxDistanceKm != null &&
-    distanceKm > config.maxDistanceKm
-  ) {
+  if (config.maxDistanceKm != null && distanceKm > config.maxDistanceKm) {
     return {
       ok: false,
       code: "too_far",
@@ -71,10 +68,13 @@ export function computeDeliveryFee(
     };
   }
 
+  // ratePerKm and minFee are denominated in cents (smallest currency unit),
+  // matching the canonical money convention used across the app/API/DB.
   const raw = distanceKm * config.ratePerKm;
   const minFee = config.minFee ?? 0;
   const minFeeApplied = raw < minFee;
-  const fee = Math.round(Math.max(raw, minFee) * 100) / 100;
+  // Round to whole cents so `fee` is always an integer in the canonical unit.
+  const fee = Math.round(Math.max(raw, minFee));
 
   return { ok: true, distanceKm, fee, minFeeApplied };
 }

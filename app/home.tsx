@@ -27,6 +27,7 @@ import { useTheme } from "@/context/ThemeContext";
 import { reviews } from "@/data/mockData";
 import { useAgencyStore } from "@/stores/useAgencyStore";
 import { useAgencyFleet } from "@/hooks/useAgencyFleet";
+import { centsToUnits } from "@/utils/money";
 
 const { width: SCREEN_WIDTH } = Dimensions.get("window");
 
@@ -329,7 +330,9 @@ export default function HomeScreen() {
                             { color: colors.text },
                           ]}
                         >
-                          {t("common.priceEuro", { price: vehicle.dailyRate })}
+                          {t("common.priceEuro", {
+                            price: centsToUnits(vehicle.dailyRate),
+                          })}
                         </Text>
                         <Text
                           style={[
