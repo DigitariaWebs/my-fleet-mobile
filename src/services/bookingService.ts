@@ -17,8 +17,18 @@ interface ServerBooking {
   endDate: string;
   status: "pending" | "confirmed" | "active" | "completed" | "cancelled";
   totalAmount: number;
-  paymentStatus: "pending" | "link_sent" | "paid" | "expired" | "failed" | null;
-  paymentLink: string | null;
+  depositStatus:
+    | "none"
+    | "held"
+    | "captured"
+    | "partially_captured"
+    | "released"
+    | "forfeited"
+    | "failed"
+    | null;
+  depositCapturedAmount: number | null;
+  rentalInvoiceId: string | null;
+  damagesInvoiceId: string | null;
   startMileage: number | null;
   returnMileage: number | null;
   includedKm: number | null;
@@ -137,8 +147,9 @@ export function adaptServerBooking(b: ServerBooking): {
   kmDriven?: number;
   kmOverage?: number;
   overageCost?: number;
-  paymentLink?: string | null;
-  paymentStatus?: ServerBooking["paymentStatus"];
+  depositStatus?: ServerBooking["depositStatus"];
+  rentalInvoiceId?: string | null;
+  damagesInvoiceId?: string | null;
 } {
   const status: "active" | "confirmed" | "completed" =
     b.status === "active" || b.status === "completed" ? b.status : "confirmed";
@@ -163,8 +174,9 @@ export function adaptServerBooking(b: ServerBooking): {
     kmDriven: b.kmDriven ?? undefined,
     kmOverage: b.kmOverage ?? undefined,
     overageCost: b.overageCost ?? undefined,
-    paymentLink: b.paymentLink,
-    paymentStatus: b.paymentStatus,
+    depositStatus: b.depositStatus,
+    rentalInvoiceId: b.rentalInvoiceId,
+    damagesInvoiceId: b.damagesInvoiceId,
   };
 }
 
